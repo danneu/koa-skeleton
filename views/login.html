@@ -1,0 +1,74 @@
+{% extends 'views/master.html' %}
+
+{% block embed %}
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li class="active">Login</li>
+  </ol>
+
+  <div class="page-header">
+    <h1>Login to your account</h1>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6 col-lg-offset-3">
+
+      <ul class="nav nav-tabs">
+        <li class="active pull-right">
+          <a href="/login">Login</a>
+        </li>
+        <li class="pull-right">
+          <a href="/register">Register</a>
+        </li>
+      </ul>
+
+      <form action="/login" method="POST">
+        <div class="panel panel-default" style="border-top: 0;">
+          <div class="panel-body">
+              <div class="form-group">
+                <label for="uname-input">Username:</label>
+                <input type="text" name="uname" id="uname-input" class="form-control" required>
+              </div>
+
+              <div class="form-group">
+                <label for="password-input">Password:</label>
+                <input type="password" name="password" id="password-input" class="form-control" required>
+              </div>
+
+              <div class="form-group">
+                <label for="remember-me-input">
+                  <input type="checkbox" name="remember-me" id="remember-me-input" checked>
+                  Remember Me?
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label>Human Test:</label>
+                <div class="g-recaptcha" data-sitekey="{{ recaptchaSitekey }}" data-callback="recaptchaSuccessCallback"></div>
+              </div>
+
+          </div>
+          <div class="panel-footer">
+            <button type="submit" class="btn btn-danger disabled but-clickable" id="login-submit">Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript">
+    $('#uname-input').focus();
+
+    function recaptchaSuccessCallback() {
+      $('#login-submit')
+        .removeClass('btn-danger')
+        .removeClass('disabled')
+        .addClass('btn-primary')
+    }
+  </script>
+
+  <script src='https://www.google.com/recaptcha/api.js'></script>
+{% endblock %}

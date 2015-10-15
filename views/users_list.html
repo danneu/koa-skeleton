@@ -1,0 +1,90 @@
+{% extends 'views/master.html' %}
+
+{% block embed %}
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li class="active">Users</li>
+  </ol>
+
+  <div class="page-header">
+    <h1>Users</h1>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Messages</th>
+        <th>Joined</th>
+        <th>Last Online</th>
+        <th>Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          {# uname #}
+          <td>
+            <a href="{{ user.url }}">
+              <img src="{{ user.uname | toAvatarUrl }}" alt="{{ user.uname }} avatar" height="32" width="32">
+            </a>
+            <a href="{{ user.url }}">{{ user.uname }}</a>
+          </td>
+          {# messages #}
+          <td>
+            {{ user.messages_count }}
+          </td>
+          {# created_at #}
+          <td>
+            <abbr class="timeago" title="{{ user.created_at.toISOString() }}">
+              {{ user.created_at|formatDate }}
+            </abbr>
+          </td>
+          {# last_online_at #}
+          <td>
+            <abbr class="timeago" title="{{ user.last_online_at.toISOString() }}">
+              {{ user.last_online_at|formatDate }}
+            </abbr>
+          </td>
+          {# role #}
+          {% if can(ctx.currUser, 'UPDATE_USER_ROLE', user) %}
+            <td>
+              <form action="{{ user.url }}/role" method="POST">
+                <input type="hidden" name="_method" value="PUT">
+                <input type="hidden" name="redirectTo" value="/users">
+                <select name="role">
+                  {% for role in ['ADMIN', 'MOD', 'MEMBER', 'BANNED'] %}
+                  <option value="{{ role }}" {% if user.role == role %}selected{% endif %}>{{ role | capitalize }} {% if user.role == role %}&larr;{% endif %}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-xs btn-default">Save</button>
+              </form>
+            </td>
+          {% else %}
+            <td>
+              {% if user.role == 'ADMIN' %}
+                <span class="label label-primary">
+                  {{ user.role | capitalize }}
+                </span>
+              {% elif user.role == 'MOD' %}
+                <span class="label label-info">
+                  {{ user.role | capitalize }}
+                </span>
+              {% elif user.role == 'BANNED' %}
+                <span class="label label-danger">
+                  {{ user.role | capitalize }}
+                </span>
+              {% else %}
+                {{ user.role | capitalize }}
+              {% endif %}
+            </td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

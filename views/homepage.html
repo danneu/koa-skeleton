@@ -1,0 +1,117 @@
+{% extends 'views/master.html' %}
+{% import 'views/macros.html' as macros %}
+
+{% block embed %}
+  <div class="jumbotron text-center" style="background-color: inherit;">
+    <h1>
+      <a href="/" style="color: #333;">
+        koa-skeleton
+      </a>
+    </h1>
+    <img src="/img/skeleton.png" height="75" width="75" alt="skeleton icon">
+    <p style="margin-top: 15px;">
+      <!-- A simple Koa + Postgres demonstration -->
+      A simple <a href="http://koajs.com/" target="_blank">Koa</a> + Postgres webapp demonstration
+      <br>
+      that comes with useful abstractions and
+      <br>
+      boilerplate that work for me
+    </p>
+
+    <a href="https://github.com/danneu/koa-skeleton" class="btn btn-lg btn-success" target="_blank" style="margin-bottom: 20px;">
+      View on GitHub
+      <p style="font-size: 14px; margin-bottom: 5px;">Just clone, gut, and modify</p>
+    </a>
+
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6 col-lg-offset-3">
+
+      <form action="/messages" method="POST">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <p class="lead text-center">Leave a message</p>
+
+            <div class="form-group">
+              <textarea id="markup-input" class="form-control" rows="4" name="markup" placeholder="Click here and begin typing..."></textarea>
+            </div>
+
+            <div class="form-group text-center">
+              <div class="g-recaptcha recaptcha-center" data-sitekey="{{ recaptchaSitekey }}" data-callback="recaptchaSuccessCallback"></div>
+            </div>
+
+          </div><!-- /.panel-body -->
+          <div class="panel-footer text-right">
+            <span class="text-muted" id="char-counter-container">
+              <span id="char-counter">0</span>/300
+            </span>
+            <button class="btn btn-default disabled" id="message-submit">
+              Submit 
+              {% if not ctx.currUser %}
+                anonymously
+              {% else %}
+                as {{ ctx.currUser.uname }}
+              {% endif %}
+            </button>
+          </div><!-- /.panel-footer -->
+        </div><!-- /.panel -->
+      </form>
+
+      <h2>Recent Messages</h2>
+
+      {% if messages.length == 0 %}
+        No messages. Wanna be the first?
+      {% endif %}
+
+      {% if messages.length > 0 %}
+        {% for message in messages %}
+          {{ macros.renderMessagePanel(ctx, message, '/') }}
+        {% endfor %}
+        <p class="text-center">
+          <div class="col-lg-6 col-lg-offset-3">
+            <a href="/messages" class="btn btn-default btn-block">
+              View All &rarr;
+            </a>
+          </div>
+        </p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+
+  <script type="text/javascript">
+    // Add confirmation pop-up to each message's delete button
+    $('.delete-message-btn').on('click', function(e) {
+      var result = confirm('Are you sure?');
+      if (!result) {
+        e.preventDefault();
+        return false;
+      }
+    });
+  </script>
+
+  <script type="text/javascript">
+    function recaptchaSuccessCallback() {
+      $('#message-submit')
+        .removeClass('disabled')
+        .addClass('btn-success');
+    }
+  </script>
+
+  <script>
+    $('#markup-input').on('change keyup', function() {
+      var count = $(this).val().length;
+      $('#char-counter').text(count);
+      if (count > 300) {
+        $('#char-counter-container').css('color', '#e74c3c');
+      } else {
+        $('#char-counter-container').css('color', '#777');
+      }
+    });
+  </script>
+
+  <script src='https://www.google.com/recaptcha/api.js'></script>
+{% endblock %}

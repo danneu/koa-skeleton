@@ -1,0 +1,21 @@
+{% extends 'views/master.html' %}
+{% import 'views/macros.html' as macros %}
+
+{% block embed %}
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li class="active">Messages</li>
+  </ol>
+
+  <div class="page-header">
+    <h1>Messages</h1>
+  </div>
+
+  {% for message in messages %}
+    {{ macros.renderMessagePanel(ctx, message, '/messages') }}
+  {% endfor %}
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

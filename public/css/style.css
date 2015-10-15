@@ -1,0 +1,21 @@
+
+/*
+
+    Put general styles and Bootstrap overrides here
+
+*/
+
+body {
+  font-size: 16px; /* Bootstrap default is 14px, too small */
+  padding-bottom: 10px;
+}
+
+/* Centers the generated Recaptcha iframe within its container */
+.recaptcha-center > div > div {
+    margin: 0 auto;
+}
+
+.footer {
+  font-size: 75%;
+  margin-top: 200px; /* Provide a scroll gutter between content */
+}

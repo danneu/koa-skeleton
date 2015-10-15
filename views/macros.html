@@ -1,0 +1,48 @@
+
+{#
+  Put your view macros here.
+
+  If you find yourself repeating the same markup a lot, consider wrapping
+  it in a macro. They're basically view helper functions that output HTML.
+#}
+
+{% macro renderMessagePanel(ctx, message, redirectTo) %}
+  {% if can(ctx.currUser, 'READ_MESSAGE', message) %}
+    <div class="panel panel-default">
+      <div class="panel-heading text-right">
+
+        {% if can(ctx.currUser, 'UPDATE_MESSAGE_STATE', message) %}
+          <form action="/messages/{{ message.id }}" method="POST">
+            <input type="hidden" name="_method" value="PUT">
+            <input type="hidden" name="redirectTo" value="{{ redirectTo }}">
+            {% if message.is_hidden %}
+              <input type="hidden" name="is_hidden" value="false">
+              <button type="submit" class="btn btn-xs btn-default pull-left delete-message-btn">Restore</button>
+            {% else %}
+              <input type="hidden" name="is_hidden" value="true">
+              <button type="submit" class="btn btn-xs btn-default pull-left delete-message-btn">Delete</button>
+            {% endif %}
+          </form>
+        {% endif %}
+
+        <small class="text-muted">
+          <abbr class="timeago" title="{{ message.created_at.toISOString() }}">
+            {{ message.created_at|formatDate }}
+          </abbr>
+          by
+          {% if message.user %}
+            <a href="{{ message.user.url }}">
+              <img src="{{ message.user.uname | toAvatarUrl }}" alt="{{ message.user.uname }} avatar" height="24" width="24">
+            </a>
+            <a href="{{ message.user.url }}">{{ message.user.uname }}</a>
+          {% else %}
+            a guest
+          {% endif %}
+        </small>
+      </div>
+      <div class="panel-body {% if message.is_hidden %}bg-danger{% endif %}" style="max-height: 200px; overflow: auto;">
+        {{ message.markup | escape | nl2br | safe }}
+      </div>
+    </div>
+  {% endif %}
+{% endmacro %}
