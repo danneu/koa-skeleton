@@ -40,8 +40,7 @@ app.poweredBy = false;
 app.use(mw.ensureReferer());
 app.use(require('koa-helmet')());
 app.use(require('koa-compress')());
-// had to add format=false to revert breaking behavior in koa-static v1.5.0
-app.use(require('koa-static')('public', { format: false }));
+app.use(require('koa-static')('public'));
 app.use(require('koa-logger')());
 app.use(require('koa-body')({ multipart: true }));
 app.use(mw.methodOverride());  // Must come after body parser
