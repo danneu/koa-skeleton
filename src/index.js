@@ -18,6 +18,7 @@ var cancan = require('./cancan');
 
 var app = koa();
 app.poweredBy = false;
+app.proxy = config.TRUST_PROXY;
 
 // Configure view-layer (nunjucks)
 
