@@ -1,7 +1,5 @@
 'use strict';
 
-console.log('__dirname:', __dirname);
-
 exports.NODE_ENV = process.env.NODE_ENV || 'development';
 exports.PORT = Number.parseInt(process.env.PORT, 10) || 3000;
 exports.DATABASE_URL = process.env.DATABASE_URL || 'postgres://localhost:5432/koa-skeleton';
