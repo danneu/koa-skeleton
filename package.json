@@ -4,7 +4,7 @@
     "url": "https://github.com/danneu/koa-skeleton"
   },
   "scripts": {
-    "start": "node --harmony ./src/index.js",
+    "start": "node ./src/index.js",
     "start-dev": "env $(cat .env | xargs) nodemon --ext js,html ./src/index.js",
     "reset-db": "env $(cat .env | xargs) node ./sql/reset_db.js"
   },
