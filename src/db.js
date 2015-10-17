@@ -19,14 +19,17 @@ pg.types.setTypeParser(20, (v) => {
 // Core helper functions
 ////////////////////////////////////////////////////////////
 
+// Run query with pooled connection
 exports.query = query;
 function* query(sql, params) {
-  var client = new pg.Client(config.DATABASE_URL);
-  yield client.connectPromise();
+  var connResult = yield pg.connectPromise(config.DATABASE_URL);
+  var client = connResult[0];
+  var done = connResult[1];
   try {
     return yield client.queryPromise(sql, params);
   } finally {
-    client.end();
+    // Release client back to pool even upon query error
+    done();
   }
 }
 
