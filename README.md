@@ -9,6 +9,8 @@ Just fork, gut, and modify.
 
 ## The Stack
 
+Depends on Node v4.x, but not very heavily.
+
 - **Micro-framework**: [Koa](http://koajs.com/). It's very similar to [Express](http://expressjs.com/) except it supports synchronous-looking code with the use of `yield`/generators/and the [co](https://github.com/tj/co) abstraction.
 - **Database**: [Postgres](http://www.postgresql.org/).
 - **User-input validation**: [koa-bouncer](https://github.com/danneu/koa-bouncer). Admittedly, an undocumented work-in-progress.
