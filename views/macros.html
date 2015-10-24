@@ -41,7 +41,7 @@
         </small>
       </div>
       <div class="panel-body {% if message.is_hidden %}bg-danger{% endif %}" style="max-height: 200px; overflow: auto;">
-        {{ message.markup | escape | nl2br | safe }}
+        {{ message.markup | escape | nl2br | autolink | safe }}
       </div>
     </div>
   {% endif %}

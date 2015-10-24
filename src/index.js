@@ -34,6 +34,7 @@ app.proxy = config.TRUST_PROXY;
   env.addFilter('nl2br', belt.nl2br);
   env.addFilter('md5', belt.md5);
   env.addFilter('toAvatarUrl', belt.toAvatarUrl);
+  env.addFilter('autolink', belt.autolink);
 }
 
 // Middleware

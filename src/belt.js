@@ -8,6 +8,7 @@ var promissory = require('promissory');
 var assert = require('better-assert');
 var debug = require('debug')('app:belt');
 var _ = require('lodash');
+var Autolinker = require('autolinker');
 
 // A dumping ground of common functions used around the app.
 // As it gets full, consider extracting similar functions into
@@ -142,4 +143,12 @@ exports.toAvatarUrl = function(input) {
   assert(_.isString(input));
   var hash = exports.md5(input);
   return `https://www.gravatar.com/avatar/${hash}?d=monsterid`
+};
+
+exports.autolink = function(s) {
+  return Autolinker.link(s, {
+    email: false,
+    phone: false,
+    twitter: false
+  });
 };
