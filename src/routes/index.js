@@ -86,7 +86,8 @@ router.post('/login', mw.ensureRecaptcha, function*() {
 router.get('/register', function*() {
   yield this.render('register', {
     ctx: this,
-    title: 'Register'
+    title: 'Register',
+    recaptchaSitekey: config.RECAPTCHA_SITEKEY
   });
 });
 
