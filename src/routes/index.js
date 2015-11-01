@@ -54,7 +54,7 @@ router.post('/login', mw.ensureRecaptcha, function*() {
   this.validateBody('uname')
     .notEmpty('Invalid creds')
     .isString()
-    .tap(s => s.trim());
+    .trim();
   this.validateBody('password')
     .notEmpty('Invalid creds')
     .isString();
@@ -99,7 +99,7 @@ router.post('/users', mw.ensureRecaptcha, function*() {
   this.validateBody('uname')
     .notEmpty('Username required')
     .isString()
-    .tap(s => s.trim())
+    .trim()
     .isLength(3, 15, 'Username must be 3-15 chars')
     .match(/^[a-z0-9_-]+$/i, 'Username must only contain a-z, 0-9, underscore (_), or hypen (-)')
     .match(/[a-z]/i, 'Username must contain at least one letter (a-z)')
@@ -118,7 +118,7 @@ router.post('/users', mw.ensureRecaptcha, function*() {
   if (this.request.body.email) {  // email is optional
     this.validateBody('email')
       .isString()
-      .tap(s => s.trim())
+      .trim()
       .checkPred(v.isEmail, 'Invalid email address')
       .isLength(1, 140, 'Email is too long');
   }
@@ -177,7 +177,7 @@ router.put('/users/:uname', function*() {
     this.assertAuthorized(this.currUser, 'UPDATE_USER_SETTINGS', user);
     this.validateBody('email')
       .isString()
-      .tap(s => s.trim())
+      .trim();
     if (this.vals.email) {
       this.validateBody('email').checkPred(v.isEmail);
     }
@@ -254,7 +254,7 @@ router.post('/messages', mw.ensureRecaptcha, function*() {
   this.validateBody('markup')
     .notEmpty('Must provide a message')
     .isString()
-    .tap(s => s.trim())
+    .trim()
     .tap(belt.transformMarkup)
     .isLength(3, 300, 'Message must be 3-300 chars');
 
@@ -326,7 +326,7 @@ router.put('/messages/:id', function*() {
     // and then reuse this here and in the insert-message route
     this.validateBody('markup')
       .isString()
-      .tap(s => s.trim())
+      .trim()
       .tap(belt.transformMarkup)
       .isLength(3, 300, 'Message must be 3-300 chars')
       ;
@@ -365,7 +365,7 @@ router.put('/users/:uname/role', function*() {
   this.validateBody('role')
     .notEmpty('Must provide a role')
     .isString()
-    .tap(s => s.trim())
+    .trim()
     .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED'], 'Invalid role');
 
   this.validateBody('redirectTo')
