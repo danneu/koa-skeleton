@@ -27,7 +27,7 @@ exports.can = function(user, action, target) {
       if (target.is_hidden) return _.contains(['ADMIN', 'MOD'], user && user.role);
       return false;
     case 'UPDATE_USER_*': // target is other user
-      return exports.can(user, 'UPDATE_USER_SETTING', target)
+      return exports.can(user, 'UPDATE_USER_SETTINGS', target)
         || exports.can(user, 'UPDATE_USER_ROLE', target);
     case 'UPDATE_USER_SETTINGS': // target is other user
       assert(target);
