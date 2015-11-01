@@ -44,6 +44,27 @@ function* queryMany(sql, params) {
   return result.rows;
 }
 
+// Add those queryOne and queryMany helpers to the pg Client prototype
+// too so that we can use them inside transactions and such.
+//
+// Example:
+//
+//    exports.testQuery = function*() {
+//      return yield withTransaction(function*(client) {
+//        var count1 = yield client.queryOnePromise('SELECT COUNT(*) FROM users');
+//        var count2 = yield client.queryOnePromise('SELECT COUNT(*) FROM messages');
+//
+//        return [count1, count2];
+//      });
+//    };
+pg.Client.prototype.queryOnePromise = function(sql, params) {
+  return this.queryPromise(sql, params).then(result => result.rows[0]);
+};
+
+pg.Client.prototype.queryManyPromise = function(sql, params) {
+  return this.queryPromise(sql, params).then(result => result.rows);
+};
+
 // `runner` is a generator function that accepts one arguement:
 // a database client.
 function* withClient(runner) {
