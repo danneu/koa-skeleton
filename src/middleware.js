@@ -6,10 +6,10 @@ var nodeUrl = require('url');
 var debug = require('debug')('app:middleware');
 var bouncer = require('koa-bouncer');
 var _ = require('lodash');
+var recaptcha = require('recaptcha-validator');
 // 1st
 var db = require('./db');
 var config = require('./config');
-var recaptcha = require('./recaptcha');
 var pre = require('./presenters');
 
 // Assoc ctx.currUser if the session_id cookie (a UUID v4)
@@ -126,7 +126,7 @@ exports.ensureRecaptcha = function*(next) {
     .notEmpty('You must attempt the human test');
 
   try {
-    yield recaptcha.ensure(config.RECAPTCHA_SITESECRET, this.vals['g-recaptcha-response'], this.request.ip);
+    yield recaptcha.promise(config.RECAPTCHA_SITESECRET, this.vals['g-recaptcha-response'], this.request.ip);
   } catch (err) {
     console.warn('Got invalid captcha: ', this.vals['g-recaptcha-response'], err);
     this.validateBody('g-recaptcha-response')

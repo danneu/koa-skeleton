@@ -33,6 +33,7 @@
     "nunjucks": "2.1.0",
     "pg": "4.4.2",
     "promissory": "1.0.1",
+    "recaptcha-validator": "^1.0.0",
     "uuid": "2.0.1",
     "validator": "4.1.0"
   }
