@@ -1,6 +1,8 @@
 
 # koa-skeleton
 
+[![Dependency Status](https://david-dm.org/danneu/koa-skeleton.svg)](https://david-dm.org/danneu/koa-skeleton)
+
 Boilerplate demonstration that glues together Koa + Postgres + good defaults + common abstractions that I frequently use to create web applications.
 
 Just fork, gut, and modify.
