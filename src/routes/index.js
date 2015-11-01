@@ -52,11 +52,11 @@ router.post('/login', mw.ensureRecaptcha, function*() {
   // Validate
 
   this.validateBody('uname')
-    .notEmpty('Invalid creds')
+    .required('Invalid creds')
     .isString()
     .trim();
   this.validateBody('password')
-    .notEmpty('Invalid creds')
+    .required('Invalid creds')
     .isString();
   this.validateBody('remember-me')
     .toBoolean();
@@ -97,7 +97,7 @@ router.post('/users', mw.ensureRecaptcha, function*() {
   // Validation
 
   this.validateBody('uname')
-    .notEmpty('Username required')
+    .required('Username required')
     .isString()
     .trim()
     .isLength(3, 15, 'Username must be 3-15 chars')
@@ -106,22 +106,21 @@ router.post('/users', mw.ensureRecaptcha, function*() {
     .checkNot(yield db.getUserByUname(this.vals.uname), 'Username taken');
 
   this.validateBody('password2')
-    .notEmpty('Password confirmation is required')
+    .required('Password confirmation is required')
     .isString();
 
   this.validateBody('password1')
-    .notEmpty('Password is required')
+    .required('Password is required')
     .isString()
     .isLength(6, 100, 'Password must be 6-100 chars')
     .eq(this.vals.password2, 'Password must match confirmation');
 
-  if (this.request.body.email) {  // email is optional
-    this.validateBody('email')
-      .isString()
-      .trim()
-      .checkPred(v.isEmail, 'Invalid email address')
-      .isLength(1, 140, 'Email is too long');
-  }
+  this.validateBody('email')
+    .optional()  // only validate email if user provided one
+    .isString()
+    .trim()
+    .checkPred(v.isEmail, 'Invalid email address')
+    .isLength(1, 140, 'Email is too long');
 
   // Insert user
 
@@ -252,7 +251,7 @@ router.post('/messages', mw.ensureRecaptcha, function*() {
   // Validation
 
   this.validateBody('markup')
-    .notEmpty('Must provide a message')
+    .required('Must provide a message')
     .isString()
     .trim()
     .tap(belt.transformMarkup)
@@ -316,8 +315,7 @@ router.put('/messages/:id', function*() {
     this.assertAuthorized(this.currUser, 'UPDATE_MESSAGE_STATE', message)
     this.validateBody('is_hidden')
       .isString()
-      .tap(belt.parseBoolean)
-      ;
+      .tap(belt.parseBoolean);
   }
 
   if (this.request.body.markup) {
@@ -328,8 +326,7 @@ router.put('/messages/:id', function*() {
       .isString()
       .trim()
       .tap(belt.transformMarkup)
-      .isLength(3, 300, 'Message must be 3-300 chars')
-      ;
+      .isLength(3, 300, 'Message must be 3-300 chars');
   }
 
   this.validateBody('redirectTo')
@@ -363,7 +360,7 @@ router.put('/users/:uname/role', function*() {
   // Validation
 
   this.validateBody('role')
-    .notEmpty('Must provide a role')
+    .required('Must provide a role')
     .isString()
     .trim()
     .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED'], 'Invalid role');
