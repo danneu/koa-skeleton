@@ -28,11 +28,20 @@
               <div class="form-group">
                 <label for="uname-input">Username:</label>
                 <input type="text" name="uname" id="uname-input" class="form-control" required>
+                <div class="help-block">
+                  Must be 3-15 chars long
+                  <br>
+                  Valid chars: 
+                  <code>a-z</code>, <code>0-9</code>, underscore (<code>_</code>), hyphen (<code>-</code>)
+                </div>
               </div>
 
               <div class="form-group">
                 <label for="password1-input">Password:</label>
                 <input type="password" name="password1" id="password1-input" class="form-control" required>
+                <div class="help-block">
+                  Must be at least 6 chars long
+                </div>
               </div>
 
               <div class="form-group">
