@@ -119,7 +119,7 @@ router.post('/users', mw.ensureRecaptcha, function*() {
     .optional()  // only validate email if user provided one
     .isString()
     .trim()
-    .checkPred(v.isEmail, 'Invalid email address')
+    .isEmail('Invalid email address')
     .isLength(1, 140, 'Email is too long');
 
   // Insert user
@@ -178,7 +178,7 @@ router.put('/users/:uname', function*() {
       .isString()
       .trim();
     if (this.vals.email) {
-      this.validateBody('email').checkPred(v.isEmail);
+      this.validateBody('email').isEmail();
     }
   }
 
@@ -197,7 +197,6 @@ router.put('/users/:uname', function*() {
 router.get('/users/:uname/edit', function*() {
   // Load user
   this.validateParam('uname');
-  debug(this.vals);
   var user = yield db.getUserByUname(this.vals.uname);
   this.assert(user, 404);
   user = pre.presentUser(user);
