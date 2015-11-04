@@ -169,7 +169,7 @@ router.put('/users/:uname', function*() {
     this.assertAuthorized(this.currUser, 'UPDATE_USER_ROLE', user);
     this.validateBody('role')
       .isString()
-      .isInt(['ADMIN', 'MOD', 'MEMBER', 'BANNED'])
+      .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED'])
   }
 
   if (this.request.body.email) {
