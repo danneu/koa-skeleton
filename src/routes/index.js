@@ -5,7 +5,6 @@ var assert = require('better-assert');
 var Router = require('koa-router');
 var debug = require('debug')('app:routes:index');
 var _ = require('lodash');
-var v = require('validator');
 // 1st party
 var db = require('../db');
 var pre = require('../presenters');
@@ -210,7 +209,7 @@ router.get('/users/:uname/edit', function*() {
 
 // Show user profile
 router.get('/users/:uname', function*() {
-  // Load user 
+  // Load user
 
   this.validateParam('uname');
   var user = yield db.getUserByUname(this.vals.uname);
