@@ -28,17 +28,17 @@ function *slurpSql(filePath) {
 co(function*() {
   console.log('Resetting the database...');
 
-  {
+  yield (function*() {
     const sql = yield slurpSql('schema.sql');
     console.log('-- Executing schema.sql...');
-    yield db.query(sql);
-  }
+    return yield db.query(sql);
+  })();
 
-  {
+  yield (function*() {
     const sql = yield slurpSql('seeds.sql');
     console.log('-- Executing seeds.sql...');
-    yield db.query(sql);
-  }
+    return yield db.query(sql);
+  })();
 }).then(function() {
   console.log('Finished resetting db');
   process.exit(0);
