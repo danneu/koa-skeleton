@@ -1,10 +1,8 @@
 'use strict';
 
 // 3rd party
-var assert = require('better-assert');
-var _ = require('lodash');
-// 1st party
-var belt = require('./belt');
+const assert = require('better-assert');
+const _ = require('lodash');
 
 ////////////////////////////////////////////////////////////
 

@@ -1,18 +1,17 @@
 'use strict';
 
 // 3rd party
-var assert = require('better-assert');
-var Router = require('koa-router');
-var debug = require('debug')('app:routes:index');
-var _ = require('lodash');
+const assert = require('better-assert');
+const Router = require('koa-router');
+const debug = require('debug')('app:routes:index');
 // 1st party
-var db = require('../db');
-var pre = require('../presenters');
-var mw = require('../middleware');
-var config = require('../config');
-var belt = require('../belt');
+const db = require('../db');
+const pre = require('../presenters');
+const mw = require('../middleware');
+const config = require('../config');
+const belt = require('../belt');
 
-var router = new Router();
+const router = new Router();
 
 ////////////////////////////////////////////////////////////
 
@@ -25,7 +24,7 @@ router.get('/test', function*() {
 
 // Show homepage
 router.get('/', function*() {
-  var messages = yield db.getRecentMessages();
+  let messages = yield db.getRecentMessages();
   messages = messages.map(pre.presentMessage);
 
   yield this.render('homepage', {
@@ -61,13 +60,13 @@ router.post('/login', mw.ensureRecaptcha, function*() {
     .toBoolean();
 
   // TODO: Change these to this.checkValue
-  var user = yield db.getUserByUname(this.vals.uname);
+  const user = yield db.getUserByUname(this.vals.uname);
   this.validate(user, 'Invalid creds');
   this.validate(yield belt.checkPassword(this.vals.password, user.digest), 'Invalid creds');
 
   // User authenticated
 
-  var session = yield db.insertSession({
+  const session = yield db.insertSession({
     user_id:    user.id,
     ip_address: this.request.ip,
     interval:  (this.vals['remember-me'] ? '1 year' : '2 weeks')
@@ -123,7 +122,7 @@ router.post('/users', mw.ensureRecaptcha, function*() {
 
   // Insert user
 
-  var user = yield db.insertUser({
+  const user = yield db.insertUser({
     uname: this.vals.uname,
     password: this.vals.password1,
     email: this.vals.email
@@ -131,7 +130,7 @@ router.post('/users', mw.ensureRecaptcha, function*() {
 
   // Log them in
 
-  var session = yield db.insertSession({
+  const session = yield db.insertSession({
     user_id: user.id,
     ip_address: this.request.ip,
     user_agent: this.headers['user-agent'],
@@ -157,7 +156,7 @@ router.post('/users', mw.ensureRecaptcha, function*() {
 router.put('/users/:uname', function*() {
   // Load user
   this.validateParam('uname');
-  var user = yield db.getUserByUname(this.vals.uname);
+  let user = yield db.getUserByUname(this.vals.uname);
   this.assert(user, 404);
   user = pre.presentUser(user);
   this.assertAuthorized(this.currUser, 'UPDATE_USER_*', user);
@@ -168,7 +167,7 @@ router.put('/users/:uname', function*() {
     this.assertAuthorized(this.currUser, 'UPDATE_USER_ROLE', user);
     this.validateBody('role')
       .isString()
-      .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED'])
+      .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED']);
   }
 
   if (this.request.body.email) {
@@ -196,7 +195,7 @@ router.put('/users/:uname', function*() {
 router.get('/users/:uname/edit', function*() {
   // Load user
   this.validateParam('uname');
-  var user = yield db.getUserByUname(this.vals.uname);
+  let user = yield db.getUserByUname(this.vals.uname);
   this.assert(user, 404);
   user = pre.presentUser(user);
   this.assertAuthorized(this.currUser, 'UPDATE_USER_*', user);
@@ -212,12 +211,12 @@ router.get('/users/:uname', function*() {
   // Load user
 
   this.validateParam('uname');
-  var user = yield db.getUserByUname(this.vals.uname);
+  let user = yield db.getUserByUname(this.vals.uname);
   this.assert(user, 404);
   user = pre.presentUser(user);
 
   // Load user's messages
-  var messages = yield db.getRecentMessagesForUserId(user.id);
+  const messages = yield db.getRecentMessagesForUserId(user.id);
 
   yield this.render('users_show', {
     ctx: this,
@@ -257,7 +256,7 @@ router.post('/messages', mw.ensureRecaptcha, function*() {
 
   // Validation pass, save message
 
-  var message = yield db.insertMessage({
+  yield db.insertMessage({
     user_id: this.currUser && this.currUser.id,
     markup: this.vals.markup,
     ip_address: this.request.ip,
@@ -271,7 +270,7 @@ router.post('/messages', mw.ensureRecaptcha, function*() {
 // List all messages
 // TODO: Add pagination
 router.get('/messages', function*() {
-  var messages = yield db.getMessages();
+  let messages = yield db.getMessages();
   messages = messages.map(pre.presentMessage);
 
   yield this.render('messages_list', {
@@ -283,7 +282,7 @@ router.get('/messages', function*() {
 // List all users
 // TODO: Pagination
 router.get('/users', function*() {
-  var users = yield db.getUsers();
+  let users = yield db.getUsers();
   users = users.map(pre.presentUser);
 
   yield this.render('users_list', {
@@ -301,7 +300,7 @@ router.get('/users', function*() {
 router.put('/messages/:id', function*() {
   // Load message
   this.validateParam('id');
-  var message = yield db.getMessageById(this.vals.id);
+  const message = yield db.getMessageById(this.vals.id);
   this.assert(message, 404);
 
   // Ensure user is authorized to make *any* update to message
@@ -310,14 +309,14 @@ router.put('/messages/:id', function*() {
   // Check authorization against specific changes user is trying to make
 
   if (this.request.body.is_hidden) {
-    this.assertAuthorized(this.currUser, 'UPDATE_MESSAGE_STATE', message)
+    this.assertAuthorized(this.currUser, 'UPDATE_MESSAGE_STATE', message);
     this.validateBody('is_hidden')
       .isString()
       .tap(belt.parseBoolean);
   }
 
   if (this.request.body.markup) {
-    this.assertAuthorized(this.currUser, 'UPDATE_MESSAGE_MARKUP', message)
+    this.assertAuthorized(this.currUser, 'UPDATE_MESSAGE_MARKUP', message);
     // FIXME: Extract markup validation into its own .isValidMarkup validator
     // and then reuse this here and in the insert-message route
     this.validateBody('markup')
@@ -339,7 +338,7 @@ router.put('/messages/:id', function*() {
     markup: this.vals.markup
   });
 
-  this.flash = { message: ['success', 'Message updated'] }
+  this.flash = { message: ['success', 'Message updated'] };
   this.redirect(this.vals.redirectTo);
 });
 
@@ -350,7 +349,7 @@ router.put('/messages/:id', function*() {
 router.put('/users/:uname/role', function*() {
   // Load user
   this.validateParam('uname');
-  var user = yield db.getUserByUname(this.vals.uname);
+  const user = yield db.getUserByUname(this.vals.uname);
   this.assert(user, 404);
 
   this.assertAuthorized(this.currUser, 'UPDATE_USER_ROLE', user);

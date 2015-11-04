@@ -1,25 +1,25 @@
 'use strict';
 
 // Node
-var nodeUrl = require('url');
+const nodeUrl = require('url');
 // 3rd
-var debug = require('debug')('app:middleware');
-var bouncer = require('koa-bouncer');
-var _ = require('lodash');
-var recaptcha = require('recaptcha-validator');
+const debug = require('debug')('app:middleware');
+const bouncer = require('koa-bouncer');
+const _ = require('lodash');
+const recaptcha = require('recaptcha-validator');
 // 1st
-var db = require('./db');
-var config = require('./config');
-var pre = require('./presenters');
+const db = require('./db');
+const config = require('./config');
+const pre = require('./presenters');
 
 // Assoc ctx.currUser if the session_id cookie (a UUID v4)
 // is an active session.
 exports.wrapCurrUser = function() {
   return function *(next) {
-    var sessionId = this.cookies.get('session_id');
+    const sessionId = this.cookies.get('session_id');
     debug('[wrapCurrUser] session_id: ' + sessionId);
     if (!sessionId) return yield next;
-    var user = yield db.getUserBySessionId(sessionId);
+    const user = yield db.getUserBySessionId(sessionId);
     if (user) {
       this.currUser = pre.presentUser(user);
       this.currSessionId = sessionId;
@@ -37,7 +37,7 @@ exports.wrapFlash = function(cookieName) {
   cookieName = cookieName || 'flash';
 
   return function *(next) {
-    var data, tmp;
+    let data, tmp;
     if (this.cookies.get(cookieName)) {
       tmp = decodeURIComponent(this.cookies.get(cookieName));
       // Handle bad JSON in the cookie, possibly set by fuzzers
@@ -155,7 +155,7 @@ exports.ensureReferer = function() {
       return;
     }
 
-    var refererHostname = nodeUrl.parse(this.headers['referer'] || '').hostname;
+    const refererHostname = nodeUrl.parse(this.headers['referer'] || '').hostname;
 
     this.assert(config.HOSTNAME === refererHostname, 'Invalid referer', 403);
 

@@ -1,15 +1,14 @@
 'use strict';
 
 // 3rd
-var Router = require('koa-router');
-var debug = require('debug')('app:routes:admin');
+const Router = require('koa-router');
+const debug = require('debug')('app:routes:admin');
 // 1st
-var db = require('../db');
-var pre = require('../presenters');
+const db = require('../db');
 
 // Every route in this router is only accessible to admins
 
-var router = new Router();
+const router = new Router();
 
 router.use(function*(next) {
   this.assert(this.currUser && this.currUser.role === 'ADMIN', 404);
@@ -21,7 +20,7 @@ router.use(function*(next) {
 
 // Show admin panel homepage
 router.get('/admin', function*() {
-  var stats = yield db.admin.getStats();
+  const stats = yield db.admin.getStats();
 
   yield this.render('admin/index', {
     ctx: this,
@@ -32,4 +31,3 @@ router.get('/admin', function*() {
 ////////////////////////////////////////////////////////////
 
 module.exports = router;
-

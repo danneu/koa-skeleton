@@ -1,14 +1,14 @@
 'use strict';
 
 // Node
-var crypto = require('crypto');
+const crypto = require('crypto');
 // 3rd
-var bcrypt = require('bcryptjs');
-var promissory = require('promissory');
-var assert = require('better-assert');
-var debug = require('debug')('app:belt');
-var _ = require('lodash');
-var Autolinker = require('autolinker');
+const bcrypt = require('bcryptjs');
+const promissory = require('promissory');
+const assert = require('better-assert');
+const debug = require('debug')('app:belt');
+const _ = require('lodash');
+const Autolinker = require('autolinker');
 
 // A dumping ground of common functions used around the app.
 // As it gets full, consider extracting similar functions into
@@ -16,12 +16,12 @@ var Autolinker = require('autolinker');
 
 // Ex: formatDate(d) -> '8 Dec 2014 16:24'
 exports.formatDate = function(d) {
-  var months = ["Jan", "Feb", "Mar", "Apr",
-                "May", "Jun", "Jul", "Aug",
-                "Sep", "Oct", "Nov", "Dec"];
-  var mins = d.getMinutes();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr',
+                  'May', 'Jun', 'Jul', 'Aug',
+                  'Sep', 'Oct', 'Nov', 'Dec'];
+  const mins = d.getMinutes();
   // Pad mins to format "XX". e.g. 8 -> "08", 10 -> "10"
-  var paddedMins = mins < 10 ? '0' + mins : mins;
+  const paddedMins = mins < 10 ? '0' + mins : mins;
   return [
     d.getDate(),
     months[d.getMonth()],
@@ -32,12 +32,12 @@ exports.formatDate = function(d) {
 
 // String -> Bool
 exports.isValidUuid = function(uuid) {
-  var regexp = /^[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}$/;
+  const regexp = /^[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}$/;
   return regexp.test(uuid);
 };
 
 exports.slugify = function() {
-  var MAX_SLUG_LENGTH = 80;
+  const MAX_SLUG_LENGTH = 80;
   // Slugifies one string
   function slugifyString(x) {
     return x.toString()
@@ -55,7 +55,7 @@ exports.slugify = function() {
       .toLowerCase();
   }
 
-  var args = Array.prototype.slice.call(arguments, 0);
+  const args = Array.prototype.slice.call(arguments, 0);
 
   return slugifyString(
     args.map(x => x.toString())
@@ -76,13 +76,13 @@ exports.slugify = function() {
   // String -> String
   exports.hashPassword = function*(password) {
     return yield Bcrypt.hash(password, 4);
-  }
+  };
 
   // Compares password plaintext against bcrypted digest
   // String, String -> Bool
   exports.checkPassword = function*(password, digest) {
     return yield Bcrypt.compare(password, digest);
-  }
+  };
 }
 
 ////////////////////////////////////////////////////////////
@@ -136,13 +136,13 @@ exports.transformMarkup = function(s) {
 exports.md5 = function(str) {
   assert(_.isString(str));
   return crypto.createHash('md5').update(str).digest('hex');
-}
+};
 
 // String -> String
 exports.toAvatarUrl = function(input) {
   assert(_.isString(input));
-  var hash = exports.md5(input);
-  return `https://www.gravatar.com/avatar/${hash}?d=monsterid`
+  const hash = exports.md5(input);
+  return `https://www.gravatar.com/avatar/${hash}?d=monsterid`;
 };
 
 exports.autolink = function(s) {

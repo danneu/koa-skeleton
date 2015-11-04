@@ -1,29 +1,27 @@
 'use strict';
 
-// Node
-var nodePath = require('path');
 // 3rd party
-var koa = require('koa');
-var bouncer = require('koa-bouncer');
-var views = require('koa-views');
-var nunjucks = require('nunjucks');
-var debug = require('debug')('app:index');
+const koa = require('koa');
+const bouncer = require('koa-bouncer');
+const views = require('koa-views');
+const nunjucks = require('nunjucks');
+const debug = require('debug')('app:index');
 // 1st party
-var config = require('./config');
-var mw = require('./middleware');
-var belt = require('./belt');
-var cancan = require('./cancan');
+const config = require('./config');
+const mw = require('./middleware');
+const belt = require('./belt');
+const cancan = require('./cancan');
 
 ////////////////////////////////////////////////////////////
 
-var app = koa();
+const app = koa();
 app.poweredBy = false;
 app.proxy = config.TRUST_PROXY;
 
 // Configure view-layer (nunjucks)
 
 {
-  let env = nunjucks.configure();
+  const env = nunjucks.configure();
 
   // Expose global bindings to view layer
   env.addGlobal('can', cancan.can);
@@ -63,20 +61,20 @@ app.use(views('../views', {
 // Usage:
 //
 //    router.get('/topics/:id', function*() {
-//      var topic = yield db.getTopicById(this.params.id);
+//      const topic = yield db.getTopicById(this.params.id);
 //      this.assertAuthorized(this.currUser, 'READ_TOPIC', topic);
 //      ...
 //    });
 app.use(function*(next) {
   this.assertAuthorized = (user, action, target) => {
-    var isAuthorized = cancan.can(user, action, target);
+    const isAuthorized = cancan.can(user, action, target);
     {
-      let uname = (user && user.uname) || '<Guest>';
+      const uname = (user && user.uname) || '<Guest>';
       debug('[assertAuthorized] Can %s %s: %s', uname, action, isAuthorized);
     }
     this.assert(isAuthorized, 404);
-  }
-  yield *next;
+  };
+  yield* next;
 });
 
 // Routes

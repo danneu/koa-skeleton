@@ -1,13 +1,13 @@
 'use strict';
 
 // Node
-var path = require('path');
+const path = require('path');
 // 3rd
-var co = require('co');
-var fs = require('co-fs');
+const co = require('co');
+const fs = require('co-fs');
 // 1st
-var config = require('../src/config');
-var db = require('../src/db');
+const config = require('../src/config');
+const db = require('../src/db');
 
 ////////////////////////////////////////////////////////////
 
@@ -20,8 +20,8 @@ if (config.NODE_ENV !== 'development') {
 ////////////////////////////////////////////////////////////
 
 function *slurpSql(filePath) {
-  var relativePath = '../sql/' + filePath;
-  var fullPath = path.join(__dirname, relativePath);
+  const relativePath = '../sql/' + filePath;
+  const fullPath = path.join(__dirname, relativePath);
   return yield fs.readFile(fullPath, 'utf8');
 }
 
@@ -29,13 +29,13 @@ co(function*() {
   console.log('Resetting the database...');
 
   {
-    let sql = yield slurpSql('schema.sql');
+    const sql = yield slurpSql('schema.sql');
     console.log('-- Executing schema.sql...');
     yield db.query(sql);
   }
 
   {
-    let sql = yield slurpSql('seeds.sql');
+    const sql = yield slurpSql('seeds.sql');
     console.log('-- Executing seeds.sql...');
     yield db.query(sql);
   }

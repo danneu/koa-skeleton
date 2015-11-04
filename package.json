@@ -35,5 +35,10 @@
     "promissory": "1.0.1",
     "recaptcha-validator": "^1.0.0",
     "uuid": "2.0.1"
-  }
+  },
+  "devDependencies": {
+    "eslint": "^1.8.0",
+    "eslint-config-volox": "^1.0.2"
+  },
+  "license": "MIT"
 }

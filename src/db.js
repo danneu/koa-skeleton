@@ -1,14 +1,14 @@
 'use strict';
 
 // 3rd
-var pg = require('co-pg')(require('pg'));
-var assert = require('better-assert');
-var _ = require('lodash');
-var uuid = require('uuid');
-var debug = require('debug')('app:db');
+const pg = require('co-pg')(require('pg'));
+const assert = require('better-assert');
+const _ = require('lodash');
+const uuid = require('uuid');
+const debug = require('debug')('app:db');
 // 1st
-var config = require('./config');
-var belt = require('./belt');
+const config = require('./config');
+const belt = require('./belt');
 
 // Configure pg client to parse int8 into Javscript integer
 pg.types.setTypeParser(20, (v) => {
@@ -22,9 +22,9 @@ pg.types.setTypeParser(20, (v) => {
 // Run query with pooled connection
 exports.query = query;
 function* query(sql, params) {
-  var connResult = yield pg.connectPromise(config.DATABASE_URL);
-  var client = connResult[0];
-  var done = connResult[1];
+  const connResult = yield pg.connectPromise(config.DATABASE_URL);
+  const client = connResult[0];
+  const done = connResult[1];
   try {
     return yield client.queryPromise(sql, params);
   } finally {
@@ -34,13 +34,13 @@ function* query(sql, params) {
 }
 
 function* queryOne(sql, params) {
-  var result = yield query(sql, params);
+  const result = yield query(sql, params);
   assert(result.rows.length <= 1);
   return result.rows[0];
 }
 
 function* queryMany(sql, params) {
-  var result = yield query(sql, params);
+  const result = yield query(sql, params);
   return result.rows;
 }
 
@@ -68,11 +68,11 @@ pg.Client.prototype.queryManyPromise = function(sql, params) {
 // `runner` is a generator function that accepts one arguement:
 // a database client.
 function* withClient(runner) {
-  var connResult = yield pg.connectPromise(config.DATABASE_URL);
-  var client = connResult[0];
-  var done = connResult[1];
+  const connResult = yield pg.connectPromise(config.DATABASE_URL);
+  const client = connResult[0];
+  const done = connResult[1];
 
-  var result;
+  let result;
   try {
     result = yield runner(client);
   } catch (err) {
@@ -97,7 +97,7 @@ function* withClient(runner) {
 // a database client.
 function* withTransaction(runner) {
   return yield withClient(function*(client) {
-    var result;
+    let result;
     try {
       yield client.queryPromise('BEGIN');
       result = yield runner(client);
@@ -125,7 +125,7 @@ function* withTransaction(runner) {
 exports.getUserBySessionId = function*(sessionId) {
   assert(belt.isValidUuid(sessionId));
 
-  var sql = `
+  const sql = `
     UPDATE users
     SET last_online_at = NOW()
     WHERE id = (
@@ -147,7 +147,7 @@ exports.getUserBySessionId = function*(sessionId) {
 exports.getUserByUname = function*(uname) {
   assert(_.isString(uname));
 
-  var sql = `
+  const sql = `
     SELECT *
     FROM users
     WHERE lower(uname) = lower($1)
@@ -159,7 +159,7 @@ exports.getUserByUname = function*(uname) {
 ////////////////////////////////////////////////////////////
 
 exports.getRecentMessages = function*() {
-  var sql = `
+  const sql = `
     SELECT
       m.*,
       to_json(u.*) "user"
@@ -176,7 +176,7 @@ exports.getRecentMessages = function*() {
 exports.getRecentMessagesForUserId = function*(userId) {
   assert(Number.isInteger(userId));
 
-  var sql = `
+  const sql = `
     SELECT
       m.*,
       to_json(u.*) "user"
@@ -200,7 +200,7 @@ exports.insertMessage = function*(data) {
   assert(_.isString(data.ip_address));
   assert(_.isString(data.user_agent) || _.isUndefined(data.user_agent));
 
-  var sql = `
+  const sql = `
     INSERT INTO messages (user_id, markup, ip_address, user_agent)
     VALUES ($1, $2, $3::inet, $4)
     RETURNING *
@@ -219,9 +219,9 @@ exports.insertUser = function*(data) {
   assert(_.isString(data.email) || _.isUndefined(data.email));
   assert(_.isString(data.password));
 
-  var digest = yield belt.hashPassword(data.password);
+  const digest = yield belt.hashPassword(data.password);
 
-  var sql = `
+  const sql = `
     INSERT INTO users (uname, email, digest)
     VALUES ($1, $2, $3)
     RETURNING *
@@ -236,14 +236,14 @@ exports.insertSession = function*(data) {
   assert(_.isString(data.user_agent) || _.isUndefined(data.user_agent));
   assert(_.isString(data.interval));
 
-  var sql = `
+  const sql = `
     INSERT INTO sessions (id, user_id, ip_address, user_agent, expired_at)
     VALUES ($1, $2, $3::inet, $4, NOW() + $5::interval)
     RETURNING *
   `;
 
   return yield queryOne(sql, [
-      uuid.v4(), data.user_id, data.ip_address, data.user_agent, data.interval
+    uuid.v4(), data.user_id, data.ip_address, data.user_agent, data.interval
   ]);
 };
 
@@ -251,7 +251,7 @@ exports.logoutSession = function*(userId, sessionId) {
   assert(Number.isInteger(userId));
   assert(_.isString(sessionId));
 
-  var sql = `;
+  const sql = `;
     UPDATE sessions
     SET logged_out_at = NOW()
     WHERE user_id = $1
@@ -264,7 +264,7 @@ exports.logoutSession = function*(userId, sessionId) {
 exports.hideMessage = function*(messageId) {
   assert(messageId);
 
-  var sql = `;
+  const sql = `;
     UPDATE messages
     SET is_hidden = true
     WHERE id = $1
@@ -276,7 +276,7 @@ exports.hideMessage = function*(messageId) {
 exports.getMessageById = function*(messageId) {
   assert(messageId);
 
-  var sql = `;
+  const sql = `;
     SELECT *
     FROM messages
     WHERE id = $1
@@ -288,7 +288,7 @@ exports.getMessageById = function*(messageId) {
 exports.updateUser = function*(userId, data) {
   assert(Number.isInteger(userId));
 
-  var sql = `
+  const sql = `
     UPDATE users
     SET
       email = $2,
@@ -298,7 +298,7 @@ exports.updateUser = function*(userId, data) {
   `;
 
   return yield queryOne(sql, [
-    userId, 
+    userId,
     data.email,
     data.role
   ]);
@@ -308,7 +308,7 @@ exports.updateUserRole = function*(userId, role) {
   assert(Number.isInteger(userId));
   assert(_.isString(role));
 
-  var sql = `
+  const sql = `
     UPDATE users
     SET role = $2::user_role
     WHERE id = $1
@@ -323,7 +323,7 @@ exports.updateMessage = function*(messageId, data) {
   assert(_.isBoolean(data.is_hidden) || _.isUndefined(data.is_hidden));
   assert(_.isString(data.markup) || _.isUndefined(data.markup));
 
-  var sql = `
+  const sql = `
     UPDATE messages
     SET
       is_hidden = COALESCE($2, is_hidden),
@@ -339,7 +339,7 @@ exports.updateMessage = function*(messageId, data) {
 
 // TODO: Pagination
 exports.getMessages = function*() {
-  var sql = `
+  const sql = `
     SELECT
       m.*,
       to_json(u.*) AS "user"
@@ -355,11 +355,11 @@ exports.getMessages = function*() {
 // TODO: user.messages_count counter cache
 // TODO: idx for is_hidden
 exports.getUsers = function*() {
-  var sql = `
-    SELECT 
+  const sql = `
+    SELECT
       u.*,
       (
-        SELECT COUNT(*) 
+        SELECT COUNT(*)
         FROM messages
         WHERE user_id = u.id AND is_hidden = false
       ) AS messages_count
@@ -380,7 +380,7 @@ exports.admin = {};
 // only counts visible messages, not hidden ones since they are effectively
 // deleted
 exports.admin.getStats = function*() {
-  var sql = `;
+  const sql = `;
     SELECT
       (SELECT COUNT(*) FROM users) AS users_count,
       (SELECT COUNT(*) FROM messages WHERE is_hidden = false) AS messages_count
