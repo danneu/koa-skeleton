@@ -57,43 +57,41 @@ Example `.env`:
 
 - Aside from validation, never access query/body/url params via the Koa default like `this.request.body.username`. Instead, use koa-bouncer to move these to the `this.vals` object and access them there. This forces you to self-document what params you expect at the top of your route and prevents the case where you forget to validate params.
 
-        router.post('/users', function*() {
+    ``` javascript
+    router.post('/users', function*() {
 
-          // Validation 
+      // Validation 
 
-          this.validateBody('uname')
-            .notEmpty('Username required')
-            .isString()
-            .tap(s => s.trim());
-          // Email is optional
-          if (this.request.body.email) {
-            this.validateBody('email')
-              .isString()
-              .tap(s => s.trim())
-              .isEmail();
-          }
-          this.validateBody('password1')
-            .notEmpty('Password required')
-            .isString()
-            .tap(s => s.trim())
-            .isLength(6, 100, 'Password must be 6-100 chars');
-          this.validateBody('password2')
-            .notEmpty('Password confirmation required')
-            .isString()
-            .tap(s => s.trim())
-            .checkPred(p2 => p2 === this.vals.password1, 'Passwords must match');
+      this.validateBody('uname')
+        .required('Username required')
+        .isString()
+        .trim();
+      this.validateBody('email')
+        .optional()
+        .isString()
+        .trim()
+        .isEmail();
+      this.validateBody('password1')
+        .required('Password required')
+        .isString()
+        .isLength(6, 100, 'Password must be 6-100 chars');
+      this.validateBody('password2')
+        .required('Password confirmation required')
+        .isString()
+        .eq(this.vals.password1, 'Passwords must match');
 
-          // Validation passed. Access the above params via `this.vals` for
-          // the remainder of the route to ensure you're getting the validated
-          // version.
+      // Validation passed. Access the above params via `this.vals` for
+      // the remainder of the route to ensure you're getting the validated
+      // version.
 
-          var user = yield db.insertUser({
-            uname: this.vals.uname,
-            password: this.vals.password1
-          });
+      var user = yield db.insertUser({
+        uname: this.vals.uname,
+        password: this.vals.password1
+      });
 
-          this.redirect(`/users/${user.uname}`);
-        })
+      this.redirect(`/users/${user.uname}`);
+    });
+    ```
 
 ## FAQ
 
