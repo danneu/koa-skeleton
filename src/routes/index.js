@@ -59,10 +59,9 @@ router.post('/login', mw.ensureRecaptcha, function*() {
   this.validateBody('remember-me')
     .toBoolean();
 
-  // TODO: Change these to this.checkValue
   const user = yield db.getUserByUname(this.vals.uname);
-  this.validate(user, 'Invalid creds');
-  this.validate(yield belt.checkPassword(this.vals.password, user.digest), 'Invalid creds');
+  this.check(user, 'Invalid creds');
+  this.check(yield belt.checkPassword(this.vals.password, user.digest), 'Invalid creds');
 
   // User authenticated
 
