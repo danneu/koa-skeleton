@@ -79,8 +79,8 @@ app.use(function*(next) {
 
 // Routes
 
-app.use(require('./routes').routes());
-app.use(require('./routes/admin').routes());
+app.use(require('./routes').middleware());
+app.use(require('./routes/admin').middleware());
 
 ////////////////////////////////////////////////////////////
 

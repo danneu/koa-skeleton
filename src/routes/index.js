@@ -2,7 +2,7 @@
 
 // 3rd party
 const assert = require('better-assert');
-const Router = require('koa-router');
+const Router = require('koa-wormhole');
 const debug = require('debug')('app:routes:index');
 // 1st party
 const db = require('../db');
