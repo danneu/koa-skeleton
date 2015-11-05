@@ -9,7 +9,7 @@
     "reset-db": "env $(cat .env | xargs) node ./sql/reset_db.js"
   },
   "engines": {
-    "node": "4.x"
+    "node": "5.x"
   },
   "dependencies": {
     "autolinker": "^0.19.0",
