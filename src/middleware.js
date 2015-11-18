@@ -63,7 +63,10 @@ exports.wrapFlash = function(cookieName) {
 
     yield* next;
 
-    if (this.response.status < 300) {
+    // clear flash cookie if it's a successful request 
+    // AND if it was actually set (instead of sending extraneous set-cookie
+    // on every request)
+    if (this.response.status < 300 && this.cookies.get(cookieName) !== undefined) {
       this.cookies.set(cookieName, null);
     }
   };
