@@ -96,6 +96,13 @@ app.use(require('./routes/admin').middleware());
 
 ////////////////////////////////////////////////////////////
 
-app.listen(config.PORT, function() {
-  console.log('Listening on port', config.PORT);
-});
+// If we run this file directly (npm start, npm run start-dev, node src/index.js)
+// then start the server. Else, if we require() this file (like from 
+// our tests), then don't start the server and instead just export the app.
+if (require.main === module) {
+  app.listen(config.PORT, function() {
+    console.log('Listening on port', config.PORT);
+  });
+} else {
+  module.exports = app;
+}
