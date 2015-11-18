@@ -57,7 +57,14 @@ exports.wrapFlash = function(cookieName) {
         return data;
       },
       set: function(val) {
-        this.cookies.set(cookieName, encodeURIComponent(JSON.stringify(val)));
+        const encodedVal = encodeURIComponent(JSON.stringify(val));
+        this.cookies.set(cookieName, encodedVal, {
+          // flash cookie only lasts 10 seconds to prevent stale flash messages.
+          // CAVEAT: if the redirect request takes more than 10 seconds to
+          // load, then the user will end up with no flash message, 
+          // no errors, etc.
+          maxAge: 10000,
+        });
       }
     });
 
@@ -106,6 +113,11 @@ exports.handleBouncerValidationError = function() {
         console.warn('Caught validation error:', err, err.stack);
         this.flash = {
           message: ['danger', err.message || 'Validation error'],
+          // CAVEAT: Max cookie size is 4096 bytes. If the user sent us a
+          // body that exceeds that (for example, a large message), then
+          // the cookie will not get set (silently).
+          // TODO: Consider using localStorage to persist request bodies
+          // so that it scales.
           params: this.request.body,
           bouncer: err.bouncer
         };
