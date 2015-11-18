@@ -215,7 +215,8 @@ router.get('/users/:uname', function*() {
   user = pre.presentUser(user);
 
   // Load user's messages
-  const messages = yield db.getRecentMessagesForUserId(user.id);
+  const messages = (yield db.getRecentMessagesForUserId(user.id))
+    .map(pre.presentMessage);
 
   yield this.render('users_show', {
     ctx: this,

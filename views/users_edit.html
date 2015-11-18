@@ -1,5 +1,5 @@
-{% extends 'views/master.html' %}
-{% import 'views/macros.html' as macros %}
+{% extends 'master.html' %}
+{% import 'macros.html' as macros %}
 
 {% block embed %}
   <ol class="breadcrumb">
@@ -32,7 +32,7 @@
           <div class="panel-body">
             <div class="form-group">
               <label for="email-input">Email</label>
-              <input type="text" name="email" value="{{ user.email }}" id="email-input" class="form-control">
+              <input type="text" name="email" value="{{ user.email or '' }}" id="email-input" class="form-control">
             </div>
           </div>
           <div class="panel-footer text-right">
