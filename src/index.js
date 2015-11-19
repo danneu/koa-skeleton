@@ -3,7 +3,6 @@
 // 3rd party
 const koa = require('koa');
 const bouncer = require('koa-bouncer');
-const views = require('koa-views');
 const nunjucksRender = require('koa-nunjucks-render');
 const debug = require('debug')('app:index');
 // 1st party
