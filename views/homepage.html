@@ -50,8 +50,8 @@
 
           </div><!-- /.panel-body -->
           <div class="panel-footer text-right">
-            <span class="text-muted" id="char-counter-container">
-              <span id="char-counter">0</span>/300
+            <span class="text-muted" id="markup-counter">
+              0/300
             </span>
             <button class="btn btn-default disabled" id="message-submit">
               Submit 
@@ -109,20 +109,7 @@
   </script>
 
   <script type="text/javascript">
-    var $input = $('#markup-input');
-
-    function updateCounter(count) {
-      var count = $input.val().length;
-      $('#char-counter').text(count);
-      if (count > 300) {
-        $('#char-counter-container').css('color', '#e74c3c');
-      } else {
-        $('#char-counter-container').css('color', '#777');
-      }
-    }
-
-    $input.on('change keyup', updateCounter);
-    updateCounter(); // also run on initial load
+    var $input = $('#markup-input').counter('#markup-counter', 3, 300);
 
     if ($input.val().length > 0) {
       $input.focusEnd();
