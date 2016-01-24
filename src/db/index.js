@@ -1,122 +1,27 @@
 'use strict';
 
 // 3rd
-const pg = require('co-pg')(require('pg'));
 const assert = require('better-assert');
 const _ = require('lodash');
 const uuid = require('uuid');
 const debug = require('debug')('app:db');
 // 1st
-const config = require('./config');
-const belt = require('./belt');
+const belt = require('../belt');
+const dbUtil = require('./util');
 
-// Configure pg client to parse int8 into Javscript integer
-pg.types.setTypeParser(20, (v) => {
-  return v === null ? null : Number.parseInt(v, 10);
-});
-
-////////////////////////////////////////////////////////////
-// Core helper functions
-////////////////////////////////////////////////////////////
-
-// Run query with pooled connection
-exports.query = query;
-function* query(sql, params) {
-  const connResult = yield pg.connectPromise(config.DATABASE_URL);
-  const client = connResult[0];
-  const done = connResult[1];
-  try {
-    return yield client.queryPromise(sql, params);
-  } finally {
-    // Release client back to pool even upon query error
-    done();
-  }
-}
-
-function* queryOne(sql, params) {
-  const result = yield query(sql, params);
-  assert(result.rows.length <= 1);
-  return result.rows[0];
-}
-
-function* queryMany(sql, params) {
-  const result = yield query(sql, params);
-  return result.rows;
-}
-
-// Add those queryOne and queryMany helpers to the pg Client prototype
-// too so that we can use them inside transactions and such.
-//
-// Example:
-//
-//    exports.testQuery = function*() {
-//      return yield withTransaction(function*(client) {
-//        var count1 = yield client.queryOnePromise('SELECT COUNT(*) FROM users');
-//        var count2 = yield client.queryOnePromise('SELECT COUNT(*) FROM messages');
-//
-//        return [count1, count2];
-//      });
-//    };
-pg.Client.prototype.queryOnePromise = function(sql, params) {
-  return this.queryPromise(sql, params).then(result => result.rows[0]);
-};
-
-pg.Client.prototype.queryManyPromise = function(sql, params) {
-  return this.queryPromise(sql, params).then(result => result.rows);
-};
-
-// `runner` is a generator function that accepts one arguement:
-// a database client.
-function* withClient(runner) {
-  const connResult = yield pg.connectPromise(config.DATABASE_URL);
-  const client = connResult[0];
-  const done = connResult[1];
-
-  let result;
-  try {
-    result = yield runner(client);
-  } catch (err) {
-    if (err.removeFromPool) {
-      err.human = 'Could not remove from pool';
-      done(new Error('Removing connection from pool'));
-      throw err;
-    } else if (err.code === '40P01') { // Deadlock
-      done();
-      return yield withClient(runner);
-    } else {
-      done();
-      throw err;
-    }
-  }
-
-  done();
-  return result;
-}
-
-// `runner` is a generator function that accepts one arguement:
-// a database client.
-function* withTransaction(runner) {
-  return yield withClient(function*(client) {
-    let result;
-    try {
-      yield client.queryPromise('BEGIN');
-      result = yield runner(client);
-      yield client.queryPromise('COMMIT');
-      return result;
-    } catch (err) {
-      try {
-        yield client.queryPromise('ROLLBACK');
-      } catch(err) {
-        err.removeFromPool = true;
-        throw err;
-      }
-      throw err;
-    }
-  });
-}
+/*
+   This module is for general database queries that haven't
+   yet been split off into more specific db submodules.
+*/
 
 ////////////////////////////////////////////////////////////
-// Custom queries
+// DB submodules
+////////////////////////////////////////////////////////////
+
+exports.admin = require('./admin');
+
+////////////////////////////////////////////////////////////
+// Query junk drawer
 ////////////////////////////////////////////////////////////
 
 // UUID -> User | undefined
@@ -140,7 +45,7 @@ exports.getUserBySessionId = function*(sessionId) {
     RETURNING *
   `;
 
-  return yield queryOne(sql, [sessionId]);
+  return yield dbUtil.queryOne(sql, [sessionId]);
 };
 
 // Case-insensitive uname lookup
@@ -153,7 +58,7 @@ exports.getUserByUname = function*(uname) {
     WHERE lower(uname) = lower($1)
   `;
 
-  return yield queryOne(sql, [uname]);
+  return yield dbUtil.queryOne(sql, [uname]);
 };
 
 ////////////////////////////////////////////////////////////
@@ -170,7 +75,7 @@ exports.getRecentMessages = function*() {
     LIMIT 25
   `;
 
-  return yield queryMany(sql);
+  return yield dbUtil.queryMany(sql);
 };
 
 exports.getRecentMessagesForUserId = function*(userId) {
@@ -188,7 +93,7 @@ exports.getRecentMessagesForUserId = function*(userId) {
     LIMIT 25
   `;
 
-  return yield queryMany(sql, [userId]);
+  return yield dbUtil.queryMany(sql, [userId]);
 };
 
 ////////////////////////////////////////////////////////////
@@ -206,7 +111,7 @@ exports.insertMessage = function*(data) {
     RETURNING *
   `;
 
-  return yield queryOne(sql, [
+  return yield dbUtil.queryOne(sql, [
     data.user_id, data.markup, data.ip_address, data.user_agent
   ]);
 };
@@ -227,7 +132,7 @@ exports.insertUser = function*(data) {
     RETURNING *
   `;
 
-  return yield queryOne(sql, [data.uname, data.email, digest]);
+  return yield dbUtil.queryOne(sql, [data.uname, data.email, digest]);
 };
 
 exports.insertSession = function*(data) {
@@ -242,7 +147,7 @@ exports.insertSession = function*(data) {
     RETURNING *
   `;
 
-  return yield queryOne(sql, [
+  return yield dbUtil.queryOne(sql, [
     uuid.v4(), data.user_id, data.ip_address, data.user_agent, data.interval
   ]);
 };
@@ -258,7 +163,7 @@ exports.logoutSession = function*(userId, sessionId) {
       AND id = $2
   `;
 
-  return yield query(sql, [userId, sessionId]);
+  return yield dbUtil.query(sql, [userId, sessionId]);
 };
 
 exports.hideMessage = function*(messageId) {
@@ -270,7 +175,7 @@ exports.hideMessage = function*(messageId) {
     WHERE id = $1
   `;
 
-  return yield query(sql, [messageId]);
+  return yield dbUtil.query(sql, [messageId]);
 };
 
 exports.getMessageById = function*(messageId) {
@@ -282,7 +187,7 @@ exports.getMessageById = function*(messageId) {
     WHERE id = $1
   `;
 
-  return yield queryOne(sql, [messageId]);
+  return yield dbUtil.queryOne(sql, [messageId]);
 };
 
 exports.updateUser = function*(userId, data) {
@@ -297,7 +202,7 @@ exports.updateUser = function*(userId, data) {
     RETURNING *
   `;
 
-  return yield queryOne(sql, [
+  return yield dbUtil.queryOne(sql, [
     userId,
     data.email,
     data.role
@@ -315,7 +220,7 @@ exports.updateUserRole = function*(userId, role) {
     RETURNING *
   `;
 
-  return yield queryOne(sql, [userId, role]);
+  return yield dbUtil.queryOne(sql, [userId, role]);
 };
 
 exports.updateMessage = function*(messageId, data) {
@@ -332,7 +237,7 @@ exports.updateMessage = function*(messageId, data) {
     RETURNING *
   `;
 
-  return yield queryOne(sql, [
+  return yield dbUtil.queryOne(sql, [
     messageId, data.is_hidden, data.markup
   ]);
 };
@@ -348,7 +253,7 @@ exports.getMessages = function*() {
     ORDER BY m.id DESC
   `;
 
-  return yield queryMany(sql);
+  return yield dbUtil.queryMany(sql);
 };
 
 // TODO: Pagination
@@ -367,24 +272,5 @@ exports.getUsers = function*() {
     ORDER BY u.id DESC
   `;
 
-  return yield queryMany(sql);
-};
-
-////////////////////////////////////////////////////////////
-// To strive for a modicum of organization, let's start a
-// 'namespace' for admin-panel related queries so we don't
-// confuse them with less sensitive queries.
-
-exports.admin = {};
-
-// only counts visible messages, not hidden ones since they are effectively
-// deleted
-exports.admin.getStats = function*() {
-  const sql = `;
-    SELECT
-      (SELECT COUNT(*) FROM users) AS users_count,
-      (SELECT COUNT(*) FROM messages WHERE is_hidden = false) AS messages_count
-  `;
-
-  return yield queryOne(sql);
+  return yield dbUtil.queryMany(sql);
 };
