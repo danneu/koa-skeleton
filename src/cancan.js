@@ -24,7 +24,7 @@ exports.can = function(user, action, target) {
     // Anyone can see a message as long as it's not hidden
     if (!target.is_hidden) return true;
     // Only admins and mods can read hidden messages
-    if (target.is_hidden) return _.contains(['ADMIN', 'MOD'], user && user.role);
+    if (target.is_hidden) return _.includes(['ADMIN', 'MOD'], user && user.role);
     return false;
   case 'UPDATE_USER_*': // target is other user
     return exports.can(user, 'UPDATE_USER_SETTINGS', target)
@@ -67,7 +67,7 @@ exports.can = function(user, action, target) {
     // Users can if it's their own message
     if (user.id === target.user_id) return true;
     // Admins and mods always can
-    if (_.contains(['ADMIN', 'MOD'], user.role)) return true;
+    if (_.includes(['ADMIN', 'MOD'], user.role)) return true;
     return false;
   // Is user authorized for any of the UPDATE_MESSAGE_* actions?
   case 'UPDATE_MESSAGE': // target is message
@@ -80,14 +80,14 @@ exports.can = function(user, action, target) {
     // Guests never can
     if (!user) return false;
     // Only mods and admins
-    if (_.contains(['ADMIN', 'MOD'], user.role)) return true;
+    if (_.includes(['ADMIN', 'MOD'], user.role)) return true;
     return false;
   case 'UPDATE_MESSAGE_MARKUP': // target is message
     assert(target);
     // Guests never can
     if (!user) return false;
     // Mods and admins can change any message markup
-    if (_.contains(['ADMIN', 'MOD'], user.role)) return true;
+    if (_.includes(['ADMIN', 'MOD'], user.role)) return true;
     // Members can update their own messages
     if (user.role === 'MEMBER')
       return user.id = target.user_id;

@@ -79,7 +79,7 @@ exports.getRecentMessages = function*() {
 };
 
 exports.getRecentMessagesForUserId = function*(userId) {
-  assert(Number.isInteger(userId));
+  assert(_.isInteger(userId));
 
   const sql = `
     SELECT
@@ -100,7 +100,7 @@ exports.getRecentMessagesForUserId = function*(userId) {
 
 // Returns inserted message
 exports.insertMessage = function*(data) {
-  assert(Number.isInteger(data.user_id) || _.isUndefined(data.user_id));
+  assert(_.isInteger(data.user_id) || _.isUndefined(data.user_id));
   assert(_.isString(data.markup));
   assert(_.isString(data.ip_address));
   assert(_.isString(data.user_agent) || _.isUndefined(data.user_agent));
@@ -136,7 +136,7 @@ exports.insertUser = function*(data) {
 };
 
 exports.insertSession = function*(data) {
-  assert(Number.isInteger(data.user_id));
+  assert(_.isInteger(data.user_id));
   assert(_.isString(data.ip_address));
   assert(_.isString(data.user_agent) || _.isUndefined(data.user_agent));
   assert(_.isString(data.interval));
@@ -153,7 +153,7 @@ exports.insertSession = function*(data) {
 };
 
 exports.logoutSession = function*(userId, sessionId) {
-  assert(Number.isInteger(userId));
+  assert(_.isInteger(userId));
   assert(_.isString(sessionId));
 
   const sql = `;
@@ -191,7 +191,7 @@ exports.getMessageById = function*(messageId) {
 };
 
 exports.updateUser = function*(userId, data) {
-  assert(Number.isInteger(userId));
+  assert(_.isInteger(userId));
 
   const sql = `
     UPDATE users
@@ -210,7 +210,7 @@ exports.updateUser = function*(userId, data) {
 };
 
 exports.updateUserRole = function*(userId, role) {
-  assert(Number.isInteger(userId));
+  assert(_.isInteger(userId));
   assert(_.isString(role));
 
   const sql = `
@@ -224,7 +224,7 @@ exports.updateUserRole = function*(userId, role) {
 };
 
 exports.updateMessage = function*(messageId, data) {
-  assert(Number.isInteger(messageId));
+  assert(_.isInteger(messageId));
   assert(_.isBoolean(data.is_hidden) || _.isUndefined(data.is_hidden));
   assert(_.isString(data.markup) || _.isUndefined(data.markup));
 

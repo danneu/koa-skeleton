@@ -61,7 +61,7 @@ exports.wrapFlash = function(cookieName) {
         this.cookies.set(cookieName, encodedVal, {
           // flash cookie only lasts 10 seconds to prevent stale flash messages.
           // CAVEAT: if the redirect request takes more than 10 seconds to
-          // load, then the user will end up with no flash message, 
+          // load, then the user will end up with no flash message,
           // no errors, etc.
           maxAge: 10000,
         });
@@ -70,7 +70,7 @@ exports.wrapFlash = function(cookieName) {
 
     yield* next;
 
-    // clear flash cookie if it's a successful request 
+    // clear flash cookie if it's a successful request
     // AND if it was actually set (instead of sending extraneous set-cookie
     // on every request)
     if (this.response.status < 300 && this.cookies.get(cookieName) !== undefined) {
@@ -156,9 +156,10 @@ exports.ensureRecaptcha = function*(next) {
 // TODO: Replace with something more versatile
 exports.ensureReferer = function() {
   return function*(next) {
+    // Don't ensure referer in tests
 
     // Skip get requests
-    if (_.contains(['GET', 'HEAD', 'OPTION'], this.method)) {
+    if (_.includes(['GET', 'HEAD', 'OPTION'], this.method)) {
       yield* next;
       return;
     }
