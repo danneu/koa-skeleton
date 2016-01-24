@@ -138,7 +138,9 @@ exports.ensureRecaptcha = function*(next) {
   }
 
   this.validateBody('g-recaptcha-response')
-    .required('You must attempt the human test');
+    .required('You must attempt the human test')
+    .isString()
+    .checkPred(s => s.length > 0, 'You must attempt the human test');
 
   try {
     yield recaptcha.promise(config.RECAPTCHA_SITESECRET, this.vals['g-recaptcha-response'], this.request.ip);

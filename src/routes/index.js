@@ -97,6 +97,7 @@ router.post('/users', mw.ensureRecaptcha, function*() {
     .required('Username required')
     .isString()
     .trim()
+    .checkPred(s => s.length > 0, 'Username required')
     .isLength(3, 15, 'Username must be 3-15 chars')
     .match(/^[a-z0-9_-]+$/i, 'Username must only contain a-z, 0-9, underscore (_), or hypen (-)')
     .match(/[a-z]/i, 'Username must contain at least one letter (a-z)')
@@ -104,11 +105,13 @@ router.post('/users', mw.ensureRecaptcha, function*() {
 
   this.validateBody('password2')
     .required('Password confirmation is required')
-    .isString();
+    .isString()
+    .checkPred(s => s.length > 0, 'Password confirmation is required');
 
   this.validateBody('password1')
     .required('Password is required')
     .isString()
+    .checkPred(s => s.length > 0, 'Password is required')
     .isLength(6, 100, 'Password must be 6-100 chars')
     .eq(this.vals.password2, 'Password must match confirmation');
 
@@ -360,6 +363,7 @@ router.put('/users/:uname/role', function*() {
     .required('Must provide a role')
     .isString()
     .trim()
+    .checkPred(s => s.length > 0, 'Must provide a role')
     .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED'], 'Invalid role');
 
   this.validateBody('redirectTo')
