@@ -30,7 +30,7 @@
     "koa-static": "1.5.2",
     "lodash": "4.0.0",
     "pg": "4.4.3",
-    "recaptcha-validator": "^1.0.0",
+    "recaptcha-validator": "1.0.0",
     "uuid": "2.0.1"
   },
   "devDependencies": {
