@@ -161,7 +161,7 @@ exports.ensureReferer = function() {
     // Don't ensure referer in tests
 
     // Skip get requests
-    if (_.includes(['GET', 'HEAD', 'OPTION'], this.method)) {
+    if (_.includes(['GET', 'HEAD', 'OPTIONS'], this.method)) {
       yield* next;
       return;
     }
