@@ -9,6 +9,29 @@ Just fork, gut, and modify.
 
 - Live Demo: https://koa-skeleton.danneu.com/
 
+## Setup
+
+You must have Postgres installed. I recommend http://postgresapp.com/ for OSX.
+
+    createdb koa-skeleton
+    git clone git@github.com:danneu/koa-skeleton.git
+    cd koa-skeleton
+    touch .env
+    npm install
+    npm run reset-db
+    npm run start-dev
+
+    > Server is listening on http://localhost:3000...
+
+Create a `.env` file in the root directory which will let you set environment variables in development. `npm run start-dev` will read from it.
+
+Example `.env`:
+
+    DATABASE_URL=postgres://username:password@localhost:5432/my-database
+    DEBUG=app:*
+    RECAPTCHA_SITEKEY=''
+    RECAPTCHA_SITESECRET=''
+
 ## The Stack
 
 Depends on Node v4.x, but not very heavily.
@@ -28,19 +51,6 @@ Depends on Node v4.x, but not very heavily.
 - Relative human-friendly timestamps like 'Created 4 hours ago' that are updated live via Javascript as the user stays on the page. I accomplish this with the [timeago](http://timeago.yarp.com/) jQuery plugin.
 - Comes with Bootstrap v3.x. I start almost every project with Bootstrap so that I can focus on the back-end code and have a decent looking front-end with minimal effort.
 - `npm run reset-db`. During early development, I like to have a `reset-db` command that I can spam that will delete the schema, recreate it, and insert any sample data I put in a `seeds.sql` file.
-
-## Setup
-
-You must have Postgres installed. I recommend http://postgresapp.com/ for OSX.
-
-    createdb koa-skeleton
-
-Create a `.env` file in the root directory which will let you set environment variables in development. `npm run start-dev` will read from it.
-
-Example `.env`:
-
-    DATABASE_URL=postgres://username:password@localhost:5432/my-database
-    DEBUG=app:*,-app:db
 
 ## Philosophy/Opinions
 
