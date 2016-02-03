@@ -28,9 +28,11 @@ const nunjucksOptions = {
   // `yield this.render('show_user')` will assume that a show_user.html exists
   ext: '.html',
   noCache: config.NODE_ENV === 'development',
-  // throw an error if we try to {{ x }} where x is null or undefined in
-  // templates. helps catch bugs and forces us to explicitly {{ x or '' }}
-  throwOnUndefined: true,
+  // don't throw template errors in development if we try to render
+  // a null/undefined like {{ x }}. in theory, setting it to true prevents
+  // bugs and forces you to be explicit about {{ x or '' }}, but in reality,
+  // often more annoying than it's worth.
+  throwOnUndefined: false,
   // globals are bindings we want to expose to all templates
   globals: {
     // let us use `can(USER, ACTION, TARGET)` authorization-checks in templates
