@@ -9,6 +9,16 @@ Just fork, gut, and modify.
 
 - Live Demo: https://koa-skeleton.danneu.com/
 
+## The Stack
+
+Depends on Node v4.x+:
+
+- **Micro-framework**: [Koa](http://koajs.com/). It's very similar to [Express](http://expressjs.com/) except it supports synchronous-looking code with the use of `yield`/generators/and the [co](https://github.com/tj/co) abstraction.
+- **Database**: [Postgres](http://www.postgresql.org/).
+- **User-input validation**: [koa-bouncer](https://github.com/danneu/koa-bouncer).
+- **View-layer templating**: [Nunjucks](https://mozilla.github.io/nunjucks/). Very similar to Django's [Jinja2](http://jinja.pocoo.org/) templates. The successor to [Swig](http://paularmstrong.github.io/swig/). Compatible with "Django HTML" editor syntax highlighter plugins like `htmldjango` in Vim.
+- **Deployment**: [Heroku](https://heroku.com/). Keeps things easy while you focus on coding your webapp. Forces you to write your webapp statelessly and horizontally-scalably.
+
 ## Setup
 
 You must have Postgres installed. I recommend http://postgresapp.com/ for OSX.
@@ -32,15 +42,28 @@ Example `.env`:
     RECAPTCHA_SITEKEY=''
     RECAPTCHA_SITESECRET=''
 
-## The Stack
+## Configuration (Environment Variables)
 
-Depends on Node v4.x, but not very heavily.
+koa-skeleton is configured with environment variables.
 
-- **Micro-framework**: [Koa](http://koajs.com/). It's very similar to [Express](http://expressjs.com/) except it supports synchronous-looking code with the use of `yield`/generators/and the [co](https://github.com/tj/co) abstraction.
-- **Database**: [Postgres](http://www.postgresql.org/).
-- **User-input validation**: [koa-bouncer](https://github.com/danneu/koa-bouncer).
-- **View-layer templating**: [Nunjucks](https://mozilla.github.io/nunjucks/). Very similar to Django's [Jinja2](http://jinja.pocoo.org/) templates. The successor to [Swig](http://paularmstrong.github.io/swig/). Compatible with "Django HTML" editor syntax highlighter plugins like `htmldjango` in Vim.
-- **Deployment**: [Heroku](https://heroku.com/). Keeps things easy while you focus on coding your webapp. Forces you to write your webapp statelessly and horizontally-scalably.
+You can set these by putting them in a `.env` file at the project root (good
+for development) or by exporting them in the environment (good for production,
+like on Heroku).
+
+The defaults are overriden by simply defining the respective variable.
+
+You can look at `src/config.js` to view these and their defaults.
+
+- `NODE_ENV` (string) defaults to `"development"`. Set to `"production"` on the production server to enable some optimizations and security checks that are turned off in development for convenience. For example, templates
+- `PORT` (integer) defaults to `3000`. Overriden by Heroku in production.
+- `DATABASE_URL` (string) defaults to `"postgres://localhost:5432/koa-skeleton"`. The format is `"postgres://dbUsername:dbPassword@dbHost:dbPort/dbName"`. Overriden by Heroku in production if you use its Heroku Postgres addon.
+- `TRUST_PROXY` (boolean) defaults to `false`. Set it to the string `"true"` to turn it on. Turn it on if you're behind a proxy like Cloudflare which means you can trust the IP address supplied in the `X-Forwarded-For` header. If so, then `this.request.ip` will use that header if it's set.
+- `HOSTNAME` (string) defaults to `undefined`. Set it to your hostname in production to enable basic CSRF protection. i.e. `example.com`, `subdomain.example.com`. If set, then any requests not one of `GET | HEAD | OPTIONS` must have a `Referer` header set that originates from the given HOSTNAME. The referer is always set for `<form>` submissions, for example. Very crude protection.
+- `RECAPTCHA_SITEKEY` (string) defaults to `undefined`. Must be set to enable the Recaptcha system. <https://www.google.com/recaptcha>
+- `RECAPTCHA_SITESECRET` (string) defaults to `undefined`. Must be set to enable the Recaptcha system. <https://www.google.com/recaptcha>
+
+Don't access `process.env.*` directly in the app. Instead, require the
+`src/config.js` and access them there.
 
 ## Features/Demonstrations
 
@@ -58,7 +81,7 @@ Depends on Node v4.x, but not very heavily.
 - Just write SQL. When you need more complex/composable queries (like a /search endpoint with various filter options), consider using a SQL query building library like [knex.js](http://knexjs.org/).
 - Use whichever Javascript features that are supported by the lastest stable version of Node. I don't think Babel compilation and the resulting idiosyncrasies are worth the build step.
 
-## Random Tips 
+## Random Tips
 
 - Save the user's `user_agent` anywhere you save their `ip_address` for abuse prevention. People are well-conditioned to switch VPNs to circumvent ip_address bans, but they often forget to change their user_agent.
 - koa-skeleton doesn't encrypt or sign cookies, so don't store sensitive information in cookies, or sign/encrypt cookies if you do.
@@ -70,7 +93,7 @@ Depends on Node v4.x, but not very heavily.
     ``` javascript
     router.post('/users', function*() {
 
-      // Validation 
+      // Validation
 
       this.validateBody('uname')
         .required('Username required')
@@ -106,8 +129,8 @@ Depends on Node v4.x, but not very heavily.
 ## FAQ
 
 - Q: Why pollute markup with Bootstrap classes?
-    - A: When prototyping or trying to reach a webapp's minimally viable release, I find it much more efficient to prefer class pollution than having to maintain the markup alongside CSS files since the markup is likely to churn so frequently. 
-    
+    - A: When prototyping or trying to reach a webapp's minimally viable release, I find it much more efficient to prefer class pollution than having to maintain the markup alongside CSS files since the markup is likely to churn so frequently.
+
     For instance, it's easier to reason about quick markup changes (like small nesting tweaks) when you can see things like `.row` and `.col-lg-6` right there in the markup you're editing.
 
     I think semantic markup purity is something that can wait until the webapp's general look and feel mature.

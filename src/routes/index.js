@@ -30,7 +30,8 @@ router.get('/', function*() {
   yield this.render('homepage', {
     ctx: this,
     messages: messages,
-    recaptchaSitekey: config.RECAPTCHA_SITEKEY
+    recaptchaSitekey: config.RECAPTCHA_SITEKEY,
+    recaptchaSystemOnline: config.RECAPTCHA_SYSTEM_ONLINE
   });
 });
 

@@ -44,7 +44,7 @@
               >{{ ctx.flash.params.markup or '' }}</textarea>
             </div>
 
-            {% if recaptchaSiteKey %}
+            {% if recaptchaSystemOnline %}
               <div class="form-group text-center">
                 <div class="g-recaptcha recaptcha-center" data-sitekey="{{ recaptchaSitekey }}" data-callback="recaptchaSuccessCallback"></div>
               </div>

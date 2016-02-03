@@ -137,6 +137,12 @@ exports.ensureRecaptcha = function*(next) {
     return;
   }
 
+  if (!config.RECAPTCHA_SYSTEM_ONLINE) {
+    console.warn('Warn: Recaptcha environment variables not set, so skipping recaptcha check');
+    yield* next;
+    return;
+  }
+
   this.validateBody('g-recaptcha-response')
     .required('You must attempt the human test')
     .isString()
@@ -166,9 +172,9 @@ exports.ensureReferer = function() {
       return;
     }
 
-    // Skip in development mode if no HOSTNAME is set
-    if (config.NODE_ENV === 'development' && !config.HOSTNAME) {
-      debug('Skipping referer check in development since HOSTNAME not provided');
+    // Skip if no HOSTNAME is set
+    if (!config.HOSTNAME) {
+      debug('Skipping referer check since HOSTNAME not provided');
       yield* next;
       return;
     }

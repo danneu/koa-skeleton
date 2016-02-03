@@ -16,11 +16,8 @@ exports.TRUST_PROXY = process.env.TRUST_PROXY === 'true';
 //
 // Ex: example.com, subdomain.example.com
 exports.HOSTNAME = process.env.HOSTNAME;
-if (exports.NODE_ENV === 'development' && !exports.HOSTNAME) {
-  console.warn('Warn: CSRF checks are disabled in development mode since there is no HOSTNAME environment variable provided');
-}
-if (exports.NODE_ENV === 'production' && !exports.HOSTNAME) {
-  throw new Error('Refusing to boot until you set the HOSTNAME environment variable');
+if (!exports.HOSTNAME) {
+  console.warn('Warn: CSRF checks are disabled since there is no HOSTNAME environment variable provided');
 }
 
 exports.RECAPTCHA_SITEKEY = process.env.RECAPTCHA_SITEKEY;
@@ -29,6 +26,13 @@ if (!exports.RECAPTCHA_SITEKEY)
   console.warn('Warn: Recaptcha will not work since RECAPTCHA_SITEKEY is not set');
 if (!exports.RECAPTCHA_SITESECRET)
   console.warn('Warn: Recaptcha will not work since RECAPTCHA_SITESECRET is not set');
+
+exports.RECAPTCHA_SYSTEM_ONLINE = exports.RECAPTCHA_SITEKEY && exports.RECAPTCHA_SITESECRET;
+if (exports.RECAPTCHA_SYSTEM_ONLINE) {
+  console.warn('Warn: Recaptcha system offline');
+} else {
+  console.log('Recaptcha system online');
+}
 
 ////////////////////////////////////////////////////////////
 
