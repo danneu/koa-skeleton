@@ -1,4 +1,6 @@
 'use strict';
+// 3rd party
+require('dotenv').config(); // Load env vars from the .env file, if any
 
 exports.NODE_ENV = process.env.NODE_ENV || 'development';
 exports.PORT = Number.parseInt(process.env.PORT, 10) || 3000;

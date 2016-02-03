@@ -5,8 +5,8 @@
   },
   "scripts": {
     "start": "node ./src/index.js",
-    "start-dev": "env $(cat .env | xargs) nodemon --ext js,html ./src/index.js",
-    "reset-db": "env $(cat .env | xargs) node ./sql/reset_db.js"
+    "start-dev": "nodemon --ext js,html ./src/index.js",
+    "reset-db": "node ./sql/reset_db.js"
   },
   "engines": {
     "node": "5.x"
@@ -19,6 +19,7 @@
     "co-fs": "1.2.0",
     "co-pg": "1.3.1",
     "debug": "2.2.0",
+    "dotenv": "^2.0.0",
     "koa": "1.1.2",
     "koa-body": "1.4.0",
     "koa-bouncer": "5.0.1",
