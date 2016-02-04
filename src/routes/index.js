@@ -1,6 +1,6 @@
 'use strict';
-
 // 3rd party
+require('dotenv').config(); // Load env vars from .env, always run this early
 const assert = require('better-assert');
 const Router = require('koa-router');
 const debug = require('debug')('app:routes:index');
