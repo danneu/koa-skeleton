@@ -126,15 +126,6 @@ Don't access `process.env.*` directly in the app. Instead, require the
     });
     ```
 
-## FAQ
-
-- Q: Why pollute markup with Bootstrap classes?
-    - A: When prototyping or trying to reach a webapp's minimally viable release, I find it much more efficient to prefer class pollution than having to maintain the markup alongside CSS files since the markup is likely to churn so frequently.
-
-    For instance, it's easier to reason about quick markup changes (like small nesting tweaks) when you can see things like `.row` and `.col-lg-6` right there in the markup you're editing.
-
-    I think semantic markup purity is something that can wait until the webapp's general look and feel mature.
-
 ## License
 
 MIT
