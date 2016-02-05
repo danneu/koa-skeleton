@@ -26,11 +26,11 @@ if (!exports.RECAPTCHA_SITEKEY)
 if (!exports.RECAPTCHA_SITESECRET)
   console.warn('Warn: Recaptcha will not work since RECAPTCHA_SITESECRET is not set');
 
-exports.RECAPTCHA_SYSTEM_ONLINE = exports.RECAPTCHA_SITEKEY && exports.RECAPTCHA_SITESECRET;
+exports.RECAPTCHA_SYSTEM_ONLINE = !!(exports.RECAPTCHA_SITEKEY && exports.RECAPTCHA_SITESECRET);
 if (exports.RECAPTCHA_SYSTEM_ONLINE) {
-  console.warn('Warn: Recaptcha system offline');
-} else {
   console.log('Recaptcha system online');
+} else {
+  console.warn('Warn: Recaptcha system offline');
 }
 
 exports.MESSAGES_PER_PAGE = Number.parseInt(process.env.MESSAGES_PER_PAGE, 10) || 10;
@@ -39,6 +39,6 @@ exports.USERS_PER_PAGE = Number.parseInt(process.env.USERS_PER_PAGE, 10) || 10;
 ////////////////////////////////////////////////////////////
 
 // Output config object in development to help with sanity-checking
-if (exports.NODE_ENV === 'development') {
+if (exports.NODE_ENV === 'development' || exports.NODE_ENV === 'test') {
   console.log(exports);
 }
