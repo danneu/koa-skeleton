@@ -30,6 +30,8 @@ router.get('/test', function*() {
   this.body = this.headers['user-agent'];
 });
 
+////////////////////////////////////////////////////////////
+
 // Show homepage
 router.get('/', function*() {
   let messages = yield db.getRecentMessages();
@@ -42,6 +44,8 @@ router.get('/', function*() {
     recaptchaSystemOnline: config.RECAPTCHA_SYSTEM_ONLINE
   });
 });
+
+////////////////////////////////////////////////////////////
 
 // Update user
 //
@@ -86,6 +90,8 @@ router.put('/users/:uname', function*() {
   this.redirect(`${user.url}/edit`);
 });
 
+////////////////////////////////////////////////////////////
+
 // Edit user page
 router.get('/users/:uname/edit', function*() {
   // Load user
@@ -98,8 +104,11 @@ router.get('/users/:uname/edit', function*() {
   yield this.render('users_edit', {
     ctx: this,
     user,
+    title: `Edit ${user.uname}`,
   });
 });
+
+////////////////////////////////////////////////////////////
 
 // Show user profile
 router.get('/users/:uname', function*() {
@@ -118,8 +127,11 @@ router.get('/users/:uname', function*() {
     ctx: this,
     user,
     messages,
+    title: user.uname,
   });
 });
+
+////////////////////////////////////////////////////////////
 
 // Create message
 router.post('/messages', mw.ensureRecaptcha, function*() {
@@ -169,6 +181,7 @@ router.get('/messages', function*() {
     messages,
     paginator,
     messagesCount: results.count,
+    title: `All Messages`,
   });
 });
 
@@ -194,6 +207,7 @@ router.get('/users', function*() {
     users,
     paginator,
     usersCount: results.count,
+    title: 'All Users',
   });
 });
 

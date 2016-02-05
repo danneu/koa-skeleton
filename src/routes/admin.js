@@ -25,6 +25,7 @@ router.get('/admin', function*() {
   yield this.render('admin/index', {
     ctx: this,
     stats,
+    title: 'Admin Panel',
   });
 });
 
