@@ -7,6 +7,7 @@ const uuid = require('uuid');
 const debug = require('debug')('app:db');
 // 1st
 const belt = require('../belt');
+const config = require('../config');
 const dbUtil = require('./util');
 
 /*
@@ -223,6 +224,8 @@ exports.updateUserRole = function*(userId, role) {
   return yield dbUtil.queryOne(sql, [userId, role]);
 };
 
+////////////////////////////////////////////////////////////
+
 exports.updateMessage = function*(messageId, data) {
   assert(_.isInteger(messageId));
   assert(_.isBoolean(data.is_hidden) || _.isUndefined(data.is_hidden));
@@ -242,19 +245,44 @@ exports.updateMessage = function*(messageId, data) {
   ]);
 };
 
-// TODO: Pagination
-exports.getMessages = function*() {
+////////////////////////////////////////////////////////////
+
+exports.getMessages = function*(page) {
+  page = page || 1;
+  assert(_.isInteger(page));
+
   const sql = `
-    SELECT
-      m.*,
-      to_json(u.*) AS "user"
-    FROM messages m
-    LEFT OUTER JOIN users u ON m.user_id = u.id
-    ORDER BY m.id DESC
+SELECT
+  m.*,
+  to_json(u.*) AS "user"
+FROM messages m
+LEFT OUTER JOIN users u ON m.user_id = u.id
+ORDER BY m.id DESC
+OFFSET $1
+LIMIT $2
   `;
 
-  return yield dbUtil.queryMany(sql);
+  const perPage = config.MESSAGES_PER_PAGE;
+  const offset = (page - 1) * perPage;
+  const limit = perPage;
+
+  return yield dbUtil.queryMany(sql, [offset, limit]);
 };
+
+////////////////////////////////////////////////////////////
+
+// Returns Int
+exports.getMessagesCount = function*() {
+  const sql = `
+SELECT COUNT(*) AS "count"
+FROM messages
+WHERE is_hidden = false
+  `;
+
+  return (yield dbUtil.queryOne(sql)).count;
+};
+
+////////////////////////////////////////////////////////////
 
 // TODO: Pagination
 // TODO: user.messages_count counter cache

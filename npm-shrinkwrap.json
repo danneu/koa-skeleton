@@ -1305,6 +1305,22 @@
         }
       }
     },
+    "interval-cache": {
+      "version": "0.0.1",
+      "from": "interval-cache@latest",
+      "dependencies": {
+        "better-assert": {
+          "version": "1.0.2",
+          "from": "better-assert@latest",
+          "resolved": "https://registry.npmjs.org/better-assert/-/better-assert-1.0.2.tgz"
+        },
+        "callsite": {
+          "version": "1.0.0",
+          "from": "callsite@1.0.0",
+          "resolved": "https://registry.npmjs.org/callsite/-/callsite-1.0.0.tgz"
+        }
+      }
+    },
     "is-binary-path": {
       "version": "1.0.1",
       "from": "is-binary-path@>=1.0.0 <2.0.0",

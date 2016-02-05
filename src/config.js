@@ -33,6 +33,8 @@ if (exports.RECAPTCHA_SYSTEM_ONLINE) {
   console.log('Recaptcha system online');
 }
 
+exports.MESSAGES_PER_PAGE = Number.parseInt(process.env.MESSAGES_PER_PAGE, 10) || 10;
+
 ////////////////////////////////////////////////////////////
 
 // Output config object in development to help with sanity-checking

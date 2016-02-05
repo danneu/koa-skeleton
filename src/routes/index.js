@@ -10,6 +10,8 @@ const pre = require('../presenters');
 const mw = require('../middleware');
 const config = require('../config');
 const belt = require('../belt');
+const paginate = require('../paginate');
+const cache = require('../cache');
 
 const router = new Router();
 
@@ -271,17 +273,32 @@ router.post('/messages', mw.ensureRecaptcha, function*() {
   this.redirect('/');
 });
 
+////////////////////////////////////////////////////////////
+
 // List all messages
-// TODO: Add pagination
 router.get('/messages', function*() {
-  let messages = yield db.getMessages();
-  messages = messages.map(pre.presentMessage);
+
+  this.validateQuery('page')
+    .defaultTo(1)
+    .toInt();
+
+  const results = yield {
+    messages: db.getMessages(this.vals.page),
+    count: cache.get('messages-count')
+  };
+
+  const messages = results.messages.map(pre.presentMessage);
+  const paginator = paginate.makePaginator(this.vals.page, results.count);
 
   yield this.render('messages_list', {
     ctx: this,
-    messages: messages
+    messages,
+    paginator,
+    messagesCount: results.count,
   });
 });
+
+////////////////////////////////////////////////////////////
 
 // List all users
 // TODO: Pagination
@@ -294,6 +311,8 @@ router.get('/users', function*() {
     users: users
   });
 });
+
+////////////////////////////////////////////////////////////
 
 // Update message
 //

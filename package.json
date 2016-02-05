@@ -20,6 +20,7 @@
     "co-pg": "1.3.1",
     "debug": "2.2.0",
     "dotenv": "^2.0.0",
+    "interval-cache": "0.0.1",
     "koa": "1.1.2",
     "koa-body": "1.4.0",
     "koa-bouncer": "5.0.1",

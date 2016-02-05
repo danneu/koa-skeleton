@@ -8,12 +8,21 @@
   </ol>
 
   <div class="page-header">
-    <h1>Messages</h1>
+    <h1>
+      Messages
+      <small>
+        {{ messagesCount }} total
+      </small>
+    </h1>
   </div>
+
+  {{ macros.renderPaginator(paginator) }}
 
   {% for message in messages %}
     {{ macros.renderMessagePanel(ctx, message, '/messages') }}
   {% endfor %}
+
+  {{ macros.renderPaginator(paginator) }}
 
 {% endblock %}
 
