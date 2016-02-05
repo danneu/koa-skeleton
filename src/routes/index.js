@@ -301,14 +301,25 @@ router.get('/messages', function*() {
 ////////////////////////////////////////////////////////////
 
 // List all users
-// TODO: Pagination
 router.get('/users', function*() {
-  let users = yield db.getUsers();
-  users = users.map(pre.presentUser);
+
+  this.validateQuery('page')
+    .defaultTo(1)
+    .toInt();
+
+  const results = yield {
+    users: db.getUsers(this.vals.page),
+    count: cache.get('users-count')
+  };
+
+  const users = results.users.map(pre.presentUser);
+  const paginator = paginate.makePaginator(this.vals.page, results.count);
 
   yield this.render('users_list', {
     ctx: this,
-    users: users
+    users,
+    paginator,
+    usersCount: results.count,
   });
 });
 

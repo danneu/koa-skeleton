@@ -34,6 +34,7 @@ if (exports.RECAPTCHA_SYSTEM_ONLINE) {
 }
 
 exports.MESSAGES_PER_PAGE = Number.parseInt(process.env.MESSAGES_PER_PAGE, 10) || 10;
+exports.USERS_PER_PAGE = Number.parseInt(process.env.USERS_PER_PAGE, 10) || 10;
 
 ////////////////////////////////////////////////////////////
 

@@ -284,21 +284,43 @@ WHERE is_hidden = false
 
 ////////////////////////////////////////////////////////////
 
-// TODO: Pagination
-// TODO: user.messages_count counter cache
-// TODO: idx for is_hidden
-exports.getUsers = function*() {
+// Returns Int
+exports.getUsersCount = function*() {
   const sql = `
-    SELECT
-      u.*,
-      (
-        SELECT COUNT(*)
-        FROM messages
-        WHERE user_id = u.id AND is_hidden = false
-      ) AS messages_count
-    FROM users u
-    ORDER BY u.id DESC
+SELECT COUNT(*) AS "count"
+FROM users
   `;
 
-  return yield dbUtil.queryMany(sql);
+  return (yield dbUtil.queryOne(sql)).count;
 };
+
+////////////////////////////////////////////////////////////
+
+// TODO: user.messages_count counter cache
+// TODO: idx for is_hidden
+exports.getUsers = function*(page) {
+  page = page || 1;
+  assert(_.isInteger(page));
+
+  const sql = `
+SELECT
+  u.*,
+  (
+    SELECT COUNT(*)
+    FROM messages
+    WHERE user_id = u.id AND is_hidden = false
+  ) AS messages_count
+FROM users u
+ORDER BY u.id DESC
+OFFSET $1
+LIMIT $2
+  `;
+
+  const perPage = config.USERS_PER_PAGE;
+  const offset = (page - 1) * perPage;
+  const limit = perPage;
+
+  return yield dbUtil.queryMany(sql, [offset, limit]);
+};
+
+////////////////////////////////////////////////////////////
