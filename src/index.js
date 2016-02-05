@@ -93,12 +93,13 @@ app.use(function*(next) {
 ////////////////////////////////////////////////////////////
 
 app.use(require('./routes').routes());
+app.use(require('./routes/authentication').routes());
 app.use(require('./routes/admin').routes());
 
 ////////////////////////////////////////////////////////////
 
 // If we run this file directly (npm start, npm run start-dev, node src/index.js)
-// then start the server. Else, if we require() this file (like from 
+// then start the server. Else, if we require() this file (like from
 // our tests), then don't start the server and instead just export the app.
 if (require.main === module) {
   app.listen(config.PORT, function() {
