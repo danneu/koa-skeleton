@@ -33,7 +33,7 @@ You must have Postgres installed. I recommend http://postgresapp.com/ for OSX.
 
     > Server is listening on http://localhost:3000...
 
-Create a `.env` file in the root directory which will let you set environment variables in development. `npm run start-dev` will read from it.
+Create a `.env` file in the root directory which will let you set environment variables. `npm run start-dev` will read from it.
 
 Example `.env`:
 
@@ -50,8 +50,6 @@ You can set these by putting them in a `.env` file at the project root (good
 for development) or by exporting them in the environment (good for production,
 like on Heroku).
 
-The defaults are overriden by simply defining the respective variable.
-
 You can look at `src/config.js` to view these and their defaults.
 
 | Evironment Variable | Type | Default | Description |
@@ -66,14 +64,14 @@ You can look at `src/config.js` to view these and their defaults.
 | <code>MESSAGES_PER_PAGE</code> | Integer | 10 | Determines how many messages to show per page when viewing paginated lists |
 | <code>USERS_PER_PAGE</code> | Integer | 10 | Determines how many users to show per page when viewing paginated lists |
 
-Don't access `process.env.*` directly in the app. Instead, require the
-`src/config.js` and access them there.
+Don't access `process.env.*` directly in the app.
+Instead, require the `src/config.js` and access them there.
 
 ## Features/Demonstrations
 
 - **User authentication** (/register, /login). Sessions are backed by the database and persisted on the client with a cookie `session_id=<UUID v4>`.
 - **Role-based user authorization** (i.e. the permission system). Core abstraction is basically `can(currUser, action, target) -> Boolean`, which is implemented as one big switch statement. For example: `can(currUser, 'READ_TOPIC', topic)`. Inspired by [ryanb/cancan](https://github.com/ryanb/cancan), though my abstraction is an ultra simplification. My user table often has a `role` column that's either one of `ADMIN` | `MOD` | `MEMBER` (default) | `BANNED`.
-- Recaptcha integration. Protect any route with Recaptcha by adding the `ensureRecaptcha` middleware to the route.
+- **Recaptcha integration**. Protect any route with Recaptcha by adding the `ensureRecaptcha` middleware to the route.
 - Flash message cookie. You often want to display simple messages like "Topic created successfully" to the user, but you want the message to last just one request and survive any redirects.
 - Relative human-friendly timestamps like 'Created 4 hours ago' that are updated live via Javascript as the user stays on the page. I accomplish this with the [timeago](http://timeago.yarp.com/) jQuery plugin.
 - Comes with Bootstrap v3.x. I start almost every project with Bootstrap so that I can focus on the back-end code and have a decent looking front-end with minimal effort.
