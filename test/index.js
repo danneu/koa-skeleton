@@ -1,40 +1,76 @@
 'use strict';
 // 3rd
 const assert = require('chai').assert;
-const req = require('supertest');
+const request = require('supertest');
 // 1st
 const app = require('../src');
 
 ////////////////////////////////////////////////////////////
 
-const server = app.listen();
-
-////////////////////////////////////////////////////////////
-
-function statusTest(verb, path, status) {
+function statusTest(agent, verb, path, status) {
   it(`${verb.toUpperCase()} ${path} works`, done => {
-    req(server)[verb.toLowerCase()](path).expect(status, done);
+    agent[verb.toLowerCase()](path).expect(status, done);
   });
 }
 
 // Hit all the public GET routes to catch stupid runtime errors
 // Better than nothing.
 
-describe('routing sanity check', () => {
-  // general routes
-  statusTest('GET', '/not-found', 404);
-  statusTest('GET', '/', 200);
-  statusTest('GET', '/users/test', 200);
-  statusTest('GET', '/messages', 200);
-  statusTest('GET', '/users', 200);
-  // authentication routes
-  statusTest('GET', '/login', 200);
-  statusTest('GET', '/register', 200);
+// describe('public routing sanity check', () => {
+//   const server = app.listen();
+//   const agent = request.agent(server);
+//   // general routes
+//   statusTest(agent, 'GET', '/not-found', 404);
+//   statusTest(agent, 'GET', '/', 200);
+//   statusTest(agent, 'GET', '/users/test', 200);
+//   statusTest(agent, 'GET', '/messages', 200);
+//   statusTest(agent, 'GET', '/users', 200);
+//   // authentication routes
+//   statusTest(agent, 'GET', '/login', 200);
+//   statusTest(agent, 'GET', '/register', 200);
+// });
+
+////////////////////////////////////////////////////////////
+
+describe('random routing flow sanity check', () => {
+  const server = app.listen();
+  const agent = request.agent(server);
+
+  // Guests can hit these routes
+
+  it('can create message', done => {
+    agent.post('/messages')
+      .type('form')
+      .send({ markup: 'hello world' })
+      .expect(302, (err, res) => {
+        console.log(res.headers);
+        done();
+      })
+  });
+
+  // Cannot hit these routes as a guest
+
+  statusTest(agent, 'GET', '/users/test/edit', 404);
+  statusTest(agent, 'GET', '/admin', 404);
+
+  // Login as @test admin
+
+  it('can login', done => {
+    agent.post('/login')
+      .type('form')
+      .send({ uname: 'test', password: 'secret' })
+      .expect(302, done);
+  });
+
+  // Should be able to hit previous routes now that agent is logged in as admin
+
+  statusTest(agent, 'GET', '/users/test/edit', 200);
+  statusTest(agent, 'GET', '/admin', 200);
+});
+
 
   // TODO:
   // General
-  // statusTest('GET', '/users/test/edit', 200);
-  // statusTest('POST', '/messages', 200);
   // statusTest('PUT', '/messages/1', 200);
   // statusTest('PUT', '/users/1', 200);
   // statusTest('PUT', '/users/test/role', 200);
@@ -44,4 +80,3 @@ describe('routing sanity check', () => {
   // statusTest('DELETE', '/sessions/1', 200);
   // Admin
   // statusTest('GET', '/admin', 200);
-});

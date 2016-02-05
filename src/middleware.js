@@ -131,7 +131,7 @@ exports.handleBouncerValidationError = function() {
 };
 
 exports.ensureRecaptcha = function*(next) {
-  if (config.NODE_ENV === 'development' && !this.request.body['g-recaptcha-response']) {
+  if (_.includes(['development', 'test'], config.NODE_ENV) && !this.request.body['g-recaptcha-response']) {
     console.log('Development mode, so skipping recaptcha check');
     yield* next;
     return;
