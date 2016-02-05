@@ -24,7 +24,7 @@ router.get('/admin', function*() {
 
   yield this.render('admin/index', {
     ctx: this,
-    stats: stats
+    stats,
   });
 });
 

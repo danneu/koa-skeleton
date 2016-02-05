@@ -37,7 +37,7 @@ router.get('/', function*() {
 
   yield this.render('homepage', {
     ctx: this,
-    messages: messages,
+    messages,
     recaptchaSitekey: config.RECAPTCHA_SITEKEY,
     recaptchaSystemOnline: config.RECAPTCHA_SYSTEM_ONLINE
   });
@@ -97,7 +97,7 @@ router.get('/users/:uname/edit', function*() {
 
   yield this.render('users_edit', {
     ctx: this,
-    user: user
+    user,
   });
 });
 
@@ -116,8 +116,8 @@ router.get('/users/:uname', function*() {
 
   yield this.render('users_show', {
     ctx: this,
-    user: user,
-    messages: messages
+    user,
+    messages,
   });
 });
 
