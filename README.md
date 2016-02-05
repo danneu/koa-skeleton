@@ -54,13 +54,17 @@ The defaults are overriden by simply defining the respective variable.
 
 You can look at `src/config.js` to view these and their defaults.
 
-- `NODE_ENV` (string) defaults to `"development"`. Set to `"production"` on the production server to enable some optimizations and security checks that are turned off in development for convenience. For example, templates
-- `PORT` (integer) defaults to `3000`. Overriden by Heroku in production.
-- `DATABASE_URL` (string) defaults to `"postgres://localhost:5432/koa-skeleton"`. The format is `"postgres://dbUsername:dbPassword@dbHost:dbPort/dbName"`. Overriden by Heroku in production if you use its Heroku Postgres addon.
-- `TRUST_PROXY` (boolean) defaults to `false`. Set it to the string `"true"` to turn it on. Turn it on if you're behind a proxy like Cloudflare which means you can trust the IP address supplied in the `X-Forwarded-For` header. If so, then `this.request.ip` will use that header if it's set.
-- `HOSTNAME` (string) defaults to `undefined`. Set it to your hostname in production to enable basic CSRF protection. i.e. `example.com`, `subdomain.example.com`. If set, then any requests not one of `GET | HEAD | OPTIONS` must have a `Referer` header set that originates from the given HOSTNAME. The referer is always set for `<form>` submissions, for example. Very crude protection.
-- `RECAPTCHA_SITEKEY` (string) defaults to `undefined`. Must be set to enable the Recaptcha system. <https://www.google.com/recaptcha>
-- `RECAPTCHA_SITESECRET` (string) defaults to `undefined`. Must be set to enable the Recaptcha system. <https://www.google.com/recaptcha>
+| Evironment Variable | Type | Default | Description |
+| --- | --- | --- | --- |
+| <code>NODE_ENV</code> | String | "development" | Set to `"production"` on the production server to enable some optimizations and security checks that are turned off in development for convenience. |
+| <code>PORT</code> | Integer | 3000 | Overriden by Heroku in production. |
+| <code>DATABASE_URL</code> | String | "postgres://localhost:5432/koa-skeleton" | Overriden by Heroku in production if you use its Heroku Postgres addon. |
+| <code>TRUST_PROXY</code> | Boolean | false | Set it to the string `"true"` to turn it on. Turn it on if you're behind a proxy like Cloudflare which means you can trust the IP address supplied in the `X-Forwarded-For` header. If so, then `this.request.ip` will use that header if it's set. |
+| <code>HOSTNAME</code> | String | undefined | Set it to your hostname in production to enable basic CSRF protection. i.e. `example.com`, `subdomain.example.com`. If set, then any requests not one of `GET | HEAD | OPTIONS` must have a `Referer` header set that originates from the given HOSTNAME. The referer is always set for `<form>` submissions, for example. Very crude protection. |
+| <code>RECAPTCHA_SITEKEY</code> | String | undefined | Must be set to enable the Recaptcha system. <https://www.google.com/recaptcha> |
+| <code>RECAPTCHA_SITESECRET</code> | String | undefined | Must be set to enable the Recaptcha system. <https://www.google.com/recaptcha> |
+| <code>MESSAGES_PER_PAGE</code> | Integer | 10 | Determines how many messages to show per page when viewing paginated lists |
+| <code>USERS_PER_PAGE</code> | Integer | 10 | Determines how many users to show per page when viewing paginated lists |
 
 Don't access `process.env.*` directly in the app. Instead, require the
 `src/config.js` and access them there.
