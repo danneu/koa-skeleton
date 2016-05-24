@@ -10,7 +10,7 @@
     "test": "NODE_ENV=test mocha --reporter spec"
   },
   "engines": {
-    "node": "5.x"
+    "node": "6.x"
   },
   "dependencies": {
     "autolinker": "0.22.0",
