@@ -98,21 +98,19 @@ Instead, require the `src/config.js` and access them there.
       // Validation
 
       this.validateBody('uname')
-        .required('Username required')
-        .isString()
-        .trim();
+        .isString('Username required')
+        .trim()
+        .isLength(3, 15, 'Username must be 3-15 chars');
       this.validateBody('email')
         .optional()
         .isString()
         .trim()
         .isEmail();
       this.validateBody('password1')
-        .required('Password required')
-        .isString()
+        .isString('Password required')
         .isLength(6, 100, 'Password must be 6-100 chars');
       this.validateBody('password2')
-        .required('Password confirmation required')
-        .isString()
+        .isString('Password confirmation required')
         .eq(this.vals.password1, 'Passwords must match');
 
       // Validation passed. Access the above params via `this.vals` for
