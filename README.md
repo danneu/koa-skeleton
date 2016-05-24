@@ -1,5 +1,5 @@
 
-# koa-skeleton
+# koa-skeleton (for Koa 1.x)
 
 [![Dependency Status](https://david-dm.org/danneu/koa-skeleton.svg)](https://david-dm.org/danneu/koa-skeleton)
 
@@ -13,7 +13,7 @@ Just fork, gut, and modify.
 
 Depends on Node v4.x+:
 
-- **Micro-framework**: [Koa](http://koajs.com/). It's very similar to [Express](http://expressjs.com/) except it supports synchronous-looking code with the use of `yield`/generators/and the [co](https://github.com/tj/co) abstraction.
+- **Micro-framework**: [Koa 1.x](http://koajs.com/). It's very similar to [Express](http://expressjs.com/) except it supports synchronous-looking code with the use of `yield`/generators/and the [co](https://github.com/tj/co) abstraction.
 - **Database**: [Postgres](http://www.postgresql.org/).
 - **User-input validation**: [koa-bouncer](https://github.com/danneu/koa-bouncer).
 - **View-layer templating**: [Nunjucks](https://mozilla.github.io/nunjucks/). Very similar to Django's [Jinja2](http://jinja.pocoo.org/) templates. The successor to [Swig](http://paularmstrong.github.io/swig/). Compatible with "Django HTML" editor syntax highlighter plugins like `htmldjango` in Vim.
