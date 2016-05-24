@@ -74,52 +74,66 @@ pg.Client.prototype.queryManyPromise = function(sql, params) {
 
 ////////////////////////////////////////////////////////////
 
-// `runner` is a generator function that accepts one arguement:
-// a database client.
-function* withClient(runner) {
+// `runner` is a function that takes the pg client as an argument.
+//
+// Ex:
+//   return yield withTransaction(function*(client) {
+//     var result = yield [
+//       client.queryPromise(fromUpdateSql, [amount, fromAccountId]),
+//       client.queryPromise(toUpdateSql,   [amount, toAccountId])
+//     ];
+//     var updatedFromAccount = result[0].rows[0];
+//     var updatedToAccount   = result[1].rows[0];
+//     return { fromAccount: updatedFromAccount, toAccount: updatedToAccount };
+//   });
+//
+exports.withTransaction = withTransaction;
+function * withTransaction(runner) {
   const connResult = yield pg.connectPromise(config.DATABASE_URL);
   const client = connResult[0];
   const done = connResult[1];
 
-  let result;
-  try {
-    result = yield runner(client);
-  } catch (err) {
-    if (err.removeFromPool) {
-      err.human = 'Could not remove from pool';
-      done(new Error('Removing connection from pool'));
-      throw err;
-    } else if (err.code === '40P01') { // Deadlock
-      done();
-      return yield withClient(runner);
-    } else {
-      done();
-      throw err;
+  function * rollback(err) {
+    try {
+      yield client.queryPromise('ROLLBACK');
+    } catch (ex) {
+      console.error('[INTERNAL_ERROR] Could not rollback transaction, removing from pool');
+      done(ex);
+      throw ex;
     }
+    done();
+
+    if (err.code === '40P01') { // Deadlock
+      console.warn('Caught deadlock error, retrying');
+      return yield * withTransaction(runner);
+    }
+    if (err.code === '40001') { // Serialization error
+      console.warn('Caught serialization error, retrying');
+      return yield * withTransaction(runner);
+    }
+    throw err;
   }
 
-  done();
-  return result;
-}
+  try {
+    yield client.queryPromise('BEGIN');
+  } catch (ex) {
+    console.error('[INTERNAL_ERROR] There was an error calling BEGIN');
+    return yield * rollback(ex);
+  }
 
-// `runner` is a generator function that accepts one arguement:
-// a database client.
-function* withTransaction(runner) {
-  return yield withClient(function*(client) {
-    let result;
-    try {
-      yield client.queryPromise('BEGIN');
-      result = yield runner(client);
-      yield client.queryPromise('COMMIT');
-      return result;
-    } catch (err) {
-      try {
-        yield client.queryPromise('ROLLBACK');
-      } catch(err) {
-        err.removeFromPool = true;
-        throw err;
-      }
-      throw err;
-    }
-  });
+  let result;
+  try {
+    result = yield * runner(client);
+  } catch (ex) {
+    return yield * rollback(ex);
+  }
+
+  try {
+    yield client.queryPromise('COMMIT');
+  } catch (ex) {
+    return yield * rollback(ex);
+  }
+  done();
+
+  return result;
 }
