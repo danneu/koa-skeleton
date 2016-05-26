@@ -42,6 +42,9 @@
                         required
                         maxlength="300"
               >{{ ctx.flash.params.markup or '' }}</textarea>
+              <div class="help-block">
+                Note: There is a 5 second ratelimit.
+              </div>
             </div>
 
             {% if recaptchaSystemOnline %}
@@ -50,7 +53,7 @@
               </div>
             {% endif %}
 
-          </div><!-- /.panel-body -->
+          </div>
           <div class="panel-footer text-right">
             <span class="text-muted" id="markup-counter">
               0/300
@@ -63,8 +66,8 @@
                 as {{ ctx.currUser.uname }}
               {% endif %}
             </button>
-          </div><!-- /.panel-footer -->
-        </div><!-- /.panel -->
+          </div>
+        </div>
       </form>
 
       <h2>Recent Messages</h2>

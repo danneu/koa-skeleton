@@ -136,7 +136,7 @@ router.get('/users/:uname', loadUser(), function*() {
 ////////////////////////////////////////////////////////////
 
 // Create message
-router.post('/messages', mw.ensureRecaptcha, function * () {
+router.post('/messages', mw.ratelimit(), mw.ensureRecaptcha, function * () {
   // AUTHZ
   this.assertAuthorized(this.currUser, 'CREATE_MESSAGE');
   // VALIDATE

@@ -76,6 +76,7 @@ Instead, require the `src/config.js` and access them there.
 - Relative human-friendly timestamps like 'Created 4 hours ago' that are updated live via Javascript as the user stays on the page. I accomplish this with the [timeago](http://timeago.yarp.com/) jQuery plugin.
 - Comes with Bootstrap v3.x. I start almost every project with Bootstrap so that I can focus on the back-end code and have a decent looking front-end with minimal effort.
 - `npm run reset-db`. During early development, I like to have a `reset-db` command that I can spam that will delete the schema, recreate it, and insert any sample data I put in a `seeds.sql` file.
+- Ratelimit middleware. An IP address can only insert a message every X seconds.
 
 ## Philosophy/Opinions
 

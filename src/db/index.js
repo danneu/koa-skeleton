@@ -10,20 +10,15 @@ const belt = require('../belt');
 const config = require('../config');
 const dbUtil = require('./util');
 
-/*
-   This module is for general database queries that haven't
-   yet been split off into more specific db submodules.
-*/
+// This module is for general database queries that haven't
+// yet been split off into more specific db submodules.
 
-////////////////////////////////////////////////////////////
-// DB submodules
-////////////////////////////////////////////////////////////
+// RE-EXPORT SUBMODULES
 
 exports.admin = require('./admin');
+exports.ratelimits = require('./ratelimits');
 
-////////////////////////////////////////////////////////////
-// Query junk drawer
-////////////////////////////////////////////////////////////
+// QUERY JUNK DRAWER
 
 // UUID -> User | undefined
 //

@@ -9,7 +9,7 @@ CREATE TYPE user_role AS ENUM ('ADMIN', 'MOD', 'MEMBER', 'BANNED');
 CREATE TABLE users (
   id             serial PRIMARY KEY,
   uname          text NOT NULL,
-  role           user_role NOT NULL DEFAULT 'MEMBER'::user_role,
+  role           user_role NOT NULL DEFAULT 'MEMBER',
   digest         text NOT NULL,
   email          text NULL,
   last_online_at timestamptz NOT NULL DEFAULT NOW(),
@@ -60,3 +60,26 @@ CREATE TABLE messages (
 
 -- Speed up user_id FK joins
 CREATE INDEX messages__user_id ON messages (user_id);
+
+------------------------------------------------------------
+------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION ip_root(ip_address inet) RETURNS inet AS 
+$$
+  DECLARE
+    masklen int;
+  BEGIN
+    masklen := CASE family(ip_address) WHEN 4 THEN 24 ELSE 48 END;
+    RETURN host(network(set_masklen(ip_address, masklen)));
+  END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+CREATE TABLE ratelimits (
+  id             bigserial        PRIMARY KEY,
+  user_id        int              NOT NULL REFERENCES users(id),
+  ip_address     inet             NOT NULL,
+  created_at     timestamptz      NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX ratelimits__user_id ON ratelimits (user_id);
+CREATE INDEX ratelimits__ip_root ON ratelimits (ip_root(ip_address));
