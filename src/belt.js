@@ -14,7 +14,8 @@ const Autolinker = require('autolinker');
 // separate modules to stay organized.
 
 // Ex: formatDate(d) -> '8 Dec 2014 16:24'
-exports.formatDate = function(d) {
+exports.formatDate = function (d) {
+  assert(d instanceof Date);
   const months = ['Jan', 'Feb', 'Mar', 'Apr',
                   'May', 'Jun', 'Jul', 'Aug',
                   'Sep', 'Oct', 'Nov', 'Dec'];
@@ -30,12 +31,14 @@ exports.formatDate = function(d) {
 };
 
 // String -> Bool
-exports.isValidUuid = function(uuid) {
-  const regexp = /^[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}$/;
-  return regexp.test(uuid);
-};
+exports.isValidUuid = (function () {
+  const re = /^[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}$/;
+  return function (uuid) {
+    return re.test(uuid);
+  };
+})();
 
-exports.slugify = function() {
+exports.slugify = function () {
   const MAX_SLUG_LENGTH = 80;
   // Slugifies one string
   function slugifyString(x) {
@@ -67,9 +70,9 @@ exports.slugify = function() {
 
 // Returns hashed password value to be used in `users.digest` column
 // String -> String
-exports.hashPassword = function(password) {
-  return new Promise(function(resolve, reject) {
-    bcrypt.hash(password, 4, function(err, hash) {
+exports.hashPassword = function (password) {
+  return new Promise(function (resolve, reject) {
+    bcrypt.hash(password, 4, function (err, hash) {
       if (err) return reject(err);
       resolve(hash);
     });
@@ -78,9 +81,9 @@ exports.hashPassword = function(password) {
 
 // Compares password plaintext against bcrypted digest
 // String, String -> Bool
-exports.checkPassword = function(password, digest) {
-  return new Promise(function(resolve, reject) {
-    bcrypt.compare(password, digest, function(err, result) {
+exports.checkPassword = function (password, digest) {
+  return new Promise(function (resolve, reject) {
+    bcrypt.compare(password, digest, function (err, result) {
       if (err) return reject(err);
       resolve(result);
     });
@@ -93,12 +96,11 @@ exports.checkPassword = function(password, digest) {
 //
 //    futureDate({ days: 4 })            -> Date
 //    futureDate(someDate, { years: 2 }) -> Date
-exports.futureDate = function(nowDate, opts) {
+exports.futureDate = function (nowDate, opts) {
   if (!opts) {
     opts = nowDate;
     nowDate = new Date();
   }
-
   return new Date(nowDate.getTime() +
                   (opts.years   || 0) * 1000 * 60 * 60 * 24 * 365 +
                   (opts.days    || 0) * 1000 * 60 * 60 * 24 +
@@ -108,46 +110,42 @@ exports.futureDate = function(nowDate, opts) {
                   (opts.milliseconds || 0));
 };
 
-exports.nl2br = function(s) {
+exports.nl2br = function (s) {
   assert(_.isString(s));
   return s.replace(/\n/g, '<br>');
 };
 
 // Used for parsing form params so that a "true" string is parsed to `true`
 // and everything is parsed to `false`.
-exports.parseBoolean = function(s) {
-  assert(_.isString(s));
-  assert(s === 'true' || s === 'false');
+exports.parseBoolean = function (s) {
   return s === 'true';
 };
 
 // Used to lightly process user-submitted message markup before
 // saving to database.
-exports.transformMarkup = function(s) {
+exports.transformMarkup = function (s) {
   assert(_.isString(s));
-
   return s
     // Normalize \r\n into \n
     .replace(/\r\n/g, '\n')
     // FIXME: Unrobust way to collapse consecutive newlines
-    .replace(/\n{3,}/g, '\n\n')
-    ;
+    .replace(/\n{3,}/g, '\n\n');
 };
 
 // String -> String (MD5 hex)
-exports.md5 = function(str) {
+exports.md5 = function (str) {
   assert(_.isString(str));
   return crypto.createHash('md5').update(str).digest('hex');
 };
 
 // String -> String
-exports.toAvatarUrl = function(input) {
+exports.toAvatarUrl = function (input) {
   assert(_.isString(input));
   const hash = exports.md5(input);
   return `https://www.gravatar.com/avatar/${hash}?d=monsterid`;
 };
 
-exports.autolink = function(s) {
+exports.autolink = function (s) {
   return Autolinker.link(s, {
     email: false,
     phone: false,
