@@ -76,10 +76,8 @@ $$ LANGUAGE plpgsql IMMUTABLE;
 
 CREATE TABLE ratelimits (
   id             bigserial        PRIMARY KEY,
-  user_id        int              NOT NULL REFERENCES users(id),
   ip_address     inet             NOT NULL,
   created_at     timestamptz      NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX ratelimits__user_id ON ratelimits (user_id);
 CREATE INDEX ratelimits__ip_root ON ratelimits (ip_root(ip_address));

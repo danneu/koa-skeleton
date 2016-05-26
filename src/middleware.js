@@ -194,7 +194,7 @@ exports.ratelimit = function () {
     // 5 second rate limit per ip_address
     const maxDate = new Date(Date.now() - 5000);
     try {
-      yield db.ratelimits.bump(this.currUser.id, this.ip, maxDate);
+      yield db.ratelimits.bump(this.ip, maxDate);
     } catch (err) {
       if (err instanceof Date) {
         const msg = `

@@ -12,8 +12,7 @@ const util = require('./util');
 //
 // If user is ratelimited, it throws the expiration Date timestamp of the
 // ratelimit that can be shown to the user (e.g. try again in 24 seconds)
-exports.bump = function * (userId, ipAddress, maxDate) {
-  assert(Number.isInteger(userId));
+exports.bump = function * (ipAddress, maxDate) {
   assert(typeof ipAddress === 'string');
   assert(maxDate instanceof Date);
   return yield util.withTransaction(function * (client) {
@@ -35,7 +34,7 @@ exports.bump = function * (userId, ipAddress, maxDate) {
     }
     // Else, insert new ratelimit
     yield client.queryPromise(`
-      INSERT INTO ratelimits (user_id, ip_address) VALUES ($1, $2)
-    `, [userId, ipAddress]);
+      INSERT INTO ratelimits (ip_address) VALUES ($1)
+    `, [ipAddress]);
   });
 };
