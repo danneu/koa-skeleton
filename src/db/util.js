@@ -1,5 +1,4 @@
 'use strict';
-
 // 3rd
 const pg = require('co-pg')(require('pg'));
 const assert = require('better-assert');
@@ -24,7 +23,7 @@ pg.types.setTypeParser(1700, val => val === null ? null : Number.parseFloat(val)
 
 // Run query with pooled connection
 exports.query = query;
-function* query(sql, params) {
+function * query(sql, params) {
   const connResult = yield pg.connectPromise(config.DATABASE_URL);
   const client = connResult[0];
   const done = connResult[1];
@@ -37,14 +36,14 @@ function* query(sql, params) {
 }
 
 exports.queryOne = queryOne;
-function* queryOne(sql, params) {
+function * queryOne(sql, params) {
   const result = yield query(sql, params);
   assert(result.rows.length <= 1);
   return result.rows[0];
 }
 
 exports.queryMany = queryMany;
-function* queryMany(sql, params) {
+function * queryMany(sql, params) {
   const result = yield query(sql, params);
   return result.rows;
 }
@@ -64,11 +63,11 @@ function* queryMany(sql, params) {
 //        return [count1, count2];
 //      });
 //    };
-pg.Client.prototype.queryOnePromise = function(sql, params) {
+pg.Client.prototype.queryOnePromise = function (sql, params) {
   return this.queryPromise(sql, params).then(result => result.rows[0]);
 };
 
-pg.Client.prototype.queryManyPromise = function(sql, params) {
+pg.Client.prototype.queryManyPromise = function (sql, params) {
   return this.queryPromise(sql, params).then(result => result.rows);
 };
 

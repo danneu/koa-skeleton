@@ -111,7 +111,7 @@ exports.futureDate = function (nowDate, opts) {
 };
 
 exports.nl2br = function (s) {
-  assert(_.isString(s));
+  assert(typeof s === 'string');
   return s.replace(/\n/g, '<br>');
 };
 
@@ -124,7 +124,7 @@ exports.parseBoolean = function (s) {
 // Used to lightly process user-submitted message markup before
 // saving to database.
 exports.transformMarkup = function (s) {
-  assert(_.isString(s));
+  assert(typeof s === 'string');
   return s
     // Normalize \r\n into \n
     .replace(/\r\n/g, '\n')
@@ -134,18 +134,19 @@ exports.transformMarkup = function (s) {
 
 // String -> String (MD5 hex)
 exports.md5 = function (str) {
-  assert(_.isString(str));
+  assert(typeof str === 'string');
   return crypto.createHash('md5').update(str).digest('hex');
 };
 
 // String -> String
-exports.toAvatarUrl = function (input) {
-  assert(_.isString(input));
-  const hash = exports.md5(input);
+exports.toAvatarUrl = function (str) {
+  assert(typeof str === 'string');
+  const hash = exports.md5(str);
   return `https://www.gravatar.com/avatar/${hash}?d=monsterid`;
 };
 
 exports.autolink = function (s) {
+  assert(typeof s === 'string');
   return Autolinker.link(s, {
     email: false,
     phone: false,

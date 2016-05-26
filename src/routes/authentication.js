@@ -53,11 +53,7 @@ router.post('/login', mw.ensureRecaptcha, function*() {
 
   // User authenticated
 
-  const session = yield db.insertSession({
-    user_id:    user.id,
-    ip_address: this.request.ip,
-    interval:  (this.vals['remember-me'] ? '1 year' : '2 weeks')
-  });
+  const session = yield db.insertSession(user.id, this.ip, this.headers['user-agent'], this.vals['remember-me'] ? '1 year' : '2 weeks');
 
   this.cookies.set('session_id', session.id, {
     expires: this.vals['remember-me'] ? belt.futureDate({ years: 1 }) : undefined
@@ -124,12 +120,7 @@ router.post('/users', mw.ensureRecaptcha, function*() {
 
   // Log them in
 
-  const session = yield db.insertSession({
-    user_id: user.id,
-    ip_address: this.request.ip,
-    user_agent: this.headers['user-agent'],
-    interval: '1 year'
-  });
+  const session = yield db.insertSession(user.id, this.ip, this.headers['user-agent'], '1 year');
 
   this.cookies.set('session_id', session.id, {
     expires: belt.futureDate({ years: 1 }),

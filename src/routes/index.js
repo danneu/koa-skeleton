@@ -176,7 +176,7 @@ router.get('/messages', function * () {
     messages,
     paginator,
     messagesCount: results.count,
-    title: `All Messages`,
+    title: `All Messages`
   });
 });
 
@@ -198,7 +198,7 @@ router.get('/users', function * () {
     users,
     paginator,
     usersCount: results.count,
-    title: 'All Users',
+    title: 'All Users'
   });
 });
 
