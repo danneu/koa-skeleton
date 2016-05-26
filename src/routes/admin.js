@@ -10,22 +10,21 @@ const db = require('../db');
 
 const router = new Router();
 
-router.use(function*(next) {
+router.use(function * (next) {
   this.assert(this.currUser && this.currUser.role === 'ADMIN', 404);
-  yield *next;
+  yield * next;
 });
 
 ////////////////////////////////////////////////////////////
 // Routes
 
 // Show admin panel homepage
-router.get('/admin', function*() {
+router.get('/admin', function * () {
   const stats = yield db.admin.getStats();
-
   yield this.render('admin/index', {
     ctx: this,
     stats,
-    title: 'Admin Panel',
+    title: 'Admin Panel'
   });
 });
 
