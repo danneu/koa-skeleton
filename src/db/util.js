@@ -14,19 +14,21 @@ const config = require('../config');
 
 ////////////////////////////////////////////////////////////
 
-// Configure pg client to parse int8 into Javscript integer
-pg.types.setTypeParser(20, val => val === null ? null : Number.parseInt(val, 10));
-// And parse numerics into floats
-pg.types.setTypeParser(1700, val => val === null ? null : Number.parseFloat(val));
+// Parse int8 into Javascript integer
+pg.types.setTypeParser(20, function (val) {
+  return val === null ? null : Number.parseInt(val, 10);
+});
+// Parse numerics into floats
+pg.types.setTypeParser(1700, function (val) {
+  return val === null ? null : Number.parseFloat(val);
+}); 
 
 ////////////////////////////////////////////////////////////
 
 // Run query with pooled connection
 exports.query = query;
-function * query(sql, params) {
-  const connResult = yield pg.connectPromise(config.DATABASE_URL);
-  const client = connResult[0];
-  const done = connResult[1];
+function * query (sql, params) {
+  const [client, done] = yield pg.connectPromise(config.DATABASE_URL);
   try {
     return yield client.queryPromise(sql, params);
   } finally {
@@ -87,12 +89,10 @@ pg.Client.prototype.queryManyPromise = function (sql, params) {
 //   });
 //
 exports.withTransaction = withTransaction;
-function * withTransaction(runner) {
-  const connResult = yield pg.connectPromise(config.DATABASE_URL);
-  const client = connResult[0];
-  const done = connResult[1];
+function * withTransaction (runner) {
+  const [client, done] = yield pg.connectPromise(config.DATABASE_URL);
 
-  function * rollback(err) {
+  function * rollback (err) {
     try {
       yield client.queryPromise('ROLLBACK');
     } catch (ex) {
