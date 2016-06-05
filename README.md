@@ -11,7 +11,7 @@ Just fork, gut, and modify.
 
 ## The Stack
 
-Depends on Node v4.x+:
+Depends on Node v6.x+:
 
 - **Micro-framework**: [Koa 1.x](http://koajs.com/). It's very similar to [Express](http://expressjs.com/) except it supports synchronous-looking code with the use of `yield`/generators/and the [co](https://github.com/tj/co) abstraction.
 - **Database**: [Postgres](http://www.postgresql.org/).
