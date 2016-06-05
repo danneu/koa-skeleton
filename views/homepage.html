@@ -23,6 +23,10 @@
       <p style="font-size: 14px; margin-bottom: 5px;">Just clone, gut, and modify</p>
     </a>
 
+    <a href="https://heroku.com/deploy?template=https://github.com/danneu/koa-skeleton" style="display: block">
+      <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
+    </a>
+
   </div>
 
   <div class="row">
@@ -50,6 +54,10 @@
             {% if recaptchaSystemOnline %}
               <div class="form-group text-center">
                 <div class="g-recaptcha recaptcha-center" data-sitekey="{{ recaptchaSitekey }}" data-callback="recaptchaSuccessCallback"></div>
+              </div>
+            {% else %}
+              <div class="alert alert-warning text-center">
+                Recaptcha unconfigured
               </div>
             {% endif %}
 

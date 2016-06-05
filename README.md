@@ -9,6 +9,8 @@ Just fork, gut, and modify.
 
 - Live Demo: https://koa-skeleton.danneu.com/
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/danneu/koa-skeleton)
+
 ## The Stack
 
 Depends on Node v6.x+:

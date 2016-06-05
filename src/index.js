@@ -1,7 +1,8 @@
 'use strict';
 
 // 3rd party
-require('dotenv').config(); // Load env vars from .env, always run this early
+// Load env vars from .env, always run this early
+require('dotenv').config({ silent: true });
 const koa = require('koa');
 const bouncer = require('koa-bouncer');
 const nunjucksRender = require('koa-nunjucks-render');
