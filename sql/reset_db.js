@@ -2,9 +2,9 @@
 
 // Node
 const path = require('path');
+const fs = require('fs');
 // 3rd
 const co = require('co');
-const fs = require('co-fs');
 // 1st
 const config = require('../src/config');
 const dbUtil = require('../src/db/util');
@@ -19,10 +19,15 @@ if (config.NODE_ENV !== 'development') {
 
 ////////////////////////////////////////////////////////////
 
-function * slurpSql (filePath) {
+function slurpSql (filePath) {
   const relativePath = '../sql/' + filePath;
   const fullPath = path.join(__dirname, relativePath);
-  return yield fs.readFile(fullPath, 'utf8');
+  return new Promise((resolve, reject) => {
+    fs.readFile(fullPath, 'utf8', (err, text) => {
+      if (err) return reject(err);
+      resolve(text);
+    });
+  });
 }
 
 co(function * () {
