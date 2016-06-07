@@ -64,8 +64,7 @@ router.get('/', function * () {
   yield this.render('homepage', {
     ctx: this,
     messages,
-    recaptchaSitekey: config.RECAPTCHA_SITEKEY,
-    recaptchaSystemOnline: config.RECAPTCHA_SYSTEM_ONLINE
+    recaptchaSitekey: config.RECAPTCHA_SITEKEY
   });
 });
 
