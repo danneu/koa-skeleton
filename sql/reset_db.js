@@ -19,30 +19,30 @@ if (config.NODE_ENV !== 'development') {
 
 ////////////////////////////////////////////////////////////
 
-function *slurpSql(filePath) {
+function * slurpSql (filePath) {
   const relativePath = '../sql/' + filePath;
   const fullPath = path.join(__dirname, relativePath);
   return yield fs.readFile(fullPath, 'utf8');
 }
 
-co(function*() {
+co(function * () {
   console.log('Resetting the database...');
 
-  yield (function*() {
+  yield (function * () {
     const sql = yield slurpSql('schema.sql');
     console.log('-- Executing schema.sql...');
     return yield dbUtil.query(sql);
   })();
 
-  yield (function*() {
+  yield (function * () {
     const sql = yield slurpSql('seeds.sql');
     console.log('-- Executing seeds.sql...');
     return yield dbUtil.query(sql);
   })();
-}).then(function() {
+}).then(function () {
   console.log('Finished resetting db');
   process.exit(0);
-}, function(err){
+}, function (err){
   console.error('Error:', err, err.stack);
   process.exit(1);
 });
