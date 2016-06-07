@@ -96,7 +96,7 @@ Instead, require the `src/config.js` and access them there.
 - Aside from validation, never access query/body/url params via the Koa default like `this.request.body.username`. Instead, use koa-bouncer to move these to the `this.vals` object and access them there. This forces you to self-document what params you expect at the top of your route and prevents the case where you forget to validate params.
 
     ``` javascript
-    router.post('/users', function*() {
+    router.post('/users', function * () {
 
       // Validation
 
@@ -120,10 +120,9 @@ Instead, require the `src/config.js` and access them there.
       // the remainder of the route to ensure you're getting the validated
       // version.
 
-      var user = yield db.insertUser({
-        uname: this.vals.uname,
-        password: this.vals.password1
-      });
+      const user = yield db.insertUser(
+        this.vals.uname, this.vals.password1, this.vals.email
+      );
 
       this.redirect(`/users/${user.uname}`);
     });
