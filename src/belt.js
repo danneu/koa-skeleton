@@ -38,7 +38,7 @@ exports.isValidUuid = (function () {
   };
 })();
 
-exports.slugify = function () {
+exports.slugify = function (...xs) {
   const MAX_SLUG_LENGTH = 80;
   // Slugifies one string
   function slugifyString(x) {
@@ -57,10 +57,8 @@ exports.slugify = function () {
       .toLowerCase();
   }
 
-  const args = Array.prototype.slice.call(arguments, 0);
-
   return slugifyString(
-    args.map(x => x.toString())
+    xs.map(x => x.toString())
       .join('-')
       .slice(0, MAX_SLUG_LENGTH)
   );
