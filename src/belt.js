@@ -56,7 +56,6 @@ exports.slugify = function (...xs) {
       .replace(/^[-]+|[-]+$/, '')
       .toLowerCase();
   }
-
   return slugifyString(
     xs.map(x => x.toString())
       .join('-')

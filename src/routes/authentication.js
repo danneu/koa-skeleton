@@ -77,28 +77,24 @@ router.get('/register', function*() {
 ////////////////////////////////////////////////////////////
 
 // Create user
-router.post('/users', mw.ensureRecaptcha, function*() {
+router.post('/users', mw.ensureRecaptcha, function * () {
 
   // Validation
 
   this.validateBody('uname')
-    .required('Username required')
-    .isString()
+    .isString('Username required')
     .trim()
-    .checkPred(s => s.length > 0, 'Username required')
     .isLength(3, 15, 'Username must be 3-15 chars')
     .match(/^[a-z0-9_-]+$/i, 'Username must only contain a-z, 0-9, underscore (_), or hypen (-)')
     .match(/[a-z]/i, 'Username must contain at least one letter (a-z)')
     .checkNot(yield db.getUserByUname(this.vals.uname), 'Username taken');
 
   this.validateBody('password2')
-    .required('Password confirmation is required')
-    .isString()
+    .isString('Password confirmation is required')
     .checkPred(s => s.length > 0, 'Password confirmation is required');
 
   this.validateBody('password1')
-    .required('Password is required')
-    .isString()
+    .isString('Password is required')
     .checkPred(s => s.length > 0, 'Password is required')
     .isLength(6, 100, 'Password must be 6-100 chars')
     .eq(this.vals.password2, 'Password must match confirmation');
@@ -108,15 +104,11 @@ router.post('/users', mw.ensureRecaptcha, function*() {
     .isString()
     .trim()
     .isEmail('Invalid email address')
-    .isLength(1, 140, 'Email is too long');
+    .isLength(1, 140, 'Email must be less than 140 chars');
 
   // Insert user
 
-  const user = yield db.insertUser({
-    uname: this.vals.uname,
-    password: this.vals.password1,
-    email: this.vals.email
-  });
+  const user = yield db.insertUser(this.vals.uname, this.vals.password1, this.vals.email);
 
   // Log them in
 
@@ -136,7 +128,7 @@ router.post('/users', mw.ensureRecaptcha, function*() {
 ////////////////////////////////////////////////////////////
 
 // Logout
-router.del('/sessions/:id', function*() {
+router.del('/sessions/:id', function * () {
   this.assert(this.currUser, 404);
   this.validateParam('id');
   this.validateBody('redirectTo')
