@@ -85,7 +85,7 @@ router.put('/users/:uname', loadUser(), function * () {
       .isString()
       .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED']);
   }
-  if (this.request.body.email) {
+  if (typeof this.request.body.email !== 'undefined') {
     this.assertAuthorized(this.currUser, 'UPDATE_USER_SETTINGS', user);
     this.validateBody('email')
       .isString()
@@ -107,7 +107,7 @@ router.put('/users/:uname', loadUser(), function * () {
 ////////////////////////////////////////////////////////////
 
 // Edit user page
-router.get('/users/:uname/edit', loadUser(), function*() {
+router.get('/users/:uname/edit', loadUser(), function * () {
   const user = this.state.user;
   this.assertAuthorized(this.currUser, 'UPDATE_USER_*', user);
   yield this.render('users_edit', {
@@ -265,7 +265,7 @@ router.put('/users/:uname/role', loadUser(), function * () {
     .isString()
     .checkPred(s => s.startsWith('/'));
   // UPDATE
-  yield db.updateUserRole(user.id, this.vals.role);
+  yield db.updateUser(user.id, { role: this.vals.role });
   // RESPOND
   this.flash = { message: ['success', 'Role updated'] };
   this.redirect(this.vals.redirectTo);

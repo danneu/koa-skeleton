@@ -22,6 +22,7 @@
     "debug": "2.2.0",
     "dotenv": "^2.0.0",
     "interval-cache": "0.0.1",
+    "knex": "^0.11.5",
     "koa": "^1.2.0",
     "koa-body": "1.4.0",
     "koa-bouncer": "5.0.1",

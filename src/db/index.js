@@ -4,6 +4,7 @@
 const assert = require('better-assert');
 const uuid = require('uuid');
 const debug = require('debug')('app:db');
+const knex = require('knex')({ client: 'pg' });
 // 1st
 const belt = require('../belt');
 const config = require('../config');
@@ -157,43 +158,32 @@ exports.getMessageById = function * (messageId) {
   `, [messageId]);
 };
 
-exports.updateUser = function * (userId, data) {
-  assert(Number.isInteger(userId));
-  return yield dbUtil.queryOne(`
-    UPDATE users
-    SET
-      email = $2,
-      role  = COALESCE($3, role)
-    WHERE id = $1
-    RETURNING *
-  `, [userId, data.email, data.role]);
-};
+////////////////////////////////////////////////////////////
 
-exports.updateUserRole = function * (userId, role) {
+exports.updateUser = function * (userId, fields) {
   assert(Number.isInteger(userId));
-  assert(typeof role === 'string');
-  return yield dbUtil.queryOne(`
-    UPDATE users
-    SET role = $2::user_role
-    WHERE id = $1
-    RETURNING *
-  `, [userId, role]);
+  const WHITELIST = ['email', 'role'];
+  assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1));
+  const sql = knex('users')
+    .where({ id: userId })
+    .update(fields)
+    .returning('*')
+    .toString();
+  return yield dbUtil.queryOne(sql);
 };
 
 ////////////////////////////////////////////////////////////
 
-// data.is_hidden is optional boolean
-// data.markup is optional string
-exports.updateMessage = function * (messageId, data) {
+exports.updateMessage = function * (messageId, fields) {
   assert(Number.isInteger(messageId));
-  return yield dbUtil.queryOne(`
-    UPDATE messages
-    SET
-      is_hidden = COALESCE($2, is_hidden),
-      markup    = COALESCE($3, markup)
-    WHERE id = $1
-    RETURNING *
-  `, [messageId, data.is_hidden, data.markup]);
+  const WHITELIST = ['is_hidden', 'markup'];
+  assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1));
+  const sql = knex('messages')
+    .where({ id: messageId })
+    .update(fields)
+    .returning('*')
+    .toString();
+  return yield dbUtil.queryOne(sql);
 };
 
 ////////////////////////////////////////////////////////////
@@ -224,7 +214,7 @@ exports.getMessagesCount = function * () {
     SELECT COUNT(*) AS "count"
     FROM messages
     WHERE is_hidden = false
-  `)
+  `);
   return row.count;
 };
 
