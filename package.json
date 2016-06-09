@@ -7,7 +7,6 @@
     "start": "node ./src/index.js",
     "start-dev": "nodemon --ext js,html ./src/index.js",
     "reset-db": "node ./sql/reset_db.js",
-    "test": "NODE_ENV=test mocha --reporter spec",
     "deploy": "git push heroku master"
   },
   "engines": {
@@ -38,10 +37,8 @@
     "uuid": "^2.0.2"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
     "eslint": "^1.8.0",
-    "eslint-config-volox": "^1.0.2",
-    "supertest": "^1.1.0"
+    "eslint-config-volox": "^1.0.2"
   },
   "license": "MIT"
 }
