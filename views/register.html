@@ -63,8 +63,7 @@
                 </label>
               </div>
 
-
-              {% if config.recaptchaSystemOnline %}
+              {% if config.RECAPTCHA_SYSTEM_ONLINE %}
                 <div class="form-group">
                   <label>Human Test:</label>
                   <div class="g-recaptcha" data-sitekey="{{ recaptchaSitekey }}" data-callback="recaptchaSuccessCallback"></div>
