@@ -39,6 +39,7 @@ const nunjucksOptions = {
   globals: {
     // let us use `can(USER, ACTION, TARGET)` authorization-checks in templates
     can: cancan.can,
+    config
   },
   // filters are functions that we can pipe values to from nunjucks templates.
   // e.g. {{ user.uname | md5 | toAvatarUrl }}
