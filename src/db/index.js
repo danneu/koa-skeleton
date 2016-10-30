@@ -24,7 +24,7 @@ exports.ratelimits = require('./ratelimits');
 // Also bumps user's last_online_at column to NOW().
 exports.getUserBySessionId = async function (sessionId) {
   assert(belt.isValidUuid(sessionId));
-  return pool.one.apply(pool, q`
+  return pool.one(...q`
     UPDATE users
     SET last_online_at = NOW()
     WHERE id = (
@@ -43,7 +43,7 @@ exports.getUserBySessionId = async function (sessionId) {
 // Case-insensitive uname lookup
 exports.getUserByUname = async function (uname) {
   assert(typeof uname === 'string');
-  return pool.one.apply(pool, q`
+  return pool.one(...q`
     SELECT *
     FROM users
     WHERE lower(uname) = lower(${uname})
@@ -67,7 +67,7 @@ exports.getRecentMessages = async function () {
 
 exports.getRecentMessagesForUserId = async function (userId) {
   assert(Number.isInteger(userId));
-  return pool.many.apply(pool, q`
+  return pool.many(...q`
     SELECT
       m.*,
       to_json(u.*) "user"
@@ -91,7 +91,7 @@ exports.getRecentMessagesForUserId = async function (userId) {
 exports.insertMessage = async function (data) {
   assert(typeof data.markup === 'string');
   assert(typeof data.ip_address === 'string');
-  return pool.one.apply(pool, q`
+  return pool.one(...q`
     INSERT INTO messages (user_id, markup, ip_address, user_agent)
     VALUES (
       ${data.user_id},
@@ -111,7 +111,7 @@ exports.insertUser = async function (uname, password, email) {
   assert(typeof uname === 'string');
   assert(typeof password === 'string');
   const digest = await belt.hashPassword(password);
-  return pool.one.apply(pool, q`
+  return pool.one(...q`
     INSERT INTO users (uname, email, digest)
     VALUES (${uname}, ${email}, ${digest})
     RETURNING *
@@ -123,7 +123,7 @@ exports.insertSession = async function (userId, ipAddress, userAgent, interval) 
   assert(Number.isInteger(userId));
   assert(typeof ipAddress === 'string');
   assert(typeof interval === 'string');
-  return pool.one.apply(pool, q`
+  return pool.one(...q`
     INSERT INTO sessions (id, user_id, ip_address, user_agent, expired_at)
     VALUES (
       ${uuid.v4()},
@@ -139,7 +139,7 @@ exports.insertSession = async function (userId, ipAddress, userAgent, interval) 
 exports.logoutSession = async function (userId, sessionId) {
   assert(Number.isInteger(userId));
   assert(typeof sessionId === 'string');
-  return pool.query.apply(pool, q`
+  return pool.query(...q`
     UPDATE sessions
     SET logged_out_at = NOW()
     WHERE user_id = ${userId}
@@ -149,7 +149,7 @@ exports.logoutSession = async function (userId, sessionId) {
 
 exports.hideMessage = async function (messageId) {
   assert(messageId);
-  return pool.query.apply(pool, q`
+  return pool.query(...q`
     UPDATE messages
     SET is_hidden = true
     WHERE id = ${messageId}
@@ -158,7 +158,7 @@ exports.hideMessage = async function (messageId) {
 
 exports.getMessageById = async function (messageId) {
   assert(messageId);
-  return pool.one.apply(pool, q`
+  return pool.one(...q`
     SELECT *
     FROM messages
     WHERE id = ${messageId}
@@ -201,7 +201,7 @@ exports.getMessages = async function (page) {
   const perPage = config.MESSAGES_PER_PAGE;
   const offset = (page - 1) * perPage;
   const limit = perPage;
-  return pool.many.apply(pool, q`
+  return pool.many(...q`
     SELECT
       m.*,
       to_json(u.*) AS "user"
@@ -246,7 +246,7 @@ exports.getUsers = async function (page) {
   const perPage = config.USERS_PER_PAGE;
   const offset = (page - 1) * perPage;
   const limit = perPage;
-  return pool.many.apply(pool, q`
+  return pool.many(...q`
     SELECT
       u.*,
       (
