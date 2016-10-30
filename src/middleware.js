@@ -5,7 +5,6 @@ const nodeUrl = require('url');
 // 3rd
 const debug = require('debug')('app:middleware');
 const bouncer = require('koa-bouncer');
-const _ = require('lodash');
 const recaptcha = require('recaptcha-validator');
 // 1st
 const db = require('./db');
@@ -79,7 +78,7 @@ exports.wrapFlash = function (cookieName = 'flash') {
 
 exports.methodOverride = function () {
   return async (ctx, next) => {
-    if (_.isUndefined(ctx.request.body))
+    if (typeof ctx.request.body === 'undefined')
       throw new Error('methodOverride middleware must be applied after the body is parsed and ctx.request.body is populated');
 
     if (ctx.request.body && ctx.request.body._method) {
@@ -129,7 +128,7 @@ exports.handleBouncerValidationError = function () {
 
 exports.ensureRecaptcha = function () {
   return async (ctx, next) => {
-    if (_.includes(['development', 'test'], config.NODE_ENV) && !ctx.request.body['g-recaptcha-response']) {
+    if (['development', 'test'].includes(config.NODE_ENV) && !ctx.request.body['g-recaptcha-response']) {
       console.log('Development mode, so skipping recaptcha check');
       await next();
       return;
@@ -166,7 +165,7 @@ exports.ensureReferer = function () {
     // Don't ensure referer in tests
 
     // Skip get requests
-    if (_.includes(['GET', 'HEAD', 'OPTIONS'], ctx.method)) {
+    if (['GET', 'HEAD', 'OPTIONS'].includes(ctx.method)) {
       return await next();
     }
 

@@ -6,7 +6,6 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const assert = require('better-assert');
 const debug = require('debug')('app:belt');
-const _ = require('lodash');
 const Autolinker = require('autolinker');
 
 // A dumping ground of common functions used around the app.

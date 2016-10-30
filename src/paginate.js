@@ -1,7 +1,6 @@
 'use strict';
 
 // 3rd
-const _ = require('lodash');
 const debug = require('debug')('app:sandbox');
 const assert = require('better-assert');
 // 1st
@@ -14,10 +13,10 @@ const config = require('./config');
 // or it returns a paginator object that can be passed into the
 // renderPaginator macro
 exports.makePaginator = function(currPage, totalItems) {
-  assert(_.isInteger(currPage));
-  assert(_.isInteger(totalItems));
+  assert(Number.isInteger(currPage));
+  assert(Number.isInteger(totalItems));
   const perPage = config.MESSAGES_PER_PAGE;
-  assert(_.isInteger(perPage));
+  assert(Number.isInteger(perPage));
 
   const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
   currPage = Math.min(currPage, totalPages);
@@ -42,12 +41,12 @@ exports.makePaginator = function(currPage, totalItems) {
     innerItems.push({ kind: 'SEPARATOR' });
   }
 
-  _.range(startPgNum, endPgNum+1).forEach(n => {
+  for (let n = startPgNum; n <= endPgNum; n++) {
     const btn = {
       text: n.toString(), href: `?page=${n}`, isActive: n === currPage, kind: 'BUTTON'
     };
     innerItems.push(btn);
-  });
+  }
 
   if (endPgNum < totalPages-1) {
     innerItems.push({ kind: 'SEPARATOR' });
