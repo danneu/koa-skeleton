@@ -1,4 +1,7 @@
 {
+  "name": "koa-skeleton",
+  "description": "a simple, full-featured koa application made to be forked and modified",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/danneu/koa-skeleton"

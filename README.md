@@ -128,6 +128,14 @@ Instead, require the `src/config.js` and access them there.
     });
     ```
 
+## Changelog
+
+- `0.1.0` 29 Oct 2016
+  - koa-skeleton is a year old, but I just started versioning it
+    started at v0.1.0.
+  - Extracted `src/db/util.js` into `pg-extra` npm module.
+    Now util.js just exports the connection pool for other modules to use.
+
 ## License
 
 MIT
