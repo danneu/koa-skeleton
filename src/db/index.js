@@ -24,9 +24,9 @@ exports.ratelimits = require('./ratelimits');
 // UUID -> User | undefined
 //
 // Also bumps user's last_online_at column to NOW().
-exports.getUserBySessionId = function * (sessionId) {
+exports.getUserBySessionId = async function (sessionId) {
   assert(belt.isValidUuid(sessionId));
-  return yield pool.one.apply(pool, q`
+  return pool.one.apply(pool, q`
     UPDATE users
     SET last_online_at = NOW()
     WHERE id = (
@@ -43,9 +43,9 @@ exports.getUserBySessionId = function * (sessionId) {
 };
 
 // Case-insensitive uname lookup
-exports.getUserByUname = function * (uname) {
+exports.getUserByUname = async function (uname) {
   assert(typeof uname === 'string');
-  return yield pool.one.apply(pool, q`
+  return pool.one.apply(pool, q`
     SELECT *
     FROM users
     WHERE lower(uname) = lower(${uname})
@@ -54,8 +54,8 @@ exports.getUserByUname = function * (uname) {
 
 ////////////////////////////////////////////////////////////
 
-exports.getRecentMessages = function * () {
-  return yield pool.many(`
+exports.getRecentMessages = async function () {
+  return pool.many(`
     SELECT
       m.*,
       to_json(u.*) "user"
@@ -67,9 +67,9 @@ exports.getRecentMessages = function * () {
   `);
 };
 
-exports.getRecentMessagesForUserId = function * (userId) {
+exports.getRecentMessagesForUserId = async function (userId) {
   assert(Number.isInteger(userId));
-  return yield pool.many.apply(pool, q`
+  return pool.many.apply(pool, q`
     SELECT
       m.*,
       to_json(u.*) "user"
@@ -90,10 +90,10 @@ exports.getRecentMessagesForUserId = function * (userId) {
 // data.markup is string
 // data.ip_address is string
 // data.user_agent is optional string
-exports.insertMessage = function * (data) {
+exports.insertMessage = async function (data) {
   assert(typeof data.markup === 'string');
   assert(typeof data.ip_address === 'string');
-  return yield pool.one.apply(pool, q`
+  return pool.one.apply(pool, q`
     INSERT INTO messages (user_id, markup, ip_address, user_agent)
     VALUES (
       ${data.user_id},
@@ -109,11 +109,11 @@ exports.insertMessage = function * (data) {
 // Returns created user record
 //
 // email is optional
-exports.insertUser = function * (uname, password, email) {
+exports.insertUser = async function (uname, password, email) {
   assert(typeof uname === 'string');
   assert(typeof password === 'string');
-  const digest = yield belt.hashPassword(password);
-  return yield pool.one.apply(pool, q`
+  const digest = await belt.hashPassword(password);
+  return pool.one.apply(pool, q`
     INSERT INTO users (uname, email, digest)
     VALUES (${uname}, ${email}, ${digest})
     RETURNING *
@@ -121,11 +121,11 @@ exports.insertUser = function * (uname, password, email) {
 };
 
 // userAgent is optional string
-exports.insertSession = function * (userId, ipAddress, userAgent, interval) {
+exports.insertSession = async function (userId, ipAddress, userAgent, interval) {
   assert(Number.isInteger(userId));
   assert(typeof ipAddress === 'string');
   assert(typeof interval === 'string');
-  return yield pool.one.apply(pool, q`
+  return pool.one.apply(pool, q`
     INSERT INTO sessions (id, user_id, ip_address, user_agent, expired_at)
     VALUES (
       ${uuid.v4()},
@@ -138,10 +138,10 @@ exports.insertSession = function * (userId, ipAddress, userAgent, interval) {
   `);
 };
 
-exports.logoutSession = function * (userId, sessionId) {
+exports.logoutSession = async function (userId, sessionId) {
   assert(Number.isInteger(userId));
   assert(typeof sessionId === 'string');
-  return yield pool.query.apply(pool, q`
+  return pool.query.apply(pool, q`
     UPDATE sessions
     SET logged_out_at = NOW()
     WHERE user_id = ${userId}
@@ -149,18 +149,18 @@ exports.logoutSession = function * (userId, sessionId) {
   `);
 };
 
-exports.hideMessage = function * (messageId) {
+exports.hideMessage = async function (messageId) {
   assert(messageId);
-  return yield pool.query.apply(pool, q`
+  return pool.query.apply(pool, q`
     UPDATE messages
     SET is_hidden = true
     WHERE id = ${messageId}
   `);
 };
 
-exports.getMessageById = function * (messageId) {
+exports.getMessageById = async function (messageId) {
   assert(messageId);
-  return yield pool.one.apply(pool, q`
+  return pool.one.apply(pool, q`
     SELECT *
     FROM messages
     WHERE id = ${messageId}
@@ -169,7 +169,7 @@ exports.getMessageById = function * (messageId) {
 
 ////////////////////////////////////////////////////////////
 
-exports.updateUser = function * (userId, fields) {
+exports.updateUser = async function (userId, fields) {
   assert(Number.isInteger(userId));
   const WHITELIST = ['email', 'role'];
   assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1));
@@ -178,12 +178,12 @@ exports.updateUser = function * (userId, fields) {
     .update(fields)
     .returning('*')
     .toString();
-  return yield pool.one(sql);
+  return pool.one(sql);
 };
 
 ////////////////////////////////////////////////////////////
 
-exports.updateMessage = function * (messageId, fields) {
+exports.updateMessage = async function (messageId, fields) {
   assert(Number.isInteger(messageId));
   const WHITELIST = ['is_hidden', 'markup'];
   assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1));
@@ -192,18 +192,18 @@ exports.updateMessage = function * (messageId, fields) {
     .update(fields)
     .returning('*')
     .toString();
-  return yield pool.one(sql);
+  return pool.one(sql);
 };
 
 ////////////////////////////////////////////////////////////
 
-exports.getMessages = function * (page) {
+exports.getMessages = async function (page) {
   page = page || 1;
   assert(Number.isInteger(page));
   const perPage = config.MESSAGES_PER_PAGE;
   const offset = (page - 1) * perPage;
   const limit = perPage;
-  return yield pool.many.apply(pool, q`
+  return pool.many.apply(pool, q`
     SELECT
       m.*,
       to_json(u.*) AS "user"
@@ -218,8 +218,8 @@ exports.getMessages = function * (page) {
 ////////////////////////////////////////////////////////////
 
 // Returns Int
-exports.getMessagesCount = function * () {
-  const {count} = yield pool.one(`
+exports.getMessagesCount = async function () {
+  const {count} = await pool.one(`
     SELECT COUNT(*) AS "count"
     FROM messages
     WHERE is_hidden = false
@@ -230,8 +230,8 @@ exports.getMessagesCount = function * () {
 ////////////////////////////////////////////////////////////
 
 // Returns Int
-exports.getUsersCount = function * () {
-  const {count} = yield pool.one(`
+exports.getUsersCount = async function () {
+  const {count} = await pool.one(`
     SELECT COUNT(*) AS "count"
     FROM users
   `);
@@ -242,13 +242,13 @@ exports.getUsersCount = function * () {
 
 // TODO: user.messages_count counter cache
 // TODO: idx for is_hidden
-exports.getUsers = function * (page) {
+exports.getUsers = async function (page) {
   page = page || 1;
   assert(Number.isInteger(page));
   const perPage = config.USERS_PER_PAGE;
   const offset = (page - 1) * perPage;
   const limit = perPage;
-  return yield pool.many.apply(pool, q`
+  return pool.many.apply(pool, q`
     SELECT
       u.*,
       (

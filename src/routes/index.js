@@ -21,28 +21,28 @@ const cache = require('../cache');
 // MIDDLEWARE
 
 // expects /:uname param in url
-// sets this.state.user
+// sets ctx.state.user
 function loadUser () {
-  return function * (next) {
-    this.validateParam('uname');
-    const user = yield db.getUserByUname(this.vals.uname);
-    this.assert(user, 404);
+  return async (ctx, next) => {
+    ctx.validateParam('uname');
+    const user = await db.getUserByUname(ctx.vals.uname);
+    ctx.assert(user, 404);
     pre.presentUser(user);
-    this.state.user = user;
-    yield * next;
-  };
+    ctx.state.user = user;
+    await next();
+  }
 }
 
 // expects /:message_id param in url
-// sets this.state.message
+// sets ctx.state.message
 function loadMessage () {
-  return function * (next) {
-    this.validateParam('message_id');
-    const message = yield db.getMessageById(this.vals.message_id);
-    this.assert(message, 404);
+  return async (ctx, next) => {
+    ctx.validateParam('message_id');
+    const message = await db.getMessageById(ctx.vals.message_id);
+    ctx.assert(message, 404);
     pre.presentMessage(message);
-    this.state.message = message;
-    yield * next;
+    ctx.state.message = message;
+    await next();
   };
 }
 
@@ -50,19 +50,19 @@ function loadMessage () {
 
 // Useful route for quickly testing something in development
 // 404s in production
-router.get('/test', function * () {
-  this.assert(config.NODE_ENV === 'development', 404);
-  this.body = this.headers['user-agent'];
+router.get('/test',  async (ctx, next) => {
+  ctx.assert(config.NODE_ENV === 'development', 404);
+  ctx.body = ctx.headers['user-agent'];
 });
 
 ////////////////////////////////////////////////////////////
 
 // Show homepage
-router.get('/', function * () {
-  const messages = yield db.getRecentMessages();
+router.get('/', async (ctx, next) => {
+  const messages = await db.getRecentMessages();
   messages.forEach(pre.presentMessage);
-  yield this.render('homepage', {
-    ctx: this,
+  await ctx.render('homepage', {
+    ctx,
     messages,
     recaptchaSitekey: config.RECAPTCHA_SITEKEY
   });
@@ -75,43 +75,43 @@ router.get('/', function * () {
 // Body:
 // - email: Optional String
 // - role: Optional String
-router.put('/users/:uname', loadUser(), function * () {
-  const user = this.state.user;
-  this.assertAuthorized(this.currUser, 'UPDATE_USER_*', user);
+router.put('/users/:uname', loadUser(), async (ctx, next) => {
+  const user = ctx.state.user;
+  ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_*', user);
   // VALIDATION
-  if (this.request.body.role) {
-    this.assertAuthorized(this.currUser, 'UPDATE_USER_ROLE', user);
-    this.validateBody('role')
+  if (ctx.request.body.role) {
+    ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_ROLE', user);
+    ctx.validateBody('role')
       .isString()
       .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED']);
   }
-  if (typeof this.request.body.email !== 'undefined') {
-    this.assertAuthorized(this.currUser, 'UPDATE_USER_SETTINGS', user);
-    this.validateBody('email')
+  if (typeof ctx.request.body.email !== 'undefined') {
+    ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_SETTINGS', user);
+    ctx.validateBody('email')
       .isString()
       .trim();
-    if (this.vals.email) {
-      this.validateBody('email').isEmail();
+    if (ctx.vals.email) {
+      ctx.validateBody('email').isEmail();
     }
   }
   // UPDATE
-  yield db.updateUser(user.id, {
-    email: this.vals.email,
-    role: this.vals.role
+  await db.updateUser(user.id, {
+    email: ctx.vals.email,
+    role: ctx.vals.role
   });
   // RESPOND
-  this.flash = { message: ['success', 'User updated']};
-  this.redirect(`${user.url}/edit`);
+  ctx.flash = { message: ['success', 'User updated']};
+  ctx.redirect(`${user.url}/edit`);
 });
 
 ////////////////////////////////////////////////////////////
 
 // Edit user page
-router.get('/users/:uname/edit', loadUser(), function * () {
-  const user = this.state.user;
-  this.assertAuthorized(this.currUser, 'UPDATE_USER_*', user);
-  yield this.render('users_edit', {
-    ctx: this,
+router.get('/users/:uname/edit', loadUser(), async (ctx, next) => {
+  const user = ctx.state.user;
+  ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_*', user);
+  await ctx.render('users_edit', {
+    ctx: ctx,
     user,
     title: `Edit ${user.uname}`
   });
@@ -120,12 +120,12 @@ router.get('/users/:uname/edit', loadUser(), function * () {
 ////////////////////////////////////////////////////////////
 
 // Show user profile
-router.get('/users/:uname', loadUser(), function*() {
-  const user = this.state.user;
-  const messages = yield db.getRecentMessagesForUserId(user.id);
+router.get('/users/:uname', loadUser(), async (ctx, next) => {
+  const user = ctx.state.user;
+  const messages = await db.getRecentMessagesForUserId(user.id);
   messages.forEach(pre.presentMessage);
-  yield this.render('users_show', {
-    ctx: this,
+  await ctx.render('users_show', {
+    ctx: ctx,
     user,
     messages,
     title: user.uname
@@ -135,46 +135,46 @@ router.get('/users/:uname', loadUser(), function*() {
 ////////////////////////////////////////////////////////////
 
 // Create message
-router.post('/messages', mw.ratelimit(), mw.ensureRecaptcha, function * () {
+router.post('/messages', mw.ratelimit(), mw.ensureRecaptcha(), async (ctx, next) => {
   // AUTHZ
-  this.assertAuthorized(this.currUser, 'CREATE_MESSAGE');
+  ctx.assertAuthorized(ctx.currUser, 'CREATE_MESSAGE');
   // VALIDATE
-  this.validateBody('markup')
+  ctx.validateBody('markup')
     .required('Must provide a message')
     .isString()
     .trim()
     .tap(belt.transformMarkup)
     .isLength(3, 300, 'Message must be 3-300 chars');
   // SAVE
-  yield db.insertMessage({
-    user_id: this.currUser && this.currUser.id,
-    markup: this.vals.markup,
-    ip_address: this.request.ip,
-    user_agent: this.headers['user-agent']
+  await db.insertMessage({
+    user_id: ctx.currUser && ctx.currUser.id,
+    markup: ctx.vals.markup,
+    ip_address: ctx.request.ip,
+    user_agent: ctx.headers['user-agent']
   });
   // RESPOND
-  this.flash = { message: ['success', 'Message created!'] };
-  this.redirect('/');
+  ctx.flash = { message: ['success', 'Message created!'] };
+  ctx.redirect('/');
 });
 
 ////////////////////////////////////////////////////////////
 
 // List all messages
-router.get('/messages', function * () {
-  this.validateQuery('page')
+router.get('/messages', async (ctx, next) => {
+  ctx.validateQuery('page')
     .defaultTo(1)
     .toInt();
-  const results = yield {
-    messages: db.getMessages(this.vals.page),
-    count: cache.get('messages-count')
-  };
-  const messages = results.messages.map(pre.presentMessage);
-  const paginator = paginate.makePaginator(this.vals.page, results.count);
-  yield this.render('messages_list', {
-    ctx: this,
+  const [messages, count] = await Promise.all([
+    db.getMessages(ctx.vals.page),
+    cache.get('messages-count')
+  ])
+  messages.forEach(pre.presentMessage);
+  const paginator = paginate.makePaginator(ctx.vals.page, count);
+  await ctx.render('messages_list', {
+    ctx: ctx,
     messages,
     paginator,
-    messagesCount: results.count,
+    messagesCount: count,
     title: `All Messages`
   });
 });
@@ -182,21 +182,21 @@ router.get('/messages', function * () {
 ////////////////////////////////////////////////////////////
 
 // List all users
-router.get('/users', function * () {
-  this.validateQuery('page')
+router.get('/users', async (ctx, next) => {
+  ctx.validateQuery('page')
     .defaultTo(1)
     .toInt();
-  const results = yield {
-    users: db.getUsers(this.vals.page),
-    count: cache.get('users-count')
-  };
-  const users = results.users.map(pre.presentUser);
-  const paginator = paginate.makePaginator(this.vals.page, results.count);
-  yield this.render('users_list', {
-    ctx: this,
+  const [users, count] = await Promise.all([
+    db.getUsers(ctx.vals.page),
+    cache.get('users-count')
+  ])
+  users.forEach(pre.presentUser);
+  const paginator = paginate.makePaginator(ctx.vals.page, count);
+  await ctx.render('users_list', {
+    ctx: ctx,
     users,
     paginator,
-    usersCount: results.count,
+    usersCount: count,
     title: 'All Users'
   });
 });
@@ -209,38 +209,38 @@ router.get('/users', function * () {
 // - is_hidden: Optional String of 'true' | 'false'
 // - markup: Optional String
 // - redirectTo: Optional String
-router.put('/messages/:message_id', loadMessage(), function * () {
-  const message = this.state.message;
+router.put('/messages/:message_id', loadMessage(), async (ctx, next) => {
+  const message = ctx.state.message;
   // AUTHZ: Ensure user is authorized to make *any* update to message
-  this.assertAuthorized(this.currUser, 'UPDATE_MESSAGE', message);
-  if (this.request.body.is_hidden) {
-    this.assertAuthorized(this.currUser, 'UPDATE_MESSAGE_STATE', message);
-    this.validateBody('is_hidden')
+  ctx.assertAuthorized(ctx.currUser, 'UPDATE_MESSAGE', message);
+  if (ctx.request.body.is_hidden) {
+    ctx.assertAuthorized(ctx.currUser, 'UPDATE_MESSAGE_STATE', message);
+    ctx.validateBody('is_hidden')
       .isString()
       .tap(belt.parseBoolean);
   }
-  if (this.request.body.markup) {
-    this.assertAuthorized(this.currUser, 'UPDATE_MESSAGE_MARKUP', message);
+  if (ctx.request.body.markup) {
+    ctx.assertAuthorized(ctx.currUser, 'UPDATE_MESSAGE_MARKUP', message);
     // FIXME: Extract markup validation into its own .isValidMarkup validator
-    // and then reuse this here and in the insert-message route
-    this.validateBody('markup')
+    // and then reuse ctx here and in the insert-message route
+    ctx.validateBody('markup')
       .isString()
       .trim()
       .tap(belt.transformMarkup)
       .isLength(3, 300, 'Message must be 3-300 chars');
   }
-  this.validateBody('redirectTo')
+  ctx.validateBody('redirectTo')
     .defaultTo('/')
     .isString()
     .checkPred(s => s.startsWith('/'));
   // UPDATE
-  yield db.updateMessage(message.id, {
-    is_hidden: this.vals.is_hidden,
-    markup: this.vals.markup
+  await db.updateMessage(message.id, {
+    is_hidden: ctx.vals.is_hidden,
+    markup: ctx.vals.markup
   });
   // RESPOND
-  this.flash = { message: ['success', 'Message updated'] };
-  this.redirect(this.vals.redirectTo);
+  ctx.flash = { message: ['success', 'Message updated'] };
+  ctx.redirect(ctx.vals.redirectTo);
 });
 
 ////////////////////////////////////////////////////////////
@@ -249,26 +249,26 @@ router.put('/messages/:message_id', loadMessage(), function * () {
 //
 // Body:
 // - role: String
-router.put('/users/:uname/role', loadUser(), function * () {
-  const user = this.state.user;
+router.put('/users/:uname/role', loadUser(), async (ctx, next) => {
+  const user = ctx.state.user;
   // AUTHZ
-  this.assertAuthorized(this.currUser, 'UPDATE_USER_ROLE', user);
+  ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_ROLE', user);
   // VALIDATE
-  this.validateBody('role')
+  ctx.validateBody('role')
     .required('Must provide a role')
     .isString()
     .trim()
     .checkPred(s => s.length > 0, 'Must provide a role')
     .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED'], 'Invalid role');
-  this.validateBody('redirectTo')
+  ctx.validateBody('redirectTo')
     .defaultTo('/')
     .isString()
     .checkPred(s => s.startsWith('/'));
   // UPDATE
-  yield db.updateUser(user.id, { role: this.vals.role });
+  await db.updateUser(user.id, { role: ctx.vals.role });
   // RESPOND
-  this.flash = { message: ['success', 'Role updated'] };
-  this.redirect(this.vals.redirectTo);
+  ctx.flash = { message: ['success', 'Role updated'] };
+  ctx.redirect(ctx.vals.redirectTo);
 });
 
 ////////////////////////////////////////////////////////////

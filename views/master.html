@@ -21,7 +21,6 @@
           {% if ctx.currUser %}
             <form action="/sessions/{{ ctx.currSessionId }}" method="POST" class="navbar-right">
               <input type="hidden" name="_method" value="DELETE">
-              <input type="hidden" name="redirectTo" value="{{ ctx.path }}">
               <button type="submit" class="btn btn-link navbar-btn">
                 Logout
               </button>

@@ -14,13 +14,13 @@ const {pool} = require('./util');
 //
 // If user is ratelimited, it throws the expiration Date timestamp of the
 // ratelimit that can be shown to the user (e.g. try again in 24 seconds)
-exports.bump = function * (ipAddress, maxDate) {
+exports.bump = async function (ipAddress, maxDate) {
   assert(typeof ipAddress === 'string');
   assert(maxDate instanceof Date);
-  return yield pool.withTransaction(co.wrap(function * (client) {
-    yield client.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+  return pool.withTransaction(async (client) => {
+    await client.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
     // Get latest ratelimit for this user
-    const row = yield client.one.apply(client, q`
+    const row = await client.one.apply(client, q`
       SELECT *
       FROM ratelimits
       WHERE ip_root(ip_address) = ip_root(${ipAddress})
@@ -35,8 +35,8 @@ exports.bump = function * (ipAddress, maxDate) {
       throw expires;
     }
     // Else, insert new ratelimit
-    yield client.query.apply(client, q`
+    await client.query.apply(client, q`
       INSERT INTO ratelimits (ip_address) VALUES (${ipAddress})
     `);
-  }));
+  });
 };

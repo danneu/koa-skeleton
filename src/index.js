@@ -1,12 +1,15 @@
-'use strict';
+require('babel-register')({
+  plugins: ['transform-async-to-generator']
+});
 
 // 3rd party
 // Load env vars from .env, always run this early
 require('dotenv').config({ silent: true });
-const koa = require('koa');
+const Koa = require('koa');
 const bouncer = require('koa-bouncer');
 const nunjucksRender = require('koa-nunjucks-render');
 const debug = require('debug')('app:index');
+const convert = require('koa-convert');
 // 1st party
 const config = require('./config');
 const mw = require('./middleware');
@@ -15,7 +18,7 @@ const cancan = require('./cancan');
 
 ////////////////////////////////////////////////////////////
 
-const app = koa();
+const app = new Koa();
 app.poweredBy = false;
 app.proxy = config.TRUST_PROXY;
 
@@ -59,20 +62,20 @@ const nunjucksOptions = {
 
 app.use(mw.ensureReferer());
 app.use(require('koa-helmet')());
-app.use(require('koa-compress')());
-app.use(require('koa-better-static')('public'));
+app.use(convert(require('koa-compress')()));
+app.use(convert(require('koa-better-static')('public')));
 // Don't show logger in test mode
 if (config.NODE_ENV !== 'test') {
-  app.use(require('koa-logger')());
+  app.use(convert(require('koa-logger')()));
 }
-app.use(require('koa-body')({ multipart: true }));
+app.use(convert(require('koa-body')()));
 app.use(mw.methodOverride());  // Must come after body parser
 app.use(mw.removeTrailingSlash());
 app.use(mw.wrapCurrUser());
-app.use(mw.wrapFlash('flash'));
+app.use(mw.wrapFlash());
 app.use(bouncer.middleware());
 app.use(mw.handleBouncerValidationError()); // Must come after bouncer.middleware()
-app.use(nunjucksRender('views', nunjucksOptions));
+app.use(convert(nunjucksRender('views', nunjucksOptions)));
 
 // Provide a convience function for protecting our routes behind
 // our authorization rules. If authorization check fails, 404 response.
@@ -84,33 +87,30 @@ app.use(nunjucksRender('views', nunjucksOptions));
 //      this.assertAuthorized(this.currUser, 'READ_TOPIC', topic);
 //      ...
 //    });
-app.use(function*(next) {
-  this.assertAuthorized = (user, action, target) => {
+app.use(async (ctx, next) => {
+  ctx.assertAuthorized = (user, action, target) => {
     const isAuthorized = cancan.can(user, action, target);
     const uname = (user && user.uname) || '<Guest>';
     debug('[assertAuthorized] Can %s %s: %s', uname, action, isAuthorized);
-    this.assert(isAuthorized, 404);
+    ctx.assert(isAuthorized, 404);
   };
-  yield* next;
+  await next();
 });
 
 ////////////////////////////////////////////////////////////
 // Routes
 ////////////////////////////////////////////////////////////
 
-app.use(require('./routes').routes());
-app.use(require('./routes/authentication').routes());
-app.use(require('./routes/admin').routes());
+app.use(convert(require('./routes').routes()));
+app.use(convert(require('./routes/authentication').routes()));
+app.use(convert(require('./routes/admin').routes()));
 
 ////////////////////////////////////////////////////////////
 
-// If we run this file directly (npm start, npm run start-dev, node src/index.js)
-// then start the server. Else, if we require() this file (like from
-// our tests), then don't start the server and instead just export the app.
-if (require.main === module) {
-  app.listen(config.PORT, function() {
-    console.log('Listening on port', config.PORT);
+app.start = function (port = config.PORT) {
+  app.listen(port, () => {
+    console.log('Listening on port', port);
   });
-} else {
-  module.exports = app;
 }
+
+module.exports = app;

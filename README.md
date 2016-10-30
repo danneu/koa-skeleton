@@ -1,5 +1,5 @@
 
-# koa-skeleton (for Koa 1.x)
+# koa-skeleton (for Koa 2.x)
 
 [![Dependency Status](https://david-dm.org/danneu/koa-skeleton.svg)](https://david-dm.org/danneu/koa-skeleton)
 
@@ -15,11 +15,17 @@ Just fork, gut, and modify.
 
 Depends on Node v6.x+:
 
-- **Micro-framework**: [Koa 1.x](http://koajs.com/). It's very similar to [Express](http://expressjs.com/) except it supports synchronous-looking code with the use of `yield`/generators/and the [co](https://github.com/tj/co) abstraction.
+- **Micro-framework**: [Koa 2.x](http://koajs.com/). It's very similar to [Express](http://expressjs.com/) except it supports async/await.
 - **Database**: [Postgres](http://www.postgresql.org/).
 - **User-input validation**: [koa-bouncer](https://github.com/danneu/koa-bouncer).
 - **View-layer templating**: [Nunjucks](https://mozilla.github.io/nunjucks/). Very similar to Django's [Jinja2](http://jinja.pocoo.org/) templates. The successor to [Swig](http://paularmstrong.github.io/swig/). Compatible with "Django HTML" editor syntax highlighter plugins like `htmldjango` in Vim.
 - **Deployment**: [Heroku](https://heroku.com/). Keeps things easy while you focus on coding your webapp. Forces you to write your webapp statelessly and horizontally-scalably.
+
+## What about Koa 1.x?
+
+koa-skeleton now works with Koa 2.x, but it used to be built with Koa 1.x.
+
+Here's the most recent code that supported Koa 1.x: <https://github.com/danneu/koa-skeleton/tree/551470a9f5422b0a266a048397edfe9900be4703>
 
 ## Setup
 
@@ -96,40 +102,42 @@ Instead, require the `src/config.js` and access them there.
 - Aside from validation, never access query/body/url params via the Koa default like `this.request.body.username`. Instead, use koa-bouncer to move these to the `this.vals` object and access them there. This forces you to self-document what params you expect at the top of your route and prevents the case where you forget to validate params.
 
     ``` javascript
-    router.post('/users', function * () {
+    router.post('/users', async (ctx, next) => {
 
       // Validation
 
-      this.validateBody('uname')
+      ctx.validateBody('uname')
         .isString('Username required')
         .trim()
-        .isLength(3, 15, 'Username must be 3-15 chars');
-      this.validateBody('email')
+        .isLength(3, 15, 'Username must be 3-15 chars')
+      ctx.validateBody('email')
         .optional()
         .isString()
         .trim()
-        .isEmail();
-      this.validateBody('password1')
+        .isEmail()
+      ctx.validateBody('password1')
         .isString('Password required')
-        .isLength(6, 100, 'Password must be 6-100 chars');
-      this.validateBody('password2')
+        .isLength(6, 100, 'Password must be 6-100 chars')
+      ctx.validateBody('password2')
         .isString('Password confirmation required')
-        .eq(this.vals.password1, 'Passwords must match');
+        .eq(this.vals.password1, 'Passwords must match')
 
-      // Validation passed. Access the above params via `this.vals` for
+      // Validation passed. Access the above params via `ctx.vals` for
       // the remainder of the route to ensure you're getting the validated
       // version.
 
-      const user = yield db.insertUser(
+      const user = await db.insertUser(
         this.vals.uname, this.vals.password1, this.vals.email
-      );
+      )
 
-      this.redirect(`/users/${user.uname}`);
-    });
+      this.redirect(`/users/${user.uname}`)
+    })
     ```
 
 ## Changelog
 
+- `2.0.0` 29 Oct 2015
+  - Refactored from Koa 1.x to Koa 2.x.
 - `0.1.0` 29 Oct 2016
   - koa-skeleton is a year old, but I just started versioning it
     started at v0.1.0.

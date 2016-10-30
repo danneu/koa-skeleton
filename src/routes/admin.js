@@ -10,19 +10,19 @@ const db = require('../db');
 
 const router = new Router();
 
-router.use(function * (next) {
-  this.assert(this.currUser && this.currUser.role === 'ADMIN', 404);
-  yield * next;
+router.use(async (ctx, next) => {
+  ctx.assert(ctx.currUser && ctx.currUser.role === 'ADMIN', 404);
+  await next();
 });
 
 ////////////////////////////////////////////////////////////
 // Routes
 
 // Show admin panel homepage
-router.get('/admin', function * () {
-  const stats = yield db.admin.getStats();
-  yield this.render('admin/index', {
-    ctx: this,
+router.get('/admin', async (ctx, next) => {
+  const stats = await db.admin.getStats();
+  await ctx.render('admin/index', {
+    ctx,
     stats,
     title: 'Admin Panel'
   });
