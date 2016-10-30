@@ -1,31 +1,31 @@
 // 3rd
-const Router = require('koa-router');
-const debug = require('debug')('app:routes:admin');
+const Router = require('koa-router')
+const debug = require('debug')('app:routes:admin')
 // 1st
-const db = require('../db');
+const db = require('../db')
 
 // Every route in this router is only accessible to admins
 
-const router = new Router();
+const router = new Router()
 
 router.use(async (ctx, next) => {
-  ctx.assert(ctx.currUser && ctx.currUser.role === 'ADMIN', 404);
-  await next();
-});
+  ctx.assert(ctx.currUser && ctx.currUser.role === 'ADMIN', 404)
+  await next()
+})
 
-////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////
 // Routes
 
 // Show admin panel homepage
-router.get('/admin', async (ctx, next) => {
-  const stats = await db.admin.getStats();
+router.get('/admin', async (ctx) => {
+  const stats = await db.admin.getStats()
   await ctx.render('admin/index', {
     ctx,
     stats,
     title: 'Admin Panel'
-  });
-});
+  })
+})
 
-////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////
 
-module.exports = router;
+module.exports = router
