@@ -5,10 +5,11 @@ const assert = require('better-assert');
 const uuid = require('uuid');
 const debug = require('debug')('app:db');
 const knex = require('knex')({ client: 'pg' });
+const {q} = require('pg-extra')
 // 1st
 const belt = require('../belt');
 const config = require('../config');
-const dbUtil = require('./util');
+const {pool} = require('./util');
 
 // This module is for general database queries that haven't
 // yet been split off into more specific db submodules.
@@ -25,7 +26,7 @@ exports.ratelimits = require('./ratelimits');
 // Also bumps user's last_online_at column to NOW().
 exports.getUserBySessionId = function * (sessionId) {
   assert(belt.isValidUuid(sessionId));
-  return yield dbUtil.queryOne(`
+  return yield pool.one.apply(pool, q`
     UPDATE users
     SET last_online_at = NOW()
     WHERE id = (
@@ -34,27 +35,27 @@ exports.getUserBySessionId = function * (sessionId) {
       WHERE u.id = (
         SELECT s.user_id
         FROM active_sessions s
-        WHERE s.id = $1
+        WHERE s.id = ${sessionId}
       )
     )
     RETURNING *
-  `, [sessionId]);
+  `);
 };
 
 // Case-insensitive uname lookup
 exports.getUserByUname = function * (uname) {
   assert(typeof uname === 'string');
-  return yield dbUtil.queryOne(`
+  return yield pool.one.apply(pool, q`
     SELECT *
     FROM users
-    WHERE lower(uname) = lower($1)
-  `, [uname]);
+    WHERE lower(uname) = lower(${uname})
+  `);
 };
 
 ////////////////////////////////////////////////////////////
 
 exports.getRecentMessages = function * () {
-  return yield dbUtil.queryMany(`
+  return yield pool.many(`
     SELECT
       m.*,
       to_json(u.*) "user"
@@ -68,17 +69,17 @@ exports.getRecentMessages = function * () {
 
 exports.getRecentMessagesForUserId = function * (userId) {
   assert(Number.isInteger(userId));
-  return yield dbUtil.queryMany(`
+  return yield pool.many.apply(pool, q`
     SELECT
       m.*,
       to_json(u.*) "user"
     FROM messages m
     LEFT JOIN users u ON m.user_id = u.id
     WHERE m.is_hidden = false
-      AND u.id = $1
+      AND u.id = ${userId}
     ORDER BY m.id DESC
     LIMIT 25
-  `, [userId]);
+  `);
 };
 
 ////////////////////////////////////////////////////////////
@@ -92,11 +93,15 @@ exports.getRecentMessagesForUserId = function * (userId) {
 exports.insertMessage = function * (data) {
   assert(typeof data.markup === 'string');
   assert(typeof data.ip_address === 'string');
-  return yield dbUtil.queryOne(`
+  return yield pool.one.apply(pool, q`
     INSERT INTO messages (user_id, markup, ip_address, user_agent)
-    VALUES ($1, $2, $3::inet, $4)
+    VALUES (
+      ${data.user_id},
+      ${data.markup},
+      ${data.ip_address}::inet,
+      ${data.user_agent})
     RETURNING *
-  `, [data.user_id, data.markup, data.ip_address, data.user_agent]);
+  `);
 };
 
 ////////////////////////////////////////////////////////////
@@ -108,11 +113,11 @@ exports.insertUser = function * (uname, password, email) {
   assert(typeof uname === 'string');
   assert(typeof password === 'string');
   const digest = yield belt.hashPassword(password);
-  return yield dbUtil.queryOne(`
+  return yield pool.one.apply(pool, q`
     INSERT INTO users (uname, email, digest)
-    VALUES ($1, $2, $3)
+    VALUES (${uname}, ${email}, ${digest})
     RETURNING *
-  `, [uname, email, digest]);
+  `);
 };
 
 // userAgent is optional string
@@ -120,42 +125,46 @@ exports.insertSession = function * (userId, ipAddress, userAgent, interval) {
   assert(Number.isInteger(userId));
   assert(typeof ipAddress === 'string');
   assert(typeof interval === 'string');
-  return yield dbUtil.queryOne(`
+  return yield pool.one.apply(pool, q`
     INSERT INTO sessions (id, user_id, ip_address, user_agent, expired_at)
-    VALUES ($1, $2, $3::inet, $4, NOW() + $5::interval)
+    VALUES (
+      ${uuid.v4()},
+      ${userId},
+      ${ipAddress}::inet,
+      ${userAgent},
+      NOW() + ${interval}::interval
+    )
     RETURNING *
-  `, [
-    uuid.v4(), userId, ipAddress, userAgent, interval
-  ]);
+  `);
 };
 
 exports.logoutSession = function * (userId, sessionId) {
   assert(Number.isInteger(userId));
   assert(typeof sessionId === 'string');
-  return yield dbUtil.query(`
+  return yield pool.query.apply(pool, q`
     UPDATE sessions
     SET logged_out_at = NOW()
-    WHERE user_id = $1
-      AND id = $2
-  `, [userId, sessionId]);
+    WHERE user_id = ${userId}
+      AND id = ${sessionId}
+  `);
 };
 
 exports.hideMessage = function * (messageId) {
   assert(messageId);
-  return yield dbUtil.query(`
+  return yield pool.query.apply(pool, q`
     UPDATE messages
     SET is_hidden = true
-    WHERE id = $1
-  `, [messageId]);
+    WHERE id = ${messageId}
+  `);
 };
 
 exports.getMessageById = function * (messageId) {
   assert(messageId);
-  return yield dbUtil.queryOne(`
+  return yield pool.one.apply(pool, q`
     SELECT *
     FROM messages
-    WHERE id = $1
-  `, [messageId]);
+    WHERE id = ${messageId}
+  `);
 };
 
 ////////////////////////////////////////////////////////////
@@ -169,7 +178,7 @@ exports.updateUser = function * (userId, fields) {
     .update(fields)
     .returning('*')
     .toString();
-  return yield dbUtil.queryOne(sql);
+  return yield pool.one(sql);
 };
 
 ////////////////////////////////////////////////////////////
@@ -183,7 +192,7 @@ exports.updateMessage = function * (messageId, fields) {
     .update(fields)
     .returning('*')
     .toString();
-  return yield dbUtil.queryOne(sql);
+  return yield pool.one(sql);
 };
 
 ////////////////////////////////////////////////////////////
@@ -194,39 +203,39 @@ exports.getMessages = function * (page) {
   const perPage = config.MESSAGES_PER_PAGE;
   const offset = (page - 1) * perPage;
   const limit = perPage;
-  return yield dbUtil.queryMany(`
+  return yield pool.many.apply(pool, q`
     SELECT
       m.*,
       to_json(u.*) AS "user"
     FROM messages m
     LEFT OUTER JOIN users u ON m.user_id = u.id
     ORDER BY m.id DESC
-    OFFSET $1
-    LIMIT $2
-  `, [offset, limit]);
+    OFFSET ${offset}
+    LIMIT ${limit}
+  `);
 };
 
 ////////////////////////////////////////////////////////////
 
 // Returns Int
 exports.getMessagesCount = function * () {
-  const row = yield dbUtil.queryOne(`
+  const {count} = yield pool.one(`
     SELECT COUNT(*) AS "count"
     FROM messages
     WHERE is_hidden = false
   `);
-  return row.count;
+  return count;
 };
 
 ////////////////////////////////////////////////////////////
 
 // Returns Int
 exports.getUsersCount = function * () {
-  const row = yield dbUtil.queryOne(`
+  const {count} = yield pool.one(`
     SELECT COUNT(*) AS "count"
     FROM users
   `);
-  return row.count;
+  return count;
 };
 
 ////////////////////////////////////////////////////////////
@@ -239,7 +248,7 @@ exports.getUsers = function * (page) {
   const perPage = config.USERS_PER_PAGE;
   const offset = (page - 1) * perPage;
   const limit = perPage;
-  return yield dbUtil.queryMany(`
+  return yield pool.many.apply(pool, q`
     SELECT
       u.*,
       (
@@ -249,9 +258,9 @@ exports.getUsers = function * (page) {
       ) AS messages_count
     FROM users u
     ORDER BY u.id DESC
-    OFFSET $1
-    LIMIT $2
-  `, [offset, limit]);
+    OFFSET ${offset}
+    LIMIT ${limit}
+  `);
 };
 
 ////////////////////////////////////////////////////////////

@@ -7,7 +7,7 @@ const fs = require('fs');
 const co = require('co');
 // 1st
 const config = require('../src/config');
-const dbUtil = require('../src/db/util');
+const {pool} = require('../src/db/util');
 
 ////////////////////////////////////////////////////////////
 
@@ -36,13 +36,13 @@ co(function * () {
   yield (function * () {
     const sql = yield slurpSql('schema.sql');
     console.log('-- Executing schema.sql...');
-    return yield dbUtil.query(sql);
+    return yield pool.query(sql);
   })();
 
   yield (function * () {
     const sql = yield slurpSql('seeds.sql');
     console.log('-- Executing seeds.sql...');
-    return yield dbUtil.query(sql);
+    return yield pool.query(sql);
   })();
 }).then(function () {
   console.log('Finished resetting db');

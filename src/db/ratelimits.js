@@ -3,8 +3,10 @@
 const assert = require('better-assert');
 const debug = require('debug')('db:ratelimits');
 const _ = require('lodash');
+const co = require('co');
+const {q} = require('pg-extra');
 // 1st
-const util = require('./util');
+const {pool} = require('./util');
 
 // maxDate (Required Date): the maximum, most recent timestamp that the user
 // can have if they have a row in the table. i.e. if user can only post
@@ -15,16 +17,16 @@ const util = require('./util');
 exports.bump = function * (ipAddress, maxDate) {
   assert(typeof ipAddress === 'string');
   assert(maxDate instanceof Date);
-  return yield util.withTransaction(function * (client) {
-    yield client.queryPromise('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+  return yield pool.withTransaction(co.wrap(function * (client) {
+    yield client.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
     // Get latest ratelimit for this user
-    const row = yield client.queryOnePromise(`
+    const row = yield client.one.apply(client, q`
       SELECT *
       FROM ratelimits
-      WHERE ip_root(ip_address) = ip_root($1)
+      WHERE ip_root(ip_address) = ip_root(${ipAddress})
       ORDER BY id DESC
       LIMIT 1
-    `, [ipAddress]);
+    `);
     // If it's too soon, throw the Date when ratelimit expires
     if (row && row.created_at > maxDate) {
       const elapsed = new Date() - row.created_at; // since ratelimit
@@ -33,8 +35,8 @@ exports.bump = function * (ipAddress, maxDate) {
       throw expires;
     }
     // Else, insert new ratelimit
-    yield client.queryPromise(`
-      INSERT INTO ratelimits (ip_address) VALUES ($1)
-    `, [ipAddress]);
-  });
+    yield client.query.apply(client, q`
+      INSERT INTO ratelimits (ip_address) VALUES (${ipAddress})
+    `);
+  }));
 };
