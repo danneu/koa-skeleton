@@ -65,7 +65,7 @@ You can look at `src/config.js` to view these and their defaults.
 | <code>NODE_ENV</code> | String | "development" | Set to `"production"` on the production server to enable some optimizations and security checks that are turned off in development for convenience. |
 | <code>PORT</code> | Integer | 3000 | Overriden by Heroku in production. |
 | <code>DATABASE_URL</code> | String | "postgres://localhost:5432/koa-skeleton" | Overriden by Heroku in production if you use its Heroku Postgres addon. |
-| <code>TRUST_PROXY</code> | Boolean | false | Set it to the string `"true"` to turn it on. Turn it on if you're behind a proxy like Cloudflare which means you can trust the IP address supplied in the `X-Forwarded-For` header. If so, then `this.request.ip` will use that header if it's set. |
+| <code>TRUST_PROXY</code> | Boolean | false | Set it to the string `"true"` to turn it on. Turn it on if you're behind a proxy like Cloudflare which means you can trust the IP address supplied in the `X-Forwarded-For` header. If so, then `ctx.request.ip` will use that header if it's set. |
 | <code>HOSTNAME</code> | String | undefined | Set it to your hostname in production to enable basic CSRF protection. i.e. `example.com`, `subdomain.example.com`. If set, then any requests not one of `GET | HEAD | OPTIONS` must have a `Referer` header set that originates from the given HOSTNAME. The referer is always set for `<form>` submissions, for example. Very crude protection. |
 | <code>RECAPTCHA_SITEKEY</code> | String | undefined | Must be set to enable the Recaptcha system. <https://www.google.com/recaptcha> |
 | <code>RECAPTCHA_SITESECRET</code> | String | undefined | Must be set to enable the Recaptcha system. <https://www.google.com/recaptcha> |
@@ -99,7 +99,7 @@ Instead, require the `src/config.js` and access them there.
 
 ## Conventions
 
-- Aside from validation, never access query/body/url params via the Koa default like `this.request.body.username`. Instead, use koa-bouncer to move these to the `this.vals` object and access them there. This forces you to self-document what params you expect at the top of your route and prevents the case where you forget to validate params.
+- Aside from validation, never access query/body/url params via the Koa default like `ctx.request.body.username`. Instead, use koa-bouncer to move these to the `ctx.vals` object and access them there. This forces you to self-document what params you expect at the top of your route and prevents the case where you forget to validate params.
 
     ``` javascript
     router.post('/users', async (ctx, next) => {
@@ -120,17 +120,17 @@ Instead, require the `src/config.js` and access them there.
         .isLength(6, 100, 'Password must be 6-100 chars')
       ctx.validateBody('password2')
         .isString('Password confirmation required')
-        .eq(this.vals.password1, 'Passwords must match')
+        .eq(ctx.vals.password1, 'Passwords must match')
 
       // Validation passed. Access the above params via `ctx.vals` for
       // the remainder of the route to ensure you're getting the validated
       // version.
 
       const user = await db.insertUser(
-        this.vals.uname, this.vals.password1, this.vals.email
+        ctx.vals.uname, ctx.vals.password1, ctx.vals.email
       )
 
-      this.redirect(`/users/${user.uname}`)
+      ctx.redirect(`/users/${user.uname}`)
     })
     ```
 
