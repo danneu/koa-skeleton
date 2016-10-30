@@ -107,6 +107,9 @@ exports.futureDate = function (nowDate, opts) {
 };
 
 exports.nl2br = function (s) {
+  // FIXME: nunjucks escape filter returns { val: String, length: Int }
+  // object. Must've changed recently?
+  if (s.val) s = s.val
   assert(typeof s === 'string');
   return s.replace(/\n/g, '<br>');
 };
