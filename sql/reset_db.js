@@ -34,13 +34,13 @@ async function seed () {
   await (async () => {
     const sql = await slurpSql('schema.sql');
     console.log('-- Executing schema.sql...');
-    await pool.query(sql);
+    await pool._query(sql);
   })();
 
   await (async () => {
     const sql = await slurpSql('seeds.sql');
     console.log('-- Executing seeds.sql...');
-    await pool.query(sql);
+    await pool._query(sql);
   })();
 }
 

@@ -105,7 +105,6 @@ exports.handleBouncerValidationError = function () {
       await next();
     } catch(err) {
       if (err instanceof bouncer.ValidationError) {
-        console.warn('Caught validation error:', err, err.stack);
         ctx.flash = {
           message: ['danger', err.message || 'Validation error'],
           // CAVEAT: Max cookie size is 4096 bytes. If the user sent us a
