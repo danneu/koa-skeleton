@@ -1,8 +1,6 @@
-'use strict';
-
 // 3rd
-var debug = require('debug')('app:cancan');
-var assert = require('better-assert');
+const debug = require('debug')('app:cancan');
+const assert = require('better-assert');
 
 // Retuns boolean
 //

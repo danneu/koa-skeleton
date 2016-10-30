@@ -1,4 +1,3 @@
-'use strict';
 // 3rd party
 const assert = require('better-assert');
 const router = require('koa-router')();

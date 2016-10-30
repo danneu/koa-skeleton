@@ -1,4 +1,3 @@
-'use strict';
 // Ensure require('dotenv').config() is run before this module is required
 
 exports.NODE_ENV = process.env.NODE_ENV || 'development';

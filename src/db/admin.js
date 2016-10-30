@@ -1,4 +1,3 @@
-'use strict';
 // 1st
 const {pool} = require('./util');
 

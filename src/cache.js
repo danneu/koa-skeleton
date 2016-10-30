@@ -1,4 +1,3 @@
-'use strict';
 // 3rd
 const IntervalCache = require('interval-cache');
 const co = require('co');
@@ -7,10 +6,10 @@ const db = require('./db');
 
 //
 // Some things are too wasteful to calculate on every request,
-// but too trivial to extract into a real caching layer. 
+// but too trivial to extract into a real caching layer.
 // e.g. SELECT COUNT(*)
 // For these things, a setInterval on each server gets the job
-// done. 
+// done.
 //
 
 ////////////////////////////////////////////////////////////

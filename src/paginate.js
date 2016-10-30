@@ -1,5 +1,3 @@
-'use strict';
-
 // 3rd
 const debug = require('debug')('app:sandbox');
 const assert = require('better-assert');

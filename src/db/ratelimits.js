@@ -1,4 +1,3 @@
-'use strict';
 // 3rd
 const assert = require('better-assert');
 const debug = require('debug')('db:ratelimits');

@@ -1,5 +1,3 @@
-'use strict';
-
 // Node
 const nodeUrl = require('url');
 // 3rd

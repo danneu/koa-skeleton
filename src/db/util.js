@@ -1,4 +1,3 @@
-'use strict';
 // 3rd
 const {extend, parseUrl} = require('pg-extra');
 const pg = extend(require('pg'));

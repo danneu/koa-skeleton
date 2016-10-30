@@ -1,5 +1,3 @@
-'use strict';
-
 // Node
 const crypto = require('crypto');
 // 3rd
