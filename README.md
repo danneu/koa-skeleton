@@ -1,3 +1,6 @@
+<div align="center">
+  <img src="/public/img/skeleton.png" alt="skeleton">
+</div>
 
 # koa-skeleton (for Koa 2.x)
 

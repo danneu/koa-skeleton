@@ -9,6 +9,7 @@ const db = require('./db')
 const config = require('./config')
 const pre = require('./presenters')
 
+
 // Assoc ctx.currUser if the session_id cookie (a UUID v4)
 // is an active session.
 exports.wrapCurrUser = function () {
@@ -27,6 +28,7 @@ exports.wrapCurrUser = function () {
     await next()
   }
 }
+
 
 // Expose req.flash (getter) and res.flash = _ (setter)
 // Flash data persists in user's sessions until the next ~successful response
@@ -74,6 +76,7 @@ exports.wrapFlash = function (cookieName = 'flash') {
   }
 }
 
+
 exports.methodOverride = function () {
   return async (ctx, next) => {
     if (typeof ctx.request.body === 'undefined') {
@@ -89,6 +92,7 @@ exports.methodOverride = function () {
   }
 }
 
+
 exports.removeTrailingSlash = function () {
   return async (ctx, next) => {
     if (ctx.path.length > 1 && ctx.path.endsWith('/')) {
@@ -99,6 +103,7 @@ exports.removeTrailingSlash = function () {
     await next()
   }
 }
+
 
 exports.handleBouncerValidationError = function () {
   return async (ctx, next) => {
@@ -123,6 +128,7 @@ exports.handleBouncerValidationError = function () {
     }
   }
 }
+
 
 exports.ensureRecaptcha = function () {
   return async (ctx, next) => {
@@ -156,6 +162,7 @@ exports.ensureRecaptcha = function () {
   }
 }
 
+
 // Cheap but simple way to protect against CSRF attacks
 // TODO: Replace with something more versatile
 exports.ensureReferer = function () {
@@ -181,7 +188,6 @@ exports.ensureReferer = function () {
   }
 }
 
-// //////////////////////////////////////////////////////////
 
 exports.ratelimit = function () {
   return async (ctx, next) => {
