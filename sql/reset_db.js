@@ -28,21 +28,23 @@ function slurpSql (filePath) {
   });
 }
 
-co(function * () {
+async function seed () {
   console.log('Resetting the database...');
 
-  yield (function * () {
-    const sql = yield slurpSql('schema.sql');
+  await (async () => {
+    const sql = await slurpSql('schema.sql');
     console.log('-- Executing schema.sql...');
-    return yield pool.query(sql);
+    await pool.query(sql);
   })();
 
-  yield (function * () {
-    const sql = yield slurpSql('seeds.sql');
+  await (async () => {
+    const sql = await slurpSql('seeds.sql');
     console.log('-- Executing seeds.sql...');
-    return yield pool.query(sql);
+    await pool.query(sql);
   })();
-}).then(function () {
+}
+
+seed().then(function () {
   console.log('Finished resetting db');
   process.exit(0);
 }, function (err){

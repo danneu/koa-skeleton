@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node ./babel.app",
     "start-dev": "nodemon --ext js,html ./babel.app",
-    "reset-db": "node ./sql/reset_db.js",
+    "reset-db": "node ./babel.reset_db",
     "deploy": "git push heroku master"
   },
   "engines": {
@@ -23,7 +23,6 @@
     "babel-preset-stage-0": "^6.16.0",
     "bcryptjs": "2.3.0",
     "better-assert": "1.0.2",
-    "co": "4.6.0",
     "debug": "2.2.0",
     "dotenv": "^2.0.0",
     "interval-cache": "0.0.1",

@@ -1,7 +1,6 @@
 // 3rd
 const assert = require('better-assert');
 const debug = require('debug')('db:ratelimits');
-const co = require('co');
 const {q} = require('pg-extra');
 // 1st
 const {pool} = require('./util');
