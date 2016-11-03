@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node ./babel.app",
     "start-dev": "nodemon --ext js,html ./babel.app",
-    "reset-db": "node ./babel.reset_db",
+    "reset-db": "psql -d koa-skeleton -f sql/schema.sql && psql -d koa-skeleton -f sql/seeds.sql",
     "lint": "./node_modules/.bin/eslint src sql test",
     "deploy": "git push heroku master"
   },
