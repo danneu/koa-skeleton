@@ -63,7 +63,10 @@ const nunjucksOptions = {
 app.use(mw.ensureReferer())
 app.use(require('koa-helmet')())
 app.use(convert(require('koa-compress')()))
-app.use(convert(require('koa-better-static')('public')))
+app.use(convert(require('koa-better-static')('public', {
+  // cache static assets for 365 days
+  maxage: 1000 * 60 * 60 * 24 * 365
+})))
 // Don't show logger in test mode
 if (config.NODE_ENV !== 'test') {
   app.use(convert(require('koa-logger')()))
