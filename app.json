@@ -1,0 +1,15 @@
+{
+  "name": "koa-skeleton demo",
+  "description": "a barebones Node + Koa 2.x + Postgres app",
+  "repository": "https://github.com/danneu/koa-skeleton",
+  "keywords": ["node", "koa", "boilerplate"],
+  "website": "https://koa-skeleton.danneu.com/",
+  "addons": ["heroku-postgresql:hobby-dev"],
+  "buildpacks": [{ "url": "heroku/nodejs" }],
+  "env": {
+    "NODE_ENV": { "value": "production" }
+  },
+  "scripts": {
+    "postdeploy": "NODE_ENV=development node ./babel.reset_db"
+  }
+}

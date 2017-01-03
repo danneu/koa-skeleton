@@ -1,38 +1,43 @@
-'use strict';
-
 // 3rd party
-const assert = require('better-assert');
-const _ = require('lodash');
+const assert = require('better-assert')
 
-////////////////////////////////////////////////////////////
+// Presents are functions that take data from the database
+// and extend/improve it for the view layer. They're used in routes.
+//
+// For instance, a presenter would promote a string timestamp into
+// a Date object which is more convenient for the view layer to work with.
+//
+// Example:
+//
+//     let user = presentUser(yield db.getUser(42))
+//     this.assert(user, 404)
+//     this.body = user
 
-exports.presentUser = function(u) {
+// //////////////////////////////////////////////////////////
+
+exports.presentUser = function (x) {
+  if (!x) return
   // Fix embedded json representation
-  if (_.isString(u.created_at))
-    u.created_at = new Date(u.created_at);
+  if (typeof x.created_at === 'string') x.created_at = new Date(x.created_at)
+  x.url = `/users/${x.uname}`
+  return x
+}
 
-  u.url = `/users/${u.uname}`;
+// //////////////////////////////////////////////////////////
 
-  return u;
-};
-
-////////////////////////////////////////////////////////////
-
-exports.presentSession = function(x) {
+exports.presentSession = function (x) {
+  if (!x) return
   // Fix embedded json representation
-  if (_.isString(x.created_at))
-    x.created_at = new Date(x.created_at);
-  if (_.isString(x.expired_at))
-    x.expired_at = new Date(x.expired_at);
+  if (typeof x.created_at === 'string') x.created_at = new Date(x.created_at)
+  if (typeof x.expired_at === 'string') x.expired_at = new Date(x.expired_at)
+  return x
+}
 
-  return x;
-};
+// //////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////
-
-exports.presentMessage = function(m) {
-  if (m.user)
-    m.user = exports.presentUser(m.user);
-  m.url = `/messages/${m.id}`;
-  return m;
-};
+exports.presentMessage = function (x) {
+  if (!x) return
+  exports.presentUser(x.user)
+  x.url = `/messages/${x.id}`
+  return x
+}

@@ -23,6 +23,10 @@
       <p style="font-size: 14px; margin-bottom: 5px;">Just clone, gut, and modify</p>
     </a>
 
+    <a href="https://heroku.com/deploy?template=https://github.com/danneu/koa-skeleton" style="display: block">
+      <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
+    </a>
+
   </div>
 
   <div class="row">
@@ -42,15 +46,22 @@
                         required
                         maxlength="300"
               >{{ ctx.flash.params.markup or '' }}</textarea>
+              <div class="help-block">
+                Note: There is a 5 second ratelimit.
+              </div>
             </div>
 
-            {% if recaptchaSystemOnline %}
+            {% if config.RECAPTCHA_SYSTEM_ONLINE %}
               <div class="form-group text-center">
                 <div class="g-recaptcha recaptcha-center" data-sitekey="{{ recaptchaSitekey }}" data-callback="recaptchaSuccessCallback"></div>
               </div>
+            {% else %}
+              <div class="alert alert-warning text-center">
+                Recaptcha unconfigured
+              </div>
             {% endif %}
 
-          </div><!-- /.panel-body -->
+          </div>
           <div class="panel-footer text-right">
             <span class="text-muted" id="markup-counter">
               0/300
@@ -63,8 +74,8 @@
                 as {{ ctx.currUser.uname }}
               {% endif %}
             </button>
-          </div><!-- /.panel-footer -->
-        </div><!-- /.panel -->
+          </div>
+        </div>
       </form>
 
       <h2>Recent Messages</h2>

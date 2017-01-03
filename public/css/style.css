@@ -11,6 +11,7 @@ body {
 }
 
 /* Centers the generated Recaptcha iframe within its container */
+.recaptcha-center > div,
 .recaptcha-center > div > div {
     margin: 0 auto;
 }

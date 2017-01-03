@@ -63,10 +63,16 @@
                 </label>
               </div>
 
-              <div class="form-group">
-                <label>Human Test:</label>
-                <div class="g-recaptcha" data-sitekey="{{ recaptchaSitekey }}" data-callback="recaptchaSuccessCallback"></div>
-              </div>
+              {% if config.RECAPTCHA_SYSTEM_ONLINE %}
+                <div class="form-group">
+                  <label>Human Test:</label>
+                  <div class="g-recaptcha" data-sitekey="{{ recaptchaSitekey }}" data-callback="recaptchaSuccessCallback"></div>
+                </div>
+              {% else %}
+                <div class="alert alert-warning text-center">
+                  Recaptcha unconfigured
+                </div>
+              {% endif %}
 
           </div>
           <div class="panel-footer text-right">
