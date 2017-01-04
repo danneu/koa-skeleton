@@ -175,7 +175,7 @@ exports.updateUser = async function (userId, fields) {
     .update(fields)
     .returning('*')
     .toString()
-  return pool.one(sql)
+  return pool._query(sql)
 }
 
 // //////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ exports.updateMessage = async function (messageId, fields) {
     .update(fields)
     .returning('*')
     .toString()
-  return pool.one(sql)
+  return pool._query(sql)
 }
 
 // //////////////////////////////////////////////////////////
