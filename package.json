@@ -38,7 +38,6 @@
     "koa-logger": "1.3.0",
     "koa-nunjucks-render": "^1.2.0",
     "koa-router": "^7.0.1",
-    "nunjucks": "^2.5.2",
     "pg": "^6.1.0",
     "pg-extra": "0.0.10",
     "recaptcha-validator": "^1.0.6",
