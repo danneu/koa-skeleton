@@ -22,6 +22,9 @@
     <thead>
       <tr>
         <th>User</th>
+        {% if cancan.isAdmin(ctx.currUser) %}
+          <th>Email</th>
+        {% endif %}
         <th>Messages</th>
         <th>Joined</th>
         <th>Last Online</th>
@@ -38,6 +41,16 @@
             </a>
             <a href="{{ user.url }}">{{ user.uname }}</a>
           </td>
+          {# email #}
+          {% if cancan.isAdmin(ctx.currUser) %}
+            <td>
+              {% if user.email %}
+                <code>{{ user.email }}</code>
+              {% else %}
+                --
+              {% endif %}
+            </td>
+          {% endif %}
           {# messages #}
           <td>
             {{ user.messages_count }}
