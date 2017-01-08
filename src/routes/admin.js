@@ -28,4 +28,14 @@ router.get('/admin', async (ctx) => {
 
 // //////////////////////////////////////////////////////////
 
+// Delete hidden messages
+router.del('/admin/messages/hidden', async (ctx) => {
+  await db.admin.deleteHiddenMessages()
+
+  ctx.flash = { message: ['success', 'Deleted hidden messages'] }
+  ctx.redirect('back')
+})
+
+// //////////////////////////////////////////////////////////
+
 module.exports = router

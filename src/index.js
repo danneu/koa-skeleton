@@ -29,7 +29,7 @@ app.proxy = config.TRUST_PROXY
 const nunjucksOptions = {
   // `yield this.render('show_user')` will assume that a show_user.html exists
   ext: '.html',
-  noCache: config.NODE_ENV === 'development',
+  noCache: config.NODE_ENV !== 'production',
   // don't throw template errors in development if we try to render
   // a null/undefined like {{ x }}. in theory, setting it to true prevents
   // bugs and forces you to be explicit about {{ x or '' }}, but in reality,
@@ -39,6 +39,7 @@ const nunjucksOptions = {
   globals: {
     // let us use `can(USER, ACTION, TARGET)` authorization-checks in templates
     can: cancan.can,
+    cancan,
     config
   },
   // filters are functions that we can pipe values to from nunjucks templates.

@@ -2,6 +2,15 @@
 const debug = require('debug')('app:cancan')
 const assert = require('better-assert')
 
+// Is `user` an admin?
+//
+// This convenience function exists so that we don't have to first check
+// if `user` is defined before passing it in.
+exports.isAdmin = function (user) {
+  if (!user) return false
+  return user.role === 'ADMIN'
+}
+
 // Retuns boolean
 //
 // `user` is object (logged in) or undefined (guest)
