@@ -1,10 +1,7 @@
-require('babel-register')({
-  plugins: ['transform-async-to-generator']
-})
 
 // 3rd party
 // Load env vars from .env, always run this early
-require('dotenv').config({ silent: true })
+require('dotenv').config()
 const Koa = require('koa')
 const bouncer = require('koa-bouncer')
 const nunjucksRender = require('koa-nunjucks-render')
