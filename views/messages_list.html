@@ -19,7 +19,7 @@
   {{ macros.renderPaginator(paginator) }}
 
   {% for message in messages %}
-    {{ macros.renderMessagePanel(ctx, message, '/messages') }}
+    {{ macros.renderMessagePanel(ctx, message) }}
   {% endfor %}
 
   {{ macros.renderPaginator(paginator) }}

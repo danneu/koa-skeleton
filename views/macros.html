@@ -6,7 +6,7 @@
   it in a macro. They're basically view helper functions that output HTML.
 #}
 
-{% macro renderMessagePanel(ctx, message, redirectTo) %}
+{% macro renderMessagePanel(ctx, message) %}
   {% if can(ctx.currUser, 'READ_MESSAGE', message) %}
     <div class="panel panel-default">
       <div class="panel-heading text-right">
@@ -14,7 +14,6 @@
         {% if can(ctx.currUser, 'UPDATE_MESSAGE_STATE', message) %}
           <form action="/messages/{{ message.id }}" method="POST">
             <input type="hidden" name="_method" value="PUT">
-            <input type="hidden" name="redirectTo" value="{{ redirectTo }}">
             {% if message.is_hidden %}
               <input type="hidden" name="is_hidden" value="false">
               <button type="submit" class="btn btn-xs btn-default pull-left delete-message-btn">Restore</button>

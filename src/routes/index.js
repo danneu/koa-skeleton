@@ -238,7 +238,7 @@ router.put('/messages/:message_id', loadMessage(), async (ctx) => {
   })
   // RESPOND
   ctx.flash = { message: ['success', 'Message updated'] }
-  ctx.redirect(ctx.vals.redirectTo)
+  ctx.redirect('back')
 })
 
 // //////////////////////////////////////////////////////////
