@@ -1,6 +1,6 @@
 // 1st
 const {pool} = require('./util')
-
+const {q} = require('pg-extra')
 // //////////////////////////////////////////////////////////
 
 // only counts visible messages, not hidden ones since they are effectively
