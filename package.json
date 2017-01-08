@@ -40,7 +40,7 @@
     "koa-router": "^7.0.1",
     "nunjucks": "^2.5.2",
     "pg": "^6.1.0",
-    "pg-extra": "0.0.9",
+    "pg-extra": "0.0.10",
     "recaptcha-validator": "^1.0.6",
     "uuid": "^2.0.2"
   },

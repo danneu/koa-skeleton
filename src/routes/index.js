@@ -74,7 +74,7 @@ router.get('/', async (ctx) => {
 // - email: Optional String
 // - role: Optional String
 router.put('/users/:uname', loadUser(), async (ctx) => {
-  const user = ctx.state.user
+  const {user} = ctx.state
   ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_*', user)
   // VALIDATION
   if (ctx.request.body.role) {
@@ -106,7 +106,7 @@ router.put('/users/:uname', loadUser(), async (ctx) => {
 
 // Edit user page
 router.get('/users/:uname/edit', loadUser(), async (ctx) => {
-  const user = ctx.state.user
+  const {user} = ctx.state
   ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_*', user)
   await ctx.render('users_edit', {
     ctx: ctx,
@@ -119,7 +119,7 @@ router.get('/users/:uname/edit', loadUser(), async (ctx) => {
 
 // Show user profile
 router.get('/users/:uname', loadUser(), async (ctx) => {
-  const user = ctx.state.user
+  const {user} = ctx.state
   const messages = await db.getRecentMessagesForUserId(user.id)
   messages.forEach(pre.presentMessage)
   await ctx.render('users_show', {
@@ -208,7 +208,7 @@ router.get('/users', async (ctx) => {
 // - markup: Optional String
 // - redirectTo: Optional String
 router.put('/messages/:message_id', loadMessage(), async (ctx) => {
-  const message = ctx.state.message
+  const {message} = ctx.state
   // AUTHZ: Ensure user is authorized to make *any* update to message
   ctx.assertAuthorized(ctx.currUser, 'UPDATE_MESSAGE', message)
   if (ctx.request.body.is_hidden) {
@@ -248,7 +248,7 @@ router.put('/messages/:message_id', loadMessage(), async (ctx) => {
 // Body:
 // - role: String
 router.put('/users/:uname/role', loadUser(), async (ctx) => {
-  const user = ctx.state.user
+  const {user} = ctx.state
   // AUTHZ
   ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_ROLE', user)
   // VALIDATE

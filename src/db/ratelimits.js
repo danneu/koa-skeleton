@@ -1,7 +1,7 @@
 // 3rd
 const assert = require('better-assert')
 const debug = require('debug')('db:ratelimits')
-const {q} = require('pg-extra')
+const {sql} = require('pg-extra')
 // 1st
 const {pool} = require('./util')
 
@@ -15,9 +15,9 @@ exports.bump = async function (ipAddress, maxDate) {
   assert(typeof ipAddress === 'string')
   assert(maxDate instanceof Date)
   return pool.withTransaction(async (client) => {
-    await client.query(q`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE`)
+    await client.query(sql`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE`)
     // Get latest ratelimit for this user
-    const row = await client.one(q`
+    const row = await client.one(sql`
       SELECT *
       FROM ratelimits
       WHERE ip_root(ip_address) = ip_root(${ipAddress})
@@ -32,7 +32,7 @@ exports.bump = async function (ipAddress, maxDate) {
       throw expires
     }
     // Else, insert new ratelimit
-    await client.query(q`
+    await client.query(sql`
       INSERT INTO ratelimits (ip_address) VALUES (${ipAddress})
     `)
   })
