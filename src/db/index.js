@@ -3,6 +3,7 @@ const assert = require('better-assert')
 const uuid = require('uuid')
 const knex = require('knex')({ client: 'pg' })
 const {sql, _unsafe} = require('pg-extra')
+const debug = require('debug')('app:db:index')
 // 1st
 const belt = require('../belt')
 const config = require('../config')
@@ -170,12 +171,12 @@ exports.updateUser = async function (userId, fields) {
   assert(Number.isInteger(userId))
   const WHITELIST = ['email', 'role']
   assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1))
-  const sql = knex('users')
+  const string = knex('users')
     .where({ id: userId })
     .update(fields)
     .returning('*')
     .toString()
-  return pool.one(_unsafe`${sql}`)
+  return pool.one(_unsafe`${string}`)
 }
 
 // //////////////////////////////////////////////////////////
@@ -184,12 +185,12 @@ exports.updateMessage = async function (messageId, fields) {
   assert(Number.isInteger(messageId))
   const WHITELIST = ['is_hidden', 'markup']
   assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1))
-  const sql = knex('messages')
+  const string = knex('messages')
     .where({ id: messageId })
     .update(fields)
     .returning('*')
     .toString()
-  return pool.one(_unsafe`${sql}`)
+  return pool.one(_unsafe`${string}`)
 }
 
 // //////////////////////////////////////////////////////////
