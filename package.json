@@ -35,7 +35,7 @@
     "koa-nunjucks-render": "^1.2.0",
     "koa-router": "^7.1.1",
     "pg": "^6.1.5",
-    "pg-extra": "0.0.12",
+    "pg-extra": "0.0.13",
     "recaptcha-validator": "^1.0.11",
     "uuid": "^3.0.1"
   },
