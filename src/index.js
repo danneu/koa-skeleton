@@ -83,9 +83,9 @@ app.use(convert(nunjucksRender('views', nunjucksOptions)))
 //
 // Usage:
 //
-//    router.get('/topics/:id', function*() {
-//      const topic = yield db.getTopicById(this.params.id)
-//      this.assertAuthorized(this.currUser, 'READ_TOPIC', topic)
+//    router.get('/topics/:id', async (ctx, next) {
+//      const topic = await db.getTopicById(ctx.params.id)
+//      ctx.assertAuthorized(ctx.currUser, 'READ_TOPIC', topic)
 //      ...
 //    })
 app.use(async (ctx, next) => {
@@ -95,7 +95,7 @@ app.use(async (ctx, next) => {
     debug('[assertAuthorized] Can %s %s: %s', uname, action, isAuthorized)
     ctx.assert(isAuthorized, 404)
   }
-  await next()
+  return next()
 })
 
 // //////////////////////////////////////////////////////////

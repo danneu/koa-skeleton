@@ -99,7 +99,7 @@ exports.insertMessage = async function (data) {
       ${data.ip_address}::inet,
       ${data.user_agent})
     RETURNING *
-  `);
+  `)
 }
 
 // //////////////////////////////////////////////////////////

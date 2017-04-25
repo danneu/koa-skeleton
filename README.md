@@ -16,7 +16,7 @@ Just fork, gut, and modify.
 
 ## The Stack
 
-Depends on Node v6.x+:
+Depends on Node v7.x:
 
 - **Micro-framework**: [Koa 2.x](http://koajs.com/). It's very similar to [Express](http://expressjs.com/) except it supports async/await.
 - **Database**: [Postgres](http://www.postgresql.org/).
@@ -139,6 +139,8 @@ Instead, require the `src/config.js` and access them there.
 
 ## Changelog
 
+- `3.0.0` 25 Apr 2017
+  - Removed Babel since the features we want are now supported by Node 7.x.
 - `2.0.0` 29 Oct 2015
   - Refactored from Koa 1.x to Koa 2.x.
 - `0.1.0` 29 Oct 2016

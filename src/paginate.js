@@ -1,5 +1,5 @@
 // 3rd
-const debug = require('debug')('app:sandbox')
+const debug = require('debug')('app:paginate')
 const assert = require('better-assert')
 // 1st
 const config = require('./config')

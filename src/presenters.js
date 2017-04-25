@@ -1,5 +1,3 @@
-// 3rd party
-const assert = require('better-assert')
 
 // Presents are functions that take data from the database
 // and extend/improve it for the view layer. They're used in routes.
