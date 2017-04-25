@@ -2,7 +2,7 @@
 const assert = require('better-assert')
 const uuid = require('uuid')
 const knex = require('knex')({ client: 'pg' })
-const {sql, _unsafe} = require('pg-extra')
+const {sql, _raw} = require('pg-extra')
 const debug = require('debug')('app:db:index')
 // 1st
 const belt = require('../belt')
@@ -176,7 +176,7 @@ exports.updateUser = async function (userId, fields) {
     .update(fields)
     .returning('*')
     .toString()
-  return pool.one(_unsafe`${string}`)
+  return pool.one(_raw`${string}`)
 }
 
 // //////////////////////////////////////////////////////////
@@ -190,7 +190,7 @@ exports.updateMessage = async function (messageId, fields) {
     .update(fields)
     .returning('*')
     .toString()
-  return pool.one(_unsafe`${string}`)
+  return pool.one(_raw`${string}`)
 }
 
 // //////////////////////////////////////////////////////////
