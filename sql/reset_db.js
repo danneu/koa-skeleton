@@ -1,10 +1,10 @@
-
 // Node
 const path = require('path')
-const fs = require('fs')
+const { promisify } = require('util')
+const readFile = promisify(require('fs').readFile)
 // 1st
 const config = require('../src/config')
-const {pool} = require('../src/db/util')
+const { pool } = require('../src/db/util')
 
 // //////////////////////////////////////////////////////////
 
@@ -16,18 +16,13 @@ if (config.NODE_ENV !== 'development') {
 
 // //////////////////////////////////////////////////////////
 
-function slurpSql (filePath) {
+function slurpSql(filePath) {
   const relativePath = '../sql/' + filePath
   const fullPath = path.join(__dirname, relativePath)
-  return new Promise((resolve, reject) => {
-    fs.readFile(fullPath, 'utf8', (err, text) => {
-      if (err) return reject(err)
-      resolve(text)
-    })
-  })
+  return readFile(fullPath, 'utf8')
 }
 
-async function seed () {
+async function seed() {
   console.log('Resetting the database...')
 
   await (async () => {
@@ -43,10 +38,13 @@ async function seed () {
   })()
 }
 
-seed().then(function () {
-  console.log('Finished resetting db')
-  process.exit(0)
-}, function (err) {
-  console.error('Error:', err, err.stack)
-  process.exit(1)
-})
+seed().then(
+  () => {
+    console.log('Finished resetting db')
+    process.exit(0)
+  },
+  err => {
+    console.error('Error:', err, err.stack)
+    process.exit(1)
+  }
+)

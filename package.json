@@ -13,7 +13,12 @@
     "reset-db": "node ./sql/reset_db",
     "deploy": "git push heroku master",
     "pretty-fix":
-      "prettier --single-quote --no-semi --trailing-comma es5 --jsx-bracket-same-line --write \"{src,iframe}/**/*.js\""
+      "./node_modules/.bin/prettier --write \"{src,sql,test}/**.js\""
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
   },
   "engines": {
     "node": ">=7.x"
