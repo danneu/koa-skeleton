@@ -72,7 +72,7 @@ app.use(
 if (config.NODE_ENV !== 'test') {
   app.use(convert(require('koa-logger')()))
 }
-app.use(convert(require('koa-body')()))
+app.use(require('koa-body')())
 app.use(mw.methodOverride()) // Must come after body parser
 app.use(mw.removeTrailingSlash())
 app.use(mw.wrapCurrUser())
