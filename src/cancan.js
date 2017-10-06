@@ -6,7 +6,7 @@ const assert = require('better-assert')
 //
 // This convenience function exists so that we don't have to first check
 // if `user` is defined before passing it in.
-exports.isAdmin = function (user) {
+exports.isAdmin = function(user) {
   if (!user) return false
   return user.role === 'ADMIN'
 }
@@ -21,7 +21,7 @@ exports.isAdmin = function (user) {
 //
 //    can(this.currUser, 'READ_TOPIC', topic)
 //    can(this.currUser, 'CREATE_TOPIC')
-exports.can = function (user, action, target) {
+exports.can = function(user, action, target) {
   assert(typeof action === 'string')
 
   switch (action) {
@@ -33,8 +33,10 @@ exports.can = function (user, action, target) {
       if (target.is_hidden) return ['ADMIN', 'MOD'].includes(user && user.role)
       return false
     case 'UPDATE_USER_*': // target is other user
-      return exports.can(user, 'UPDATE_USER_SETTINGS', target) ||
+      return (
+        exports.can(user, 'UPDATE_USER_SETTINGS', target) ||
         exports.can(user, 'UPDATE_USER_ROLE', target)
+      )
     case 'UPDATE_USER_SETTINGS': // target is other user
       assert(target)
       // Guests never can
@@ -76,8 +78,10 @@ exports.can = function (user, action, target) {
     // Is user authorized for any of the UPDATE_MESSAGE_* actions?
     case 'UPDATE_MESSAGE': // target is message
       assert(target)
-      return exports.can(user, 'UPDATE_MESSAGE_STATE', target) ||
+      return (
+        exports.can(user, 'UPDATE_MESSAGE_STATE', target) ||
         exports.can(user, 'UPDATE_MESSAGE_MARKUP', target)
+      )
     // Can user change message.is_hidden?
     case 'UPDATE_MESSAGE_STATE': // target is message
       assert(target)

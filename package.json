@@ -1,6 +1,7 @@
 {
   "name": "koa-skeleton",
-  "description": "a simple, full-featured koa application made to be forked and modified",
+  "description":
+    "a simple, full-featured koa application made to be forked and modified",
   "version": "3.0.0",
   "repository": {
     "type": "git",
@@ -10,8 +11,9 @@
     "start": "node app.js",
     "start-dev": "nodemon --ext js,html app.js",
     "reset-db": "node ./sql/reset_db",
-    "lint": "./node_modules/.bin/standard 'src/**.js' 'sql/**.js' 'test/**.js'",
-    "deploy": "git push heroku master"
+    "deploy": "git push heroku master",
+    "pretty-fix":
+      "prettier --single-quote --no-semi --trailing-comma es5 --jsx-bracket-same-line --write \"{src,iframe}/**/*.js\""
   },
   "engines": {
     "node": ">=7.x"
@@ -39,5 +41,8 @@
     "recaptcha-validator": "^1.0.11",
     "uuid": "^3.0.1"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^1.7.4"
+  }
 }

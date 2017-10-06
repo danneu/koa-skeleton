@@ -1,9 +1,9 @@
 // 3rd
 const assert = require('better-assert')
 const debug = require('debug')('db:ratelimits')
-const {sql} = require('pg-extra')
+const { sql } = require('pg-extra')
 // 1st
-const {pool} = require('./util')
+const { pool } = require('./util')
 
 // maxDate (Required Date): the maximum, most recent timestamp that the user
 // can have if they have a row in the table. i.e. if user can only post
@@ -11,10 +11,10 @@ const {pool} = require('./util')
 //
 // If user is ratelimited, it throws the expiration Date timestamp of the
 // ratelimit that can be shown to the user (e.g. try again in 24 seconds)
-exports.bump = async function (ipAddress, maxDate) {
+exports.bump = async function(ipAddress, maxDate) {
   assert(typeof ipAddress === 'string')
   assert(maxDate instanceof Date)
-  return pool.withTransaction(async (client) => {
+  return pool.withTransaction(async client => {
     await client.query(sql`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE`)
     // Get latest ratelimit for this user
     const row = await client.one(sql`

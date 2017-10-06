@@ -1,4 +1,3 @@
-
 // 3rd party
 // Load env vars from .env, always run this early
 require('dotenv').config()
@@ -40,7 +39,7 @@ const nunjucksOptions = {
     // let us use `can(USER, ACTION, TARGET)` authorization-checks in templates
     can: cancan.can,
     cancan,
-    config
+    config,
   },
   // filters are functions that we can pipe values to from nunjucks templates.
   // e.g. {{ user.uname | md5 | toAvatarUrl }}
@@ -50,8 +49,8 @@ const nunjucksOptions = {
     nl2br: belt.nl2br,
     md5: belt.md5,
     toAvatarUrl: belt.toAvatarUrl,
-    autolink: belt.autolink
-  }
+    autolink: belt.autolink,
+  },
 }
 
 // //////////////////////////////////////////////////////////
@@ -61,10 +60,14 @@ const nunjucksOptions = {
 app.use(mw.ensureReferer())
 app.use(require('koa-helmet')())
 app.use(convert(require('koa-compress')()))
-app.use(convert(require('koa-better-static')('public', {
-  // cache static assets for 365 days in production
-  maxage: config.NODE_ENV === 'production' ? 1000 * 60 * 60 * 24 * 365 : 0
-})))
+app.use(
+  convert(
+    require('koa-better-static')('public', {
+      // cache static assets for 365 days in production
+      maxage: config.NODE_ENV === 'production' ? 1000 * 60 * 60 * 24 * 365 : 0,
+    })
+  )
+)
 // Don't show logger in test mode
 if (config.NODE_ENV !== 'test') {
   app.use(convert(require('koa-logger')()))
@@ -108,7 +111,7 @@ app.use(convert(require('./routes/admin').routes()))
 
 // //////////////////////////////////////////////////////////
 
-app.start = function (port = config.PORT) {
+app.start = function(port = config.PORT) {
   app.listen(port, () => {
     console.log('Listening on port', port)
   })

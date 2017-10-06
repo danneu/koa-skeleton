@@ -9,7 +9,7 @@ const config = require('./config')
 // Returns falsey if no paginator needs to be displayed
 // or it returns a paginator object that can be passed into the
 // renderPaginator macro
-exports.makePaginator = function (currPage, totalItems) {
+exports.makePaginator = function(currPage, totalItems) {
   assert(Number.isInteger(currPage))
   assert(Number.isInteger(totalItems))
   const perPage = config.MESSAGES_PER_PAGE
@@ -27,7 +27,11 @@ exports.makePaginator = function (currPage, totalItems) {
   let endPgNum = Math.min(totalPages, startPgNum + 6)
 
   if (currPage > 1) {
-    innerItems.push({ text: 'Prev', href: `?page=${currPage - 1}`, kind: 'BUTTON' })
+    innerItems.push({
+      text: 'Prev',
+      href: `?page=${currPage - 1}`,
+      kind: 'BUTTON',
+    })
   }
 
   if (startPgNum > 1) {
@@ -40,7 +44,10 @@ exports.makePaginator = function (currPage, totalItems) {
 
   for (let n = startPgNum; n <= endPgNum; n++) {
     const btn = {
-      text: n.toString(), href: `?page=${n}`, isActive: n === currPage, kind: 'BUTTON'
+      text: n.toString(),
+      href: `?page=${n}`,
+      isActive: n === currPage,
+      kind: 'BUTTON',
     }
     innerItems.push(btn)
   }
@@ -53,12 +60,16 @@ exports.makePaginator = function (currPage, totalItems) {
     innerItems.push({
       text: totalPages.toString(),
       href: `?page=${totalPages.toString()}`,
-      kind: 'BUTTON'
+      kind: 'BUTTON',
     })
   }
 
   if (currPage < totalPages) {
-    innerItems.push({ text: 'Next', href: `?page=${currPage + 1}`, kind: 'BUTTON' })
+    innerItems.push({
+      text: 'Next',
+      href: `?page=${currPage + 1}`,
+      kind: 'BUTTON',
+    })
   }
 
   return innerItems

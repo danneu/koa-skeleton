@@ -1,5 +1,5 @@
 // 3rd
-const {extend, parseUrl} = require('pg-extra')
+const { extend, parseUrl } = require('pg-extra')
 const pg = extend(require('pg'))
 // 1st
 const config = require('../config')
@@ -10,4 +10,4 @@ const config = require('../config')
 // should import and use
 const pool = new pg.Pool(parseUrl(config.DATABASE_URL))
 
-module.exports = {pool}
+module.exports = { pool }

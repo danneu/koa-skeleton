@@ -11,7 +11,7 @@ const pre = require('./presenters')
 
 // Assoc ctx.currUser if the session_id cookie (a UUID v4)
 // is an active session.
-exports.wrapCurrUser = function () {
+exports.wrapCurrUser = function() {
   return async (ctx, next) => {
     const sessionId = ctx.cookies.get('session_id')
     debug('[wrapCurrUser] session_id: ' + sessionId)
@@ -30,7 +30,7 @@ exports.wrapCurrUser = function () {
 
 // Expose req.flash (getter) and res.flash = _ (setter)
 // Flash data persists in user's sessions until the next ~successful response
-exports.wrapFlash = function (cookieName = 'flash') {
+exports.wrapFlash = function(cookieName = 'flash') {
   return async (ctx, next) => {
     let data, tmp
     if (ctx.cookies.get(cookieName)) {
@@ -48,19 +48,19 @@ exports.wrapFlash = function (cookieName = 'flash') {
 
     Object.defineProperty(ctx, 'flash', {
       enumerable: true,
-      get: function () {
+      get: function() {
         return data
       },
-      set: function (val) {
+      set: function(val) {
         const encodedVal = encodeURIComponent(JSON.stringify(val))
         ctx.cookies.set(cookieName, encodedVal, {
           // flash cookie only lasts 10 seconds to prevent stale flash messages.
           // CAVEAT: if the redirect request takes more than 10 seconds to
           // load, then the user will end up with no flash message,
           // no errors, etc.
-          maxAge: 10000
+          maxAge: 10000,
         })
-      }
+      },
     })
 
     await next()
@@ -68,16 +68,21 @@ exports.wrapFlash = function (cookieName = 'flash') {
     // clear flash cookie if it's a successful request
     // AND if it was actually set (instead of sending extraneous set-cookie
     // on every request)
-    if (ctx.response.status < 300 && ctx.cookies.get(cookieName) !== undefined) {
+    if (
+      ctx.response.status < 300 &&
+      ctx.cookies.get(cookieName) !== undefined
+    ) {
       ctx.cookies.set(cookieName, null)
     }
   }
 }
 
-exports.methodOverride = function () {
+exports.methodOverride = function() {
   return async (ctx, next) => {
     if (typeof ctx.request.body === 'undefined') {
-      throw new Error('methodOverride middleware must be applied after the body is parsed and ctx.request.body is populated')
+      throw new Error(
+        'methodOverride middleware must be applied after the body is parsed and ctx.request.body is populated'
+      )
     }
 
     if (ctx.request.body && ctx.request.body._method) {
@@ -89,7 +94,7 @@ exports.methodOverride = function () {
   }
 }
 
-exports.removeTrailingSlash = function () {
+exports.removeTrailingSlash = function() {
   return async (ctx, next) => {
     if (ctx.path.length > 1 && ctx.path.endsWith('/')) {
       ctx.redirect(ctx.path.slice(0, ctx.path.length - 1))
@@ -100,7 +105,7 @@ exports.removeTrailingSlash = function () {
   }
 }
 
-exports.handleBouncerValidationError = function () {
+exports.handleBouncerValidationError = function() {
   return async (ctx, next) => {
     try {
       await next()
@@ -114,7 +119,7 @@ exports.handleBouncerValidationError = function () {
           // TODO: Consider using localStorage to persist request bodies
           // so that it scales.
           params: ctx.request.body,
-          bouncer: err.bouncer
+          bouncer: err.bouncer,
         }
         return ctx.redirect('back')
       }
@@ -124,30 +129,45 @@ exports.handleBouncerValidationError = function () {
   }
 }
 
-exports.ensureRecaptcha = function () {
+exports.ensureRecaptcha = function() {
   return async (ctx, next) => {
-    if (['development', 'test'].includes(config.NODE_ENV) && !ctx.request.body['g-recaptcha-response']) {
+    if (
+      ['development', 'test'].includes(config.NODE_ENV) &&
+      !ctx.request.body['g-recaptcha-response']
+    ) {
       console.log('Development mode, so skipping recaptcha check')
       await next()
       return
     }
 
     if (!config.RECAPTCHA_SYSTEM_ONLINE) {
-      console.warn('Warn: Recaptcha environment variables not set, so skipping recaptcha check')
+      console.warn(
+        'Warn: Recaptcha environment variables not set, so skipping recaptcha check'
+      )
       await next()
       return
     }
 
-    ctx.validateBody('g-recaptcha-response')
+    ctx
+      .validateBody('g-recaptcha-response')
       .required('You must attempt the human test')
       .isString()
       .checkPred(s => s.length > 0, 'You must attempt the human test')
 
     try {
-      await recaptcha.promise(config.RECAPTCHA_SITESECRET, ctx.vals['g-recaptcha-response'], ctx.request.ip)
+      await recaptcha.promise(
+        config.RECAPTCHA_SITESECRET,
+        ctx.vals['g-recaptcha-response'],
+        ctx.request.ip
+      )
     } catch (err) {
-      console.warn('Got invalid captcha: ', ctx.vals['g-recaptcha-response'], err)
-      ctx.validateBody('g-recaptcha-response')
+      console.warn(
+        'Got invalid captcha: ',
+        ctx.vals['g-recaptcha-response'],
+        err
+      )
+      ctx
+        .validateBody('g-recaptcha-response')
         .check(false, 'Could not verify recaptcha was correct')
       return
     }
@@ -158,7 +178,7 @@ exports.ensureRecaptcha = function () {
 
 // Cheap but simple way to protect against CSRF attacks
 // TODO: Replace with something more versatile
-exports.ensureReferer = function () {
+exports.ensureReferer = function() {
   return async (ctx, next) => {
     // Don't ensure referer in tests
 
@@ -181,7 +201,7 @@ exports.ensureReferer = function () {
   }
 }
 
-exports.ratelimit = function () {
+exports.ratelimit = function() {
   return async (ctx, next) => {
     // 5 second rate limit per ip_address
     const maxDate = new Date(Date.now() - 5000)
@@ -206,7 +226,7 @@ exports.ratelimit = function () {
   //
   // Turn a future date into a human-friendly message
   // waitLength(future) -> '1 minute and 13 seconds'
-  function waitLength (tilDate) {
+  function waitLength(tilDate) {
     // diff is in seconds
     const diff = Math.max(0, Math.ceil((tilDate - new Date()) / 1000))
     const mins = Math.floor(diff / 60)

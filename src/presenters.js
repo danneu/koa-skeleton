@@ -1,4 +1,3 @@
-
 // Presents are functions that take data from the database
 // and extend/improve it for the view layer. They're used in routes.
 //
@@ -13,7 +12,7 @@
 
 // //////////////////////////////////////////////////////////
 
-exports.presentUser = function (x) {
+exports.presentUser = function(x) {
   if (!x) return
   // Fix embedded json representation
   if (typeof x.created_at === 'string') x.created_at = new Date(x.created_at)
@@ -23,7 +22,7 @@ exports.presentUser = function (x) {
 
 // //////////////////////////////////////////////////////////
 
-exports.presentSession = function (x) {
+exports.presentSession = function(x) {
   if (!x) return
   // Fix embedded json representation
   if (typeof x.created_at === 'string') x.created_at = new Date(x.created_at)
@@ -33,7 +32,7 @@ exports.presentSession = function (x) {
 
 // //////////////////////////////////////////////////////////
 
-exports.presentMessage = function (x) {
+exports.presentMessage = function(x) {
   if (!x) return
   exports.presentUser(x.user)
   x.url = `/messages/${x.id}`

@@ -2,12 +2,12 @@
 const assert = require('better-assert')
 const uuid = require('uuid')
 const knex = require('knex')({ client: 'pg' })
-const {sql, _raw} = require('pg-extra')
+const { sql, _raw } = require('pg-extra')
 const debug = require('debug')('app:db:index')
 // 1st
 const belt = require('../belt')
 const config = require('../config')
-const {pool} = require('./util')
+const { pool } = require('./util')
 
 // This module is for general database queries that haven't
 // yet been split off into more specific db submodules.
@@ -22,7 +22,7 @@ exports.ratelimits = require('./ratelimits')
 // UUID -> User | undefined
 //
 // Also bumps user's last_online_at column to NOW().
-exports.getUserBySessionId = async function (sessionId) {
+exports.getUserBySessionId = async function(sessionId) {
   assert(belt.isValidUuid(sessionId))
   return pool.one(sql`
     UPDATE users
@@ -41,7 +41,7 @@ exports.getUserBySessionId = async function (sessionId) {
 }
 
 // Case-insensitive uname lookup
-exports.getUserByUname = async function (uname) {
+exports.getUserByUname = async function(uname) {
   assert(typeof uname === 'string')
   return pool.one(sql`
     SELECT *
@@ -52,7 +52,7 @@ exports.getUserByUname = async function (uname) {
 
 // //////////////////////////////////////////////////////////
 
-exports.getRecentMessages = async function () {
+exports.getRecentMessages = async function() {
   return pool.many(sql`
     SELECT
       m.*,
@@ -65,7 +65,7 @@ exports.getRecentMessages = async function () {
   `)
 }
 
-exports.getRecentMessagesForUserId = async function (userId) {
+exports.getRecentMessagesForUserId = async function(userId) {
   assert(Number.isInteger(userId))
   return pool.many(sql`
     SELECT
@@ -88,7 +88,7 @@ exports.getRecentMessagesForUserId = async function (userId) {
 // data.markup is string
 // data.ip_address is string
 // data.user_agent is optional string
-exports.insertMessage = async function (data) {
+exports.insertMessage = async function(data) {
   assert(typeof data.markup === 'string')
   assert(typeof data.ip_address === 'string')
   return pool.one(sql`
@@ -107,7 +107,7 @@ exports.insertMessage = async function (data) {
 // Returns created user record
 //
 // email is optional
-exports.insertUser = async function (uname, password, email) {
+exports.insertUser = async function(uname, password, email) {
   assert(typeof uname === 'string')
   assert(typeof password === 'string')
   const digest = await belt.hashPassword(password)
@@ -119,7 +119,7 @@ exports.insertUser = async function (uname, password, email) {
 }
 
 // userAgent is optional string
-exports.insertSession = async function (userId, ipAddress, userAgent, interval) {
+exports.insertSession = async function(userId, ipAddress, userAgent, interval) {
   assert(Number.isInteger(userId))
   assert(typeof ipAddress === 'string')
   assert(typeof interval === 'string')
@@ -136,7 +136,7 @@ exports.insertSession = async function (userId, ipAddress, userAgent, interval) 
   `)
 }
 
-exports.logoutSession = async function (userId, sessionId) {
+exports.logoutSession = async function(userId, sessionId) {
   assert(Number.isInteger(userId))
   assert(typeof sessionId === 'string')
   return pool.query(sql`
@@ -147,7 +147,7 @@ exports.logoutSession = async function (userId, sessionId) {
   `)
 }
 
-exports.hideMessage = async function (messageId) {
+exports.hideMessage = async function(messageId) {
   assert(messageId)
   return pool.query(sql`
     UPDATE messages
@@ -156,7 +156,7 @@ exports.hideMessage = async function (messageId) {
   `)
 }
 
-exports.getMessageById = async function (messageId) {
+exports.getMessageById = async function(messageId) {
   assert(messageId)
   return pool.one(sql`
     SELECT *
@@ -167,10 +167,10 @@ exports.getMessageById = async function (messageId) {
 
 // //////////////////////////////////////////////////////////
 
-exports.updateUser = async function (userId, fields) {
+exports.updateUser = async function(userId, fields) {
   assert(Number.isInteger(userId))
   const WHITELIST = ['email', 'role']
-  assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1))
+  assert(Object.keys(fields).every(key => WHITELIST.indexOf(key) > -1))
   const string = knex('users')
     .where({ id: userId })
     .update(fields)
@@ -181,10 +181,10 @@ exports.updateUser = async function (userId, fields) {
 
 // //////////////////////////////////////////////////////////
 
-exports.updateMessage = async function (messageId, fields) {
+exports.updateMessage = async function(messageId, fields) {
   assert(Number.isInteger(messageId))
   const WHITELIST = ['is_hidden', 'markup']
-  assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1))
+  assert(Object.keys(fields).every(key => WHITELIST.indexOf(key) > -1))
   const string = knex('messages')
     .where({ id: messageId })
     .update(fields)
@@ -195,7 +195,7 @@ exports.updateMessage = async function (messageId, fields) {
 
 // //////////////////////////////////////////////////////////
 
-exports.getMessages = async function (page) {
+exports.getMessages = async function(page) {
   page = page || 1
   assert(Number.isInteger(page))
   const perPage = config.MESSAGES_PER_PAGE
@@ -216,8 +216,8 @@ exports.getMessages = async function (page) {
 // //////////////////////////////////////////////////////////
 
 // Returns Int
-exports.getMessagesCount = async function () {
-  const {count} = await pool.one(sql`
+exports.getMessagesCount = async function() {
+  const { count } = await pool.one(sql`
     SELECT COUNT(*) AS "count"
     FROM messages
     WHERE is_hidden = false
@@ -228,8 +228,8 @@ exports.getMessagesCount = async function () {
 // //////////////////////////////////////////////////////////
 
 // Returns Int
-exports.getUsersCount = async function () {
-  const {count} = await pool.one(sql`
+exports.getUsersCount = async function() {
+  const { count } = await pool.one(sql`
     SELECT COUNT(*) AS "count"
     FROM users
   `)
@@ -240,7 +240,7 @@ exports.getUsersCount = async function () {
 
 // TODO: user.messages_count counter cache
 // TODO: idx for is_hidden
-exports.getUsers = async function (page) {
+exports.getUsers = async function(page) {
   page = page || 1
   assert(Number.isInteger(page))
   const perPage = config.USERS_PER_PAGE

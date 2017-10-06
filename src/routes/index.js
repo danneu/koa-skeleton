@@ -21,7 +21,7 @@ const cache = require('../cache')
 
 // expects /:uname param in url
 // sets ctx.state.user
-function loadUser () {
+function loadUser() {
   return async (ctx, next) => {
     ctx.validateParam('uname')
     const user = await db.getUserByUname(ctx.vals.uname)
@@ -34,7 +34,7 @@ function loadUser () {
 
 // expects /:message_id param in url
 // sets ctx.state.message
-function loadMessage () {
+function loadMessage() {
   return async (ctx, next) => {
     ctx.validateParam('message_id')
     const message = await db.getMessageById(ctx.vals.message_id)
@@ -49,20 +49,20 @@ function loadMessage () {
 
 // Useful route for quickly testing something in development
 // 404s in production
-router.get('/test', async (ctx) => {
+router.get('/test', async ctx => {
   ctx.assert(config.NODE_ENV === 'development', 404)
 })
 
 // //////////////////////////////////////////////////////////
 
 // Show homepage
-router.get('/', async (ctx) => {
+router.get('/', async ctx => {
   const messages = await db.getRecentMessages()
   messages.forEach(pre.presentMessage)
   await ctx.render('homepage', {
     ctx,
     messages,
-    recaptchaSitekey: config.RECAPTCHA_SITEKEY
+    recaptchaSitekey: config.RECAPTCHA_SITEKEY,
   })
 })
 
@@ -73,19 +73,21 @@ router.get('/', async (ctx) => {
 // Body:
 // - email: Optional String
 // - role: Optional String
-router.put('/users/:uname', loadUser(), async (ctx) => {
-  const {user} = ctx.state
+router.put('/users/:uname', loadUser(), async ctx => {
+  const { user } = ctx.state
   ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_*', user)
   // VALIDATION
   if (ctx.request.body.role) {
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_ROLE', user)
-    ctx.validateBody('role')
+    ctx
+      .validateBody('role')
       .isString()
       .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED'])
   }
   if (typeof ctx.request.body.email !== 'undefined') {
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_SETTINGS', user)
-    ctx.validateBody('email')
+    ctx
+      .validateBody('email')
       .isString()
       .trim()
     if (ctx.vals.email) {
@@ -95,7 +97,7 @@ router.put('/users/:uname', loadUser(), async (ctx) => {
   // UPDATE
   await db.updateUser(user.id, {
     email: ctx.vals.email,
-    role: ctx.vals.role
+    role: ctx.vals.role,
   })
   // RESPOND
   ctx.flash = { message: ['success', 'User updated'] }
@@ -105,39 +107,40 @@ router.put('/users/:uname', loadUser(), async (ctx) => {
 // //////////////////////////////////////////////////////////
 
 // Edit user page
-router.get('/users/:uname/edit', loadUser(), async (ctx) => {
-  const {user} = ctx.state
+router.get('/users/:uname/edit', loadUser(), async ctx => {
+  const { user } = ctx.state
   ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_*', user)
   await ctx.render('users_edit', {
     ctx: ctx,
     user,
-    title: `Edit ${user.uname}`
+    title: `Edit ${user.uname}`,
   })
 })
 
 // //////////////////////////////////////////////////////////
 
 // Show user profile
-router.get('/users/:uname', loadUser(), async (ctx) => {
-  const {user} = ctx.state
+router.get('/users/:uname', loadUser(), async ctx => {
+  const { user } = ctx.state
   const messages = await db.getRecentMessagesForUserId(user.id)
   messages.forEach(pre.presentMessage)
   await ctx.render('users_show', {
     ctx: ctx,
     user,
     messages,
-    title: user.uname
+    title: user.uname,
   })
 })
 
 // //////////////////////////////////////////////////////////
 
 // Create message
-router.post('/messages', mw.ratelimit(), mw.ensureRecaptcha(), async (ctx) => {
+router.post('/messages', mw.ratelimit(), mw.ensureRecaptcha(), async ctx => {
   // AUTHZ
   ctx.assertAuthorized(ctx.currUser, 'CREATE_MESSAGE')
   // VALIDATE
-  ctx.validateBody('markup')
+  ctx
+    .validateBody('markup')
     .required('Must provide a message')
     .isString()
     .trim()
@@ -148,7 +151,7 @@ router.post('/messages', mw.ratelimit(), mw.ensureRecaptcha(), async (ctx) => {
     user_id: ctx.currUser && ctx.currUser.id,
     markup: ctx.vals.markup,
     ip_address: ctx.request.ip,
-    user_agent: ctx.headers['user-agent']
+    user_agent: ctx.headers['user-agent'],
   })
   // RESPOND
   ctx.flash = { message: ['success', 'Message created!'] }
@@ -158,13 +161,14 @@ router.post('/messages', mw.ratelimit(), mw.ensureRecaptcha(), async (ctx) => {
 // //////////////////////////////////////////////////////////
 
 // List all messages
-router.get('/messages', async (ctx) => {
-  ctx.validateQuery('page')
+router.get('/messages', async ctx => {
+  ctx
+    .validateQuery('page')
     .defaultTo(1)
     .toInt()
   const [messages, count] = await Promise.all([
     db.getMessages(ctx.vals.page),
-    cache.get('messages-count')
+    cache.get('messages-count'),
   ])
   messages.forEach(pre.presentMessage)
   const paginator = paginate.makePaginator(ctx.vals.page, count)
@@ -173,20 +177,21 @@ router.get('/messages', async (ctx) => {
     messages,
     paginator,
     messagesCount: count,
-    title: `All Messages`
+    title: `All Messages`,
   })
 })
 
 // //////////////////////////////////////////////////////////
 
 // List all users
-router.get('/users', async (ctx) => {
-  ctx.validateQuery('page')
+router.get('/users', async ctx => {
+  ctx
+    .validateQuery('page')
     .defaultTo(1)
     .toInt()
   const [users, count] = await Promise.all([
     db.getUsers(ctx.vals.page),
-    cache.get('users-count')
+    cache.get('users-count'),
   ])
   users.forEach(pre.presentUser)
   const paginator = paginate.makePaginator(ctx.vals.page, count)
@@ -195,7 +200,7 @@ router.get('/users', async (ctx) => {
     users,
     paginator,
     usersCount: count,
-    title: 'All Users'
+    title: 'All Users',
   })
 })
 
@@ -207,13 +212,14 @@ router.get('/users', async (ctx) => {
 // - is_hidden: Optional String of 'true' | 'false'
 // - markup: Optional String
 // - redirectTo: Optional String
-router.put('/messages/:message_id', loadMessage(), async (ctx) => {
-  const {message} = ctx.state
+router.put('/messages/:message_id', loadMessage(), async ctx => {
+  const { message } = ctx.state
   // AUTHZ: Ensure user is authorized to make *any* update to message
   ctx.assertAuthorized(ctx.currUser, 'UPDATE_MESSAGE', message)
   if (ctx.request.body.is_hidden) {
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_MESSAGE_STATE', message)
-    ctx.validateBody('is_hidden')
+    ctx
+      .validateBody('is_hidden')
       .isString()
       .tap(belt.parseBoolean)
   }
@@ -221,20 +227,22 @@ router.put('/messages/:message_id', loadMessage(), async (ctx) => {
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_MESSAGE_MARKUP', message)
     // FIXME: Extract markup validation into its own .isValidMarkup validator
     // and then reuse ctx here and in the insert-message route
-    ctx.validateBody('markup')
+    ctx
+      .validateBody('markup')
       .isString()
       .trim()
       .tap(belt.transformMarkup)
       .isLength(3, 300, 'Message must be 3-300 chars')
   }
-  ctx.validateBody('redirectTo')
+  ctx
+    .validateBody('redirectTo')
     .defaultTo('/')
     .isString()
     .checkPred(s => s.startsWith('/'))
   // UPDATE
   await db.updateMessage(message.id, {
     is_hidden: ctx.vals.is_hidden,
-    markup: ctx.vals.markup
+    markup: ctx.vals.markup,
   })
   // RESPOND
   ctx.flash = { message: ['success', 'Message updated'] }
@@ -247,18 +255,20 @@ router.put('/messages/:message_id', loadMessage(), async (ctx) => {
 //
 // Body:
 // - role: String
-router.put('/users/:uname/role', loadUser(), async (ctx) => {
-  const {user} = ctx.state
+router.put('/users/:uname/role', loadUser(), async ctx => {
+  const { user } = ctx.state
   // AUTHZ
   ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_ROLE', user)
   // VALIDATE
-  ctx.validateBody('role')
+  ctx
+    .validateBody('role')
     .required('Must provide a role')
     .isString()
     .trim()
     .checkPred(s => s.length > 0, 'Must provide a role')
     .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED'], 'Invalid role')
-  ctx.validateBody('redirectTo')
+  ctx
+    .validateBody('redirectTo')
     .defaultTo('/')
     .isString()
     .checkPred(s => s.startsWith('/'))
