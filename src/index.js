@@ -3,7 +3,6 @@
 require('dotenv').config()
 const Koa = require('koa')
 const bouncer = require('koa-bouncer')
-const nunjucksRender = require('koa-nunjucks-render')
 const debug = require('debug')('app:index')
 const convert = require('koa-convert')
 // 1st party
@@ -61,12 +60,10 @@ app.use(mw.ensureReferer())
 app.use(require('koa-helmet')())
 app.use(convert(require('koa-compress')()))
 app.use(
-  convert(
-    require('koa-better-static')('public', {
-      // cache static assets for 365 days in production
-      maxage: config.NODE_ENV === 'production' ? 1000 * 60 * 60 * 24 * 365 : 0,
-    })
-  )
+  require('koa-better-static2')('public', {
+    // cache static assets for 365 days in production
+    maxage: config.NODE_ENV === 'production' ? 1000 * 60 * 60 * 24 * 365 : 0,
+  })
 )
 // Don't show logger in test mode
 if (config.NODE_ENV !== 'test') {
@@ -79,7 +76,7 @@ app.use(mw.wrapCurrUser())
 app.use(mw.wrapFlash())
 app.use(bouncer.middleware())
 app.use(mw.handleBouncerValidationError()) // Must come after bouncer.middleware()
-app.use(convert(nunjucksRender('views', nunjucksOptions)))
+app.use(require('koa-nunjucks-render2')('views', nunjucksOptions))
 
 // Provide a convience function for protecting our routes behind
 // our authorization rules. If authorization check fails, 404 response.

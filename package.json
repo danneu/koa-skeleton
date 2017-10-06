@@ -1,7 +1,6 @@
 {
   "name": "koa-skeleton",
-  "description":
-    "a simple, full-featured koa application made to be forked and modified",
+  "description": "a simple, full-featured koa application made to be forked and modified",
   "version": "3.0.0",
   "repository": {
     "type": "git",
@@ -12,8 +11,7 @@
     "start-dev": "nodemon --ext js,html app.js",
     "reset-db": "node ./sql/reset_db",
     "deploy": "git push heroku master",
-    "pretty-fix":
-      "./node_modules/.bin/prettier --write \"{src,sql,test}/**.js\""
+    "pretty-fix": "./node_modules/.bin/prettier --write \"{src,sql,test}/**.js\""
   },
   "prettier": {
     "semi": false,
@@ -32,14 +30,14 @@
     "interval-cache": "0.0.1",
     "knex": "^0.13.0",
     "koa": "^2.2.0",
-    "koa-better-static": "^1.0.5",
+    "koa-better-static2": "^1.0.2",
     "koa-body": "^2.5.0",
     "koa-bouncer": "^6.0.0",
     "koa-compress": "^2.0.0",
     "koa-convert": "^1.2.0",
     "koa-helmet": "^3.1.0",
     "koa-logger": "^3.1.0",
-    "koa-nunjucks-render": "^1.2.0",
+    "koa-nunjucks-render2": "^1.0.2",
     "koa-router": "^7.1.1",
     "pg": "^7.3.0",
     "pg-extra": "0.1.0",
