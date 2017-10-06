@@ -74,7 +74,7 @@ router.post('/login', mw.ensureRecaptcha(), async ctx => {
 // Show register form
 router.get('/register', async ctx => {
   await ctx.render('register', {
-    ctx: ctx,
+    ctx,
     title: 'Register',
     recaptchaSitekey: config.RECAPTCHA_SITEKEY,
   })

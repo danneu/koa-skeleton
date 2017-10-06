@@ -125,7 +125,7 @@ router.get('/users/:uname', loadUser(), async ctx => {
   const messages = await db.getRecentMessagesForUserId(user.id)
   messages.forEach(pre.presentMessage)
   await ctx.render('users_show', {
-    ctx: ctx,
+    ctx,
     user,
     messages,
     title: user.uname,
@@ -173,7 +173,7 @@ router.get('/messages', async ctx => {
   messages.forEach(pre.presentMessage)
   const paginator = paginate.makePaginator(ctx.vals.page, count)
   await ctx.render('messages_list', {
-    ctx: ctx,
+    ctx,
     messages,
     paginator,
     messagesCount: count,
@@ -196,7 +196,7 @@ router.get('/users', async ctx => {
   users.forEach(pre.presentUser)
   const paginator = paginate.makePaginator(ctx.vals.page, count)
   await ctx.render('users_list', {
-    ctx: ctx,
+    ctx,
     users,
     paginator,
     usersCount: count,
