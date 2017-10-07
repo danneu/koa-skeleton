@@ -1,6 +1,7 @@
 {
   "name": "koa-skeleton",
-  "description": "a simple, full-featured koa application made to be forked and modified",
+  "description":
+    "a simple, full-featured koa application made to be forked and modified",
   "version": "3.0.0",
   "repository": {
     "type": "git",
@@ -11,7 +12,8 @@
     "start-dev": "nodemon --ext js,html app.js",
     "reset-db": "node ./sql/reset_db",
     "deploy": "git push heroku master",
-    "pretty-fix": "./node_modules/.bin/prettier --write \"{src,sql,test}/**.js\""
+    "pretty-fix":
+      "./node_modules/.bin/prettier --write \"{src,sql,test}/**/*.js\""
   },
   "prettier": {
     "semi": false,
