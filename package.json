@@ -11,8 +11,8 @@
         "start-dev": "nodemon --ext js,html app.js",
         "reset-db": "node ./sql/reset_db",
         "deploy": "git push heroku master",
-        "pretty-fix":
-            "./node_modules/.bin/prettier --write \"{src,sql,test}/**/*.js\""
+        "pretty-fix": "prettier --write \"{src,sql,test}/**/*.js\"",
+        "lint": "eslint src"
     },
     "prettier": {
         "semi": false,
