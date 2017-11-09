@@ -13,28 +13,28 @@
 // //////////////////////////////////////////////////////////
 
 exports.presentUser = function(x) {
-  if (!x) return
-  // Fix embedded json representation
-  if (typeof x.created_at === 'string') x.created_at = new Date(x.created_at)
-  x.url = `/users/${x.uname}`
-  return x
+    if (!x) return
+    // Fix embedded json representation
+    if (typeof x.created_at === 'string') x.created_at = new Date(x.created_at)
+    x.url = `/users/${x.uname}`
+    return x
 }
 
 // //////////////////////////////////////////////////////////
 
 exports.presentSession = function(x) {
-  if (!x) return
-  // Fix embedded json representation
-  if (typeof x.created_at === 'string') x.created_at = new Date(x.created_at)
-  if (typeof x.expired_at === 'string') x.expired_at = new Date(x.expired_at)
-  return x
+    if (!x) return
+    // Fix embedded json representation
+    if (typeof x.created_at === 'string') x.created_at = new Date(x.created_at)
+    if (typeof x.expired_at === 'string') x.expired_at = new Date(x.expired_at)
+    return x
 }
 
 // //////////////////////////////////////////////////////////
 
 exports.presentMessage = function(x) {
-  if (!x) return
-  exports.presentUser(x.user)
-  x.url = `/messages/${x.id}`
-  return x
+    if (!x) return
+    exports.presentUser(x.user)
+    x.url = `/messages/${x.id}`
+    return x
 }

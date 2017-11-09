@@ -2,13 +2,17 @@
   <img src="/public/img/skeleton.png" alt="skeleton">
 </div>
 
-# koa-skeleton (for Koa 2.x)
+# koa-skeleton
 
 [![Dependency Status](https://david-dm.org/danneu/koa-skeleton.svg)](https://david-dm.org/danneu/koa-skeleton)
 
-Boilerplate demonstration that glues together Koa + Postgres + good defaults + common abstractions that I frequently use to create web applications.
+An example Koa application that glues together Koa + Postgres + good defaults + common abstractions that I frequently use to create web applications.
 
-Just fork, gut, and modify.
+Originally this project was intended to be forked and modified, but it's grown to the point
+that it's better left as a demonstration of how one can structure a Koa + Postgres application.
+
+I think the best way to use it is to click around the source code and see if there are any
+ideas you want to steal.
 
 - Live Demo: https://koa-skeleton.danneu.com/
 
@@ -23,12 +27,6 @@ Depends on Node v7.x:
 - **User-input validation**: [koa-bouncer](https://github.com/danneu/koa-bouncer).
 - **View-layer templating**: [Nunjucks](https://mozilla.github.io/nunjucks/). Very similar to Django's [Jinja2](http://jinja.pocoo.org/) templates. The successor to [Swig](http://paularmstrong.github.io/swig/). Compatible with "Django HTML" editor syntax highlighter plugins like `htmldjango` in Vim.
 - **Deployment**: [Heroku](https://heroku.com/). Keeps things easy while you focus on coding your webapp. Forces you to write your webapp statelessly and horizontally-scalably.
-
-## What about Koa 1.x?
-
-koa-skeleton now works with Koa 2.x, but it used to be built with Koa 1.x.
-
-Here's the most recent code that supported Koa 1.x: <https://github.com/danneu/koa-skeleton/tree/551470a9f5422b0a266a048397edfe9900be4703>
 
 ## Setup
 
