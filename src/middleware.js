@@ -136,16 +136,14 @@ exports.ensureRecaptcha = function() {
             !ctx.request.body['g-recaptcha-response']
         ) {
             console.log('Development mode, so skipping recaptcha check')
-            await next()
-            return
+            return next()
         }
 
         if (!config.RECAPTCHA_SYSTEM_ONLINE) {
             console.warn(
                 'Warn: Recaptcha environment variables not set, so skipping recaptcha check'
             )
-            await next()
-            return
+            return next()
         }
 
         ctx
@@ -154,25 +152,22 @@ exports.ensureRecaptcha = function() {
             .isString()
             .checkPred(s => s.length > 0, 'You must attempt the human test')
 
-        try {
-            await recaptcha.promise(
-                config.RECAPTCHA_SITESECRET,
-                ctx.vals['g-recaptcha-response'],
-                ctx.request.ip
-            )
-        } catch (err) {
-            console.warn(
-                'Got invalid captcha: ',
-                ctx.vals['g-recaptcha-response'],
-                err
-            )
-            ctx
-                .validateBody('g-recaptcha-response')
-                .check(false, 'Could not verify recaptcha was correct')
-            return
-        }
+        await recaptcha(
+            config.RECAPTCHA_SITESECRET,
+            ctx.vals['g-recaptcha-response'],
+            ctx.request.ip
+        ).catch(err => {
+            if (typeof err === 'string') {
+                console.warn(`Got invalid captcha: ${err}`)
+                ctx
+                    .validateBody('g-recaptcha-response')
+                    .check(false, 'Could not verify recaptcha was correct')
+                return
+            }
+            throw err
+        })
 
-        await next()
+        return next()
     }
 }
 
@@ -210,9 +205,9 @@ exports.ratelimit = function() {
             await db.ratelimits.bump(ctx.ip, maxDate)
         } catch (err) {
             if (err instanceof Date) {
-                const msg = `
-          Ratelimited! You must wait ${waitLength(err)} longer before posting.
-        `
+                const msg = `Ratelimited! You must wait ${waitLength(
+                    err
+                )} longer before posting.`
                 ctx.check(false, msg)
                 return
             }

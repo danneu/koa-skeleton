@@ -77,7 +77,7 @@ app.use(mw.wrapCurrUser())
 app.use(mw.wrapFlash())
 app.use(bouncer.middleware())
 app.use(mw.handleBouncerValidationError()) // Must come after bouncer.middleware()
-app.use(require('koa-nunjucks-render2')('views', nunjucksOptions))
+app.use(require('koa-nunjucks-render')('views', nunjucksOptions))
 
 // Provide a convience function for protecting our routes behind
 // our authorization rules. If authorization check fails, 404 response.
