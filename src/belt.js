@@ -1,7 +1,7 @@
 // Node
 const crypto = require('crypto')
 // 3rd
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcrypt')
 const assert = require('better-assert')
 const debug = require('debug')('app:belt')
 const Autolinker = require('autolinker')
@@ -80,23 +80,13 @@ exports.slugify = function(...xs) {
 // Returns hashed password value to be used in `users.digest` column
 // String -> String
 exports.hashPassword = function(password) {
-    return new Promise(function(resolve, reject) {
-        bcrypt.hash(password, 4, function(err, hash) {
-            if (err) return reject(err)
-            resolve(hash)
-        })
-    })
+    return bcrypt.hash(password, 10)
 }
 
 // Compares password plaintext against bcrypted digest
 // String, String -> Bool
 exports.checkPassword = function(password, digest) {
-    return new Promise(function(resolve, reject) {
-        bcrypt.compare(password, digest, function(err, result) {
-            if (err) return reject(err)
-            resolve(result)
-        })
-    })
+    return bcrypt.compare(password, digest)
 }
 
 // //////////////////////////////////////////////////////////

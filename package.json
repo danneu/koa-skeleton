@@ -25,7 +25,7 @@
     },
     "dependencies": {
         "autolinker": "^1.4.3",
-        "bcryptjs": "2.4.3",
+        "bcrypt": "^1.0.3",
         "better-assert": "1.0.2",
         "debug": "^3.1.0",
         "dotenv": "^4.0.0",
