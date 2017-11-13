@@ -10,6 +10,6 @@
         "NODE_ENV": { "value": "production" }
     },
     "scripts": {
-        "postdeploy": "NODE_ENV=development node ./babel.reset_db"
+        "postdeploy": "NODE_ENV=development node ./sql/reset_db"
     }
 }

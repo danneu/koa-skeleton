@@ -1,3 +1,4 @@
+require('dotenv').config()
 // Node
 const path = require('path')
 const { promisify } = require('util')
