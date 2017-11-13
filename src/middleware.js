@@ -97,11 +97,11 @@ exports.methodOverride = function() {
 exports.removeTrailingSlash = function() {
     return async (ctx, next) => {
         if (ctx.path.length > 1 && ctx.path.endsWith('/')) {
-            ctx.redirect(ctx.path.slice(0, ctx.path.length - 1))
+            ctx.redirect(ctx.path.slice(0, -1))
             return
         }
 
-        await next()
+        return next()
     }
 }
 
@@ -193,7 +193,7 @@ exports.ensureReferer = function() {
 
         ctx.assert(config.HOSTNAME === refererHostname, 'Invalid referer', 403)
 
-        await next()
+        return next()
     }
 }
 
@@ -213,7 +213,7 @@ exports.ratelimit = function() {
             }
             throw err
         }
-        await next()
+        return next()
     }
 
     // HELPERS

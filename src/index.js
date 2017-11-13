@@ -4,7 +4,6 @@ require('dotenv').config()
 const Koa = require('koa')
 const bouncer = require('koa-bouncer')
 const debug = require('debug')('app:index')
-const convert = require('koa-convert')
 // 1st party
 const config = require('./config')
 const mw = require('./middleware')
@@ -28,10 +27,6 @@ const nunjucksOptions = {
     // `yield this.render('show_user')` will assume that a show_user.html exists
     ext: '.html',
     noCache: config.NODE_ENV !== 'production',
-    // don't throw template errors in development if we try to render
-    // a null/undefined like {{ x }}. in theory, setting it to true prevents
-    // bugs and forces you to be explicit about {{ x or '' }}, but in reality,
-    // often more annoying than it's worth.
     throwOnUndefined: false,
     // globals are bindings we want to expose to all templates
     globals: {
@@ -43,7 +38,7 @@ const nunjucksOptions = {
     // filters are functions that we can pipe values to from nunjucks templates.
     // e.g. {{ user.uname | md5 | toAvatarUrl }}
     filters: {
-        json: x => JSON.stringify(x, null, '  '),
+        json: x => JSON.stringify(x, null, 2),
         formatDate: belt.formatDate,
         nl2br: belt.nl2br,
         md5: belt.md5,
@@ -58,7 +53,7 @@ const nunjucksOptions = {
 
 app.use(mw.ensureReferer())
 app.use(require('koa-helmet')())
-app.use(convert(require('koa-compress')()))
+app.use(require('koa-compress')())
 app.use(
     require('koa-better-static2')('public', {
         // cache static assets for 365 days in production
@@ -68,7 +63,7 @@ app.use(
 )
 // Don't show logger in test mode
 if (config.NODE_ENV !== 'test') {
-    app.use(convert(require('koa-logger')()))
+    app.use(require('koa-logger')())
 }
 app.use(require('koa-body')())
 app.use(mw.methodOverride()) // Must come after body parser
@@ -103,9 +98,9 @@ app.use(async (ctx, next) => {
 // Routes
 // //////////////////////////////////////////////////////////
 
-app.use(convert(require('./routes').routes()))
-app.use(convert(require('./routes/authentication').routes()))
-app.use(convert(require('./routes/admin').routes()))
+app.use(require('./routes').routes())
+app.use(require('./routes/authentication').routes())
+app.use(require('./routes/admin').routes())
 
 // //////////////////////////////////////////////////////////
 
