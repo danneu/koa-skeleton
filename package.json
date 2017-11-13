@@ -30,7 +30,7 @@
         "debug": "^3.1.0",
         "dotenv": "^4.0.0",
         "interval-cache": "^1.0.0",
-        "knex": "^0.13.0",
+        "knex": "^0.14.0",
         "koa": "^2.2.0",
         "koa-better-static2": "^1.0.2",
         "koa-body": "^2.5.0",
