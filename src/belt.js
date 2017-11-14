@@ -1,6 +1,7 @@
 // Node
 const crypto = require('crypto')
 // 3rd
+const escapeHtml = require('escape-html')
 const bcrypt = require('bcrypt')
 const assert = require('better-assert')
 const debug = require('debug')('app:belt')
@@ -85,13 +86,6 @@ exports.checkPassword = function(password, digest) {
     return bcrypt.compare(password, digest)
 }
 
-exports.nl2br = function(s) {
-    //nunjucks escape filter returns { val: String, length: Int }
-    if (s.val) s = s.val
-    assert(typeof s === 'string')
-    return s.replace(/\n/g, '<br>')
-}
-
 // Used to lightly process user-submitted message markup before
 // saving to database.
 exports.transformMarkup = function(s) {
@@ -105,20 +99,14 @@ exports.transformMarkup = function(s) {
     )
 }
 
-// String -> String (MD5 hex)
-exports.md5 = function(str) {
-    assert(typeof str === 'string')
-    return crypto
-        .createHash('md5')
-        .update(str)
-        .digest('hex')
-}
-
 // String -> String
 exports.toAvatarUrl = function(str) {
     assert(typeof str === 'string')
-    const hash = exports.md5(str)
-    return `https://www.gravatar.com/avatar/${hash}?d=monsterid`
+    const md5 = crypto
+        .createHash('md5')
+        .update(str)
+        .digest('hex')
+    return `https://www.gravatar.com/avatar/${md5}?d=monsterid`
 }
 
 exports.autolink = function(s) {
@@ -128,4 +116,19 @@ exports.autolink = function(s) {
         phone: false,
         twitter: false,
     })
+}
+
+exports.markupToHtml = (() => {
+    // Turns all \n into <br>
+    const nl2br = s => {
+        assert(typeof s === 'string')
+        return s.replace(/\n/g, '<br>')
+    }
+    return markup => {
+        return exports.autolink(nl2br(escapeHtml(markup)))
+    }
+})()
+
+exports.capitalize = s => {
+    return s[0] + s.slice(1).toLowerCase()
 }

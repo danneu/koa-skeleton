@@ -1,0 +1,87 @@
+doctype html
+html
+    head
+        link(
+            href="/vendor/bootstrap-3.3.7/css/bootstrap.min.css"
+            type="text/css"
+            rel="stylesheet"
+        )
+        link(
+            href="/css/style.css"
+            type="text/css"
+            rel="stylesheet"
+        )
+
+        if title
+            title #{title} &mdash; koa-skeleton
+        else
+            title koa-skeleton &mdash; a basic koa webapp demonstration</itle>
+
+    body
+        nav.navbar.navbar-default
+            div.container
+                div.div.navbar-header
+                    a.navbar-brand(href="/") koa-skeleton
+                if ctx.currUser
+                    form.navbar-right(action=`/sessions/${ctx.currSessionId}` method="POST")
+                        input(type="hidden" name="_method" value="DELETE")
+                        button.btn.btn-link.navbar-btn(type="submit") Logout
+                    div.btn-group.navbar-right
+                        a.btn.btn-default.navbar-btn(href=ctx.currUser.url)
+                            span.glyphicon.glyphicon-user
+                            |
+                            | #{ctx.currUser.uname}
+                            |
+                            if ctx.currUser.role === 'ADMIN'
+                                span.label.label-primary Admin
+                            else if ctx.currUser.role === 'MOD'
+                                span.label.label-primary Mod
+                        if ctx.currUser.role === 'ADMIN'
+                            a.btn.btn-default.navbar-btn(href="/admin")
+                                | Admin Panel
+                else
+                    a.btn.btn-default.navbar-btn.navbar-right(href="/login") Login
+                    span.navbar-text.navbar-right
+                    a.btn.btn-primary.navbar-btn.navbar-right(href="/register") Register
+                ul.nav.navbar-nav
+                    li(class=(ctx.path === '/users' && 'active'))
+                        a(href="/users") Users
+
+        div.container
+            // Flash
+
+            if ctx.flash && ctx.flash.message
+                div.alert(class=`alert-${ctx.flash.message[0]}` role="alert")
+                    | #{ctx.flash.message[1]}
+
+            block content
+
+            div.footer.text-muted.text-center
+                hr
+                p
+                    | &copy; 2015
+                    | &mdash;
+                    | Source on
+                    |
+                    a(href="https://github.com/danneu/koa-skeleton") Github
+                    |
+                    | &mdash;
+                    | Cute skeleton icon from
+                    |
+                    a(href="https://www.reddit.com/r/PixelArt/comments/100tkt/two_weeks_ago_i_posted_50_mini_roleplay_adventure/") svh440
+                    |
+                    | &mdash;
+                    | Demo by
+                    |
+                    a(href="https://www.danneu.com") danneu
+
+        // Vendored javascript is any javascript supplied by 3rd parties
+        script(src="/vendor/jquery-1.11.3.min.js")
+        script(src="/vendor/bootstrap-3.3.7/js/bootstrap.min.js")
+        script(src="/vendor/jquery.timeago.js")
+
+        // Custom javascript defined for our app
+        script(type="text/javascript" src="/js/app.js")
+
+        // If any templates specify a 'scripts', it will be loaded last #}
+        block scripts

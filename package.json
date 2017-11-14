@@ -1,7 +1,7 @@
 {
     "name": "koa-skeleton",
     "description": "a simple, full-featured koa application",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "repository": {
         "type": "git",
         "url": "https://github.com/danneu/koa-skeleton"
@@ -29,6 +29,7 @@
         "better-assert": "1.0.2",
         "debug": "^3.1.0",
         "dotenv": "^4.0.0",
+        "escape-html": "^1.0.3",
         "interval-cache": "^1.0.0",
         "knex": "^0.14.0",
         "koa": "^2.2.0",
@@ -38,10 +39,10 @@
         "koa-compress": "^2.0.0",
         "koa-helmet": "^3.1.0",
         "koa-logger": "^3.1.0",
-        "koa-nunjucks-render": "^2.0.0",
         "koa-router": "^7.1.1",
         "pg": "^7.3.0",
         "pg-extra": "^0.1.0",
+        "pug": "^2.0.0-rc.4",
         "recaptcha-validator": "^2.0.0",
         "uuid": "^3.0.1"
     },

@@ -49,8 +49,12 @@ function loadMessage() {
 
 // Useful route for quickly testing something in development
 // 404s in production
-router.get('/test', async ctx => {
+router.get('/test2', async ctx => {
     ctx.assert(config.NODE_ENV === 'development', 404)
+    ctx.render('test.pug', {
+        ctx,
+        there: 'hihi',
+    })
 })
 
 // //////////////////////////////////////////////////////////
@@ -59,7 +63,7 @@ router.get('/test', async ctx => {
 router.get('/', async ctx => {
     const messages = await db.getRecentMessages()
     messages.forEach(pre.presentMessage)
-    await ctx.render('homepage', {
+    ctx.render('homepage.pug', {
         ctx,
         messages,
         recaptchaSitekey: config.RECAPTCHA_SITEKEY,
@@ -110,7 +114,7 @@ router.put('/users/:uname', loadUser(), async ctx => {
 router.get('/users/:uname/edit', loadUser(), async ctx => {
     const { user } = ctx.state
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_*', user)
-    await ctx.render('users_edit', {
+    await ctx.render('users_edit.pug', {
         ctx: ctx,
         user,
         title: `Edit ${user.uname}`,
@@ -124,7 +128,7 @@ router.get('/users/:uname', loadUser(), async ctx => {
     const { user } = ctx.state
     const messages = await db.getRecentMessagesForUserId(user.id)
     messages.forEach(pre.presentMessage)
-    await ctx.render('users_show', {
+    await ctx.render('users_show.pug', {
         ctx,
         user,
         messages,
@@ -172,7 +176,7 @@ router.get('/messages', async ctx => {
     ])
     messages.forEach(pre.presentMessage)
     const paginator = paginate.makePaginator(ctx.vals.page, count)
-    await ctx.render('messages_list', {
+    await ctx.render('messages_list.pug', {
         ctx,
         messages,
         paginator,
@@ -195,7 +199,7 @@ router.get('/users', async ctx => {
     ])
     users.forEach(pre.presentUser)
     const paginator = paginate.makePaginator(ctx.vals.page, count)
-    await ctx.render('users_list', {
+    await ctx.render('users_list.pug', {
         ctx,
         users,
         paginator,
