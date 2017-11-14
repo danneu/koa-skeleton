@@ -18,7 +18,7 @@ const router = new Router()
 
 // Show login form
 router.get('/login', async ctx => {
-    await ctx.render('login', {
+    return ctx.render('login.pug', {
         ctx,
         title: 'Login',
         recaptchaSitekey: config.RECAPTCHA_SITEKEY,
@@ -73,7 +73,7 @@ router.post('/login', mw.ensureRecaptcha(), async ctx => {
 
 // Show register form
 router.get('/register', async ctx => {
-    await ctx.render('register', {
+    await ctx.render('register.pug', {
         ctx,
         title: 'Register',
         recaptchaSitekey: config.RECAPTCHA_SITEKEY,

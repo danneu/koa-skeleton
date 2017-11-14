@@ -1,0 +1,38 @@
+
+mixin renderMessage(ctx, message)
+    if can(ctx.currUser, 'READ_MESSAGE', message)
+        div.panel.panel-default
+            div.panel-heading.text-right
+                if can(ctx.currUser, 'UPDATE_MESSAGE_STATE', message)
+                    form(method="POST" action=`/messages/${message.id}`)
+                        input(type="hidden" name="_method" value="PUT")
+                        if message.is_hidden
+                            input(type="hidden" name="is_hidden" value="false")
+                            button.btn.btn-xs.btn-default.pull-left.delete-message-btn
+                                | Restore
+                        else
+                            input(type="hidden" name="is_hidden" value="true")
+                            button.btn.btn-xs.btn-default.pull-left.delete-message-btn
+                                | Delete
+                small.text-muted
+                    abbr.timeago(title=message.created_at.toISOString())
+                        = message.created_at.toISOString()
+                    |
+                    | by
+                    |
+                    if message.user
+                        a(href=message.user.url)
+                            img(
+                                src= belt.toAvatarUrl(message.user.uname)
+                                alter=`${message.user.uname} avatar`
+                                height="24"
+                                width="24"
+                            )
+                        |
+                        |
+                        a(href=message.user.url)
+                            = message.user.uname
+                    else
+                        | a guest
+            div.panel-body(class=(message.is_hidden && 'bg-danger') style="max-height: 200px; overflow: auto;")
+                != belt.markupToHtml(message.markup)

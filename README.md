@@ -11,9 +11,6 @@ An example Koa application that glues together Koa + Postgres + good defaults + 
 Originally this project was intended to be forked and modified, but it's grown to the point
 that it's better left as a demonstration of how one can structure a Koa + Postgres application.
 
-I think the best way to use it is to click around the source code and see if there are any
-ideas you want to steal.
-
 - Live Demo: https://koa-skeleton.danneu.com/
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/danneu/koa-skeleton)
@@ -25,7 +22,7 @@ Depends on Node v7.x:
 - **Micro-framework**: [Koa 2.x](http://koajs.com/). It's very similar to [Express](http://expressjs.com/) except it supports async/await.
 - **Database**: [Postgres](http://www.postgresql.org/).
 - **User-input validation**: [koa-bouncer](https://github.com/danneu/koa-bouncer).
-- **View-layer templating**: [Nunjucks](https://mozilla.github.io/nunjucks/). Very similar to Django's [Jinja2](http://jinja.pocoo.org/) templates. The successor to [Swig](http://paularmstrong.github.io/swig/). Compatible with "Django HTML" editor syntax highlighter plugins like `htmldjango` in Vim.
+- **View-layer templating**: [Pug](https://pugjs.org/api/getting-started.html). I chose it over Nunjucks because it has better editor support.
 - **Deployment**: [Heroku](https://heroku.com/). Keeps things easy while you focus on coding your webapp. Forces you to write your webapp statelessly and horizontally-scalably.
 
 ## Setup
@@ -93,11 +90,6 @@ Instead, require the `src/config.js` and access them there.
 - Just write SQL. When you need more complex/composable queries (like a /search endpoint with various filter options), consider using a SQL query building library like [knex.js](http://knexjs.org/).
 - Use whichever Javascript features that are supported by the lastest stable version of Node. I don't think Babel compilation and the resulting idiosyncrasies are worth the build step.
 
-## Random Tips
-
-- Save the user's `user_agent` anywhere you save their `ip_address` for abuse prevention. People are well-conditioned to switch VPNs to circumvent ip_address bans, but they often forget to change their user_agent.
-- koa-skeleton doesn't encrypt or sign cookies, so don't store sensitive information in cookies, or sign/encrypt cookies if you do.
-
 ## Conventions
 
 - Aside from validation, never access query/body/url params via the Koa default like `ctx.request.body.username`. Instead, use koa-bouncer to move these to the `ctx.vals` object and access them there. This forces you to self-document what params you expect at the top of your route and prevents the case where you forget to validate params.
@@ -137,6 +129,10 @@ Instead, require the `src/config.js` and access them there.
 
 ## Changelog
 
+The following version numbers are meaningless.
+
+- `3.1.0` 14 Nov 2017
+  - Replace Nunjucks with Pug for HTML templating.
 - `3.0.0` 25 Apr 2017
   - Removed Babel since the features we want are now supported by Node 7.x.
 - `2.0.0` 29 Oct 2015

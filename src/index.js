@@ -17,37 +17,6 @@ app.poweredBy = false
 app.proxy = config.TRUST_PROXY
 
 // //////////////////////////////////////////////////////////
-// Configure view-layer (nunjucks)
-//
-// We can override options send directly to nunjucks.
-// https://mozilla.github.io/nunjucks/api.html#configure
-// //////////////////////////////////////////////////////////
-
-const nunjucksOptions = {
-    // `yield this.render('show_user')` will assume that a show_user.html exists
-    ext: '.html',
-    noCache: config.NODE_ENV !== 'production',
-    throwOnUndefined: false,
-    // globals are bindings we want to expose to all templates
-    globals: {
-        // let us use `can(USER, ACTION, TARGET)` authorization-checks in templates
-        can: cancan.can,
-        cancan,
-        config,
-    },
-    // filters are functions that we can pipe values to from nunjucks templates.
-    // e.g. {{ user.uname | md5 | toAvatarUrl }}
-    filters: {
-        json: x => JSON.stringify(x, null, 2),
-        formatDate: belt.formatDate,
-        nl2br: belt.nl2br,
-        md5: belt.md5,
-        toAvatarUrl: belt.toAvatarUrl,
-        autolink: belt.autolink,
-    },
-}
-
-// //////////////////////////////////////////////////////////
 // Middleware
 // //////////////////////////////////////////////////////////
 
@@ -72,7 +41,17 @@ app.use(mw.wrapCurrUser())
 app.use(mw.wrapFlash())
 app.use(bouncer.middleware())
 app.use(mw.handleBouncerValidationError()) // Must come after bouncer.middleware()
-app.use(require('koa-nunjucks-render')('views', nunjucksOptions))
+//app.use(mw.koaPugRender(require('path').join(__dirname, '../views2')))
+app.use(
+    mw.koaPugRender('views', {
+        locals: {
+            config,
+            cancan,
+            can: cancan.can,
+            belt,
+        },
+    })
+)
 
 // Provide a convience function for protecting our routes behind
 // our authorization rules. If authorization check fails, 404 response.

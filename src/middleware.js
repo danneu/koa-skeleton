@@ -1,10 +1,12 @@
 // Node
 const nodeUrl = require('url')
+const path = require('path')
 // 3rd
 const debug = require('debug')('app:middleware')
 const bouncer = require('koa-bouncer')
 const recaptcha = require('recaptcha-validator')
 // 1st
+const pug = require('pug')
 const db = require('./db')
 const config = require('./config')
 const pre = require('./presenters')
@@ -90,7 +92,7 @@ exports.methodOverride = function() {
             delete ctx.request.body._method
         }
 
-        await next()
+        return next()
     }
 }
 
@@ -239,5 +241,49 @@ exports.ratelimit = function() {
             output += `${secs} seconds`
         }
         return output
+    }
+}
+
+const defaultOpts = {
+    locals: {},
+    cache: config.NODE_ENV === 'production',
+    compileDebug: config.NODE_ENV !== 'production',
+}
+
+exports.koaPugRender = (viewsDir, _opts) => {
+    const { locals: extraLocals, ...opts } = { ...defaultOpts, ..._opts }
+    const blacklist = [
+        'filename',
+        'basedir',
+        'doctype',
+        'pretty',
+        'filters',
+        'self',
+        'debug',
+        'compileDebug',
+        'globals',
+        'cache',
+        'inlineRuntimeFunctions',
+        'name',
+    ]
+    return async (ctx, next) => {
+        ctx.render = (tplpath, locals) => {
+            for (const k of Object.keys(locals)) {
+                if (blacklist.includes(k)) {
+                    throw new Error(`used reserved pug key "${k}" in locals`)
+                }
+            }
+            tplpath = tplpath.endsWith('.pug') ? tplpath : tplpath + '.pug'
+            const fullpath = path.join(viewsDir, tplpath)
+            ctx.type = 'html'
+            ctx.body = pug.renderFile(fullpath, {
+                filename: tplpath, // cache key
+                basedir: viewsDir,
+                ...opts,
+                ...extraLocals,
+                ...locals,
+            })
+        }
+        return next()
     }
 }

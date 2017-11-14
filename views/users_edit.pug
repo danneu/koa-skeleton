@@ -1,0 +1,37 @@
+extends master.pug
+
+
+block content
+    include mixins/timeago.pug
+    include mixins/render-message.pug
+
+    ol.breadcrumb
+        li
+            a(href="/") Home
+        li
+            a(href="/users") Users
+        li
+            a(href=user.url)= user.uname
+        li.active
+            | Edit
+
+    div.page-header
+        h1
+            | Edit
+            |
+            a(href=user.url style="color: #333")
+                = user.uname
+
+        a(href=user.url) &larr; Back to Profile
+
+    div.row
+        div.col-lg-8.col-lg-offset-2
+            form(method="POST" action=user.url)
+                input(type="hidden" name="_method" value="PUT")
+                div.panel.panel-default
+                    div.panel-body
+                        div.form-group
+                            label(for="email-input") Email
+                            input#email-input.form-control(name="email" value=user.email)
+                    div.panel-footer.text-right
+                        button.btn.btn-default(type="submit") Submit
