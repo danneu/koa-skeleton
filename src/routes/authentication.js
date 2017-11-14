@@ -61,7 +61,7 @@ router.post('/login', mw.ensureRecaptcha(), async ctx => {
 
     ctx.cookies.set('session_id', session.id, {
         expires: ctx.vals['remember-me']
-            ? belt.futureDate({ years: 1 })
+            ? new Date(Date.now() + 1000 * 60 * 60 * 24 * 365)
             : undefined,
     })
     ctx.flash = { message: ['success', 'Logged in successfully'] }
@@ -136,7 +136,7 @@ router.post('/users', mw.ensureRecaptcha(), async ctx => {
     )
 
     ctx.cookies.set('session_id', session.id, {
-        expires: belt.futureDate({ years: 1 }),
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
         httpOnly: true,
     })
 

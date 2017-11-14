@@ -39,41 +39,37 @@ exports.formatDate = function(d) {
 }
 
 // String -> Bool
-exports.isValidUuid = (function() {
+exports.isValidUuid = (() => {
     const re = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
-    return function(uuid) {
-        return re.test(uuid)
-    }
+    return uuid => re.test(uuid)
 })()
 
-exports.slugify = function(...xs) {
+exports.slugify = (() => {
     const MAX_SLUG_LENGTH = 80
-    // Slugifies one string
-    function slugifyString(x) {
-        return (
-            x
-                .toString()
-                .trim()
-                // Remove apostrophes
-                .replace(/'/g, '')
-                // Hyphenize anything that's not alphanumeric, hyphens, or spaces
-                .replace(/[^a-z0-9- ]/gi, '-')
-                // Replace spaces with hyphens
-                .replace(/ /g, '-')
-                // Consolidate consecutive hyphens
-                .replace(/-{2,}/g, '-')
-                // Remove prefix and suffix hyphens
-                .replace(/^[-]+|[-]+$/, '')
-                .toLowerCase()
+
+    const slugifyString = x =>
+        String(x)
+            .trim()
+            // Remove apostrophes
+            .replace(/'/g, '')
+            // Hyphenize anything that's not alphanumeric, hyphens, or spaces
+            .replace(/[^a-z0-9- ]/gi, '-')
+            // Replace spaces with hyphens
+            .replace(/ /g, '-')
+            // Consolidate consecutive hyphens
+            .replace(/-{2,}/g, '-')
+            // Remove prefix and suffix hyphens
+            .replace(/^[-]+|[-]+$/, '')
+            .toLowerCase()
+
+    return (...xs) =>
+        slugifyString(
+            xs
+                .map(String)
+                .join('-')
+                .slice(0, MAX_SLUG_LENGTH)
         )
-    }
-    return slugifyString(
-        xs
-            .map(x => x.toString())
-            .join('-')
-            .slice(0, MAX_SLUG_LENGTH)
-    )
-}
+})()
 
 // //////////////////////////////////////////////////////////
 
@@ -89,40 +85,11 @@ exports.checkPassword = function(password, digest) {
     return bcrypt.compare(password, digest)
 }
 
-// //////////////////////////////////////////////////////////
-
-// Quickly generate Date objects in the future.
-//
-//    futureDate({ days: 4 })            -> Date
-//    futureDate(someDate, { years: 2 }) -> Date
-exports.futureDate = function(nowDate, opts) {
-    if (!opts) {
-        opts = nowDate
-        nowDate = new Date()
-    }
-    return new Date(
-        nowDate.getTime() +
-            (opts.years || 0) * 1000 * 60 * 60 * 24 * 365 +
-            (opts.days || 0) * 1000 * 60 * 60 * 24 +
-            (opts.hours || 0) * 1000 * 60 * 60 +
-            (opts.minutes || 0) * 1000 * 60 +
-            (opts.seconds || 0) * 1000 +
-            (opts.milliseconds || 0)
-    )
-}
-
 exports.nl2br = function(s) {
-    // FIXME: nunjucks escape filter returns { val: String, length: Int }
-    // object. Must've changed recently?
+    //nunjucks escape filter returns { val: String, length: Int }
     if (s.val) s = s.val
     assert(typeof s === 'string')
     return s.replace(/\n/g, '<br>')
-}
-
-// Used for parsing form params so that a "true" string is parsed to `true`
-// and everything is parsed to `false`.
-exports.parseBoolean = function(s) {
-    return s === 'true'
 }
 
 // Used to lightly process user-submitted message markup before

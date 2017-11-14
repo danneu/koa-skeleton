@@ -10,7 +10,7 @@ const router = new Router()
 
 router.use(async (ctx, next) => {
     ctx.assert(ctx.currUser && ctx.currUser.role === 'ADMIN', 404)
-    await next()
+    return next()
 })
 
 // //////////////////////////////////////////////////////////

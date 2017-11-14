@@ -221,7 +221,7 @@ router.put('/messages/:message_id', loadMessage(), async ctx => {
         ctx
             .validateBody('is_hidden')
             .isString()
-            .tap(belt.parseBoolean)
+            .tap(x => x === 'true')
     }
     if (ctx.request.body.markup) {
         ctx.assertAuthorized(ctx.currUser, 'UPDATE_MESSAGE_MARKUP', message)
