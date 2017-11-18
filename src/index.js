@@ -52,7 +52,6 @@ app.use(
         locals: {
             config,
             cancan,
-            can: cancan.can,
             belt,
         },
     })

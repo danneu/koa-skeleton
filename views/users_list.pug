@@ -59,7 +59,7 @@ mixin userRow(user)
             +timeago(user.created_at)
         td
             +timeago(user.last_online_at)
-        if can(ctx.currUser, 'UPDATE_USER_ROLE', user)
+        if cancan.can(ctx.currUser, 'UPDATE_USER_ROLE', user)
             td
                 form(method="POST" action=`${user.url}/role`)
                     input(type="hidden" name="_method" value="PUT")

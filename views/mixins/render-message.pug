@@ -1,9 +1,9 @@
 
 mixin renderMessage(ctx, message)
-    if can(ctx.currUser, 'READ_MESSAGE', message)
+    if cancan.can(ctx.currUser, 'READ_MESSAGE', message)
         div.panel.panel-default
             div.panel-heading.text-right
-                if can(ctx.currUser, 'UPDATE_MESSAGE_STATE', message)
+                if cancan.can(ctx.currUser, 'UPDATE_MESSAGE_STATE', message)
                     form(method="POST" action=`/messages/${message.id}`)
                         input(type="hidden" name="_method" value="PUT")
                         if message.is_hidden
