@@ -1,9 +1,15 @@
-// 3rd party
 // Load env vars from .env, always run this early
 require('dotenv').config()
-const Koa = require('koa')
-const bouncer = require('koa-bouncer')
+// 3rd party
 const debug = require('debug')('app:index')
+const Koa = require('koa')
+const helmet = require('koa-helmet')
+const compress = require('koa-compress')
+const static = require('koa-better-static2')
+const logger = require('koa-logger')
+const bodyParser = require('koa-bodyparser')
+const bouncer = require('koa-bouncer')
+const pugRender = require('koa-pug-render')
 // 1st party
 const config = require('./config')
 const mw = require('./middleware')
@@ -21,10 +27,10 @@ app.proxy = config.TRUST_PROXY
 // //////////////////////////////////////////////////////////
 
 app.use(mw.ensureReferer())
-app.use(require('koa-helmet')())
-app.use(require('koa-compress')())
+app.use(helmet())
+app.use(compress())
 app.use(
-    require('koa-better-static2')('public', {
+    static('public', {
         // cache static assets for 365 days in production
         maxage:
             config.NODE_ENV === 'production' ? 1000 * 60 * 60 * 24 * 365 : 0,
@@ -32,18 +38,17 @@ app.use(
 )
 // Don't show logger in test mode
 if (config.NODE_ENV !== 'test') {
-    app.use(require('koa-logger')())
+    app.use(logger())
 }
-app.use(require('koa-body')())
+app.use(bodyParser())
 app.use(mw.methodOverride()) // Must come after body parser
 app.use(mw.removeTrailingSlash())
 app.use(mw.wrapCurrUser())
 app.use(mw.wrapFlash())
 app.use(bouncer.middleware())
 app.use(mw.handleBouncerValidationError()) // Must come after bouncer.middleware()
-//app.use(mw.koaPugRender(require('path').join(__dirname, '../views2')))
 app.use(
-    mw.koaPugRender('views', {
+    pugRender('views', {
         locals: {
             config,
             cancan,
@@ -85,7 +90,7 @@ app.use(require('./routes/admin').routes())
 
 app.start = function(port = config.PORT) {
     app.listen(port, () => {
-        console.log('Listening on port', port)
+        console.log(`Listening on http://localhost:${port}`)
     })
 }
 
