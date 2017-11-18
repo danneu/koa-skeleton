@@ -36,10 +36,7 @@ app.use(
             config.NODE_ENV === 'production' ? 1000 * 60 * 60 * 24 * 365 : 0,
     })
 )
-// Don't show logger in test mode
-if (config.NODE_ENV !== 'test') {
-    app.use(logger())
-}
+app.use(logger())
 app.use(bodyParser())
 app.use(mw.methodOverride()) // Must come after body parser
 app.use(mw.removeTrailingSlash())
@@ -48,7 +45,7 @@ app.use(mw.wrapFlash())
 app.use(bouncer.middleware())
 app.use(mw.handleBouncerValidationError()) // Must come after bouncer.middleware()
 app.use(
-    pugRender('views', {
+    pugRender(require('path').join(__dirname, '../views'), {
         locals: {
             config,
             cancan,
@@ -72,7 +69,7 @@ app.use(async (ctx, next) => {
         const isAuthorized = cancan.can(user, action, target)
         const uname = (user && user.uname) || '<Guest>'
         debug('[assertAuthorized] Can %s %s: %s', uname, action, isAuthorized)
-        ctx.assert(isAuthorized, 404)
+        ctx.assert(isAuthorized, 403)
     }
     return next()
 })

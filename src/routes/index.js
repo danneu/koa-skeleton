@@ -49,9 +49,9 @@ function loadMessage() {
 
 // Useful route for quickly testing something in development
 // 404s in production
-router.get('/test2', async ctx => {
+router.get('/test', async ctx => {
     ctx.assert(config.NODE_ENV === 'development', 404)
-    ctx.render('test.pug', {
+    await ctx.render('test.pug', {
         ctx,
         there: 'hihi',
     })
@@ -63,7 +63,7 @@ router.get('/test2', async ctx => {
 router.get('/', async ctx => {
     const messages = await db.getRecentMessages()
     messages.forEach(pre.presentMessage)
-    ctx.render('homepage.pug', {
+    await ctx.render('homepage.pug', {
         ctx,
         messages,
         recaptchaSitekey: config.RECAPTCHA_SITEKEY,

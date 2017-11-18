@@ -18,7 +18,7 @@ const router = new Router()
 
 // Show login form
 router.get('/login', async ctx => {
-    return ctx.render('login.pug', {
+    await ctx.render('login.pug', {
         ctx,
         title: 'Login',
         recaptchaSitekey: config.RECAPTCHA_SITEKEY,
