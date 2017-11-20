@@ -4,6 +4,7 @@ const nodeUrl = require('url')
 const debug = require('debug')('app:middleware')
 const bouncer = require('koa-bouncer')
 const recaptcha = require('recaptcha-validator')
+const pugRender = require('pug-render')
 // 1st
 const db = require('./db')
 const config = require('./config')
@@ -239,5 +240,18 @@ exports.ratelimit = function() {
             output += `${secs} seconds`
         }
         return output
+    }
+}
+
+// Adds ctx.render() method to koa context for rendering our pug templates
+exports.pugRender = (root, opts = {}) => {
+    const render = pugRender(root, opts)
+
+    return async (ctx, next) => {
+        ctx.render = async (templatePath, locals) => {
+            ctx.type = 'html'
+            ctx.body = await render(templatePath, locals)
+        }
+        return next()
     }
 }

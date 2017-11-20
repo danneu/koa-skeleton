@@ -9,7 +9,6 @@ const static = require('koa-better-static2')
 const logger = require('koa-logger')
 const bodyParser = require('koa-bodyparser')
 const bouncer = require('koa-bouncer')
-const pugRender = require('koa-pug-render')
 // 1st party
 const config = require('./config')
 const mw = require('./middleware')
@@ -45,7 +44,7 @@ app.use(mw.wrapFlash())
 app.use(bouncer.middleware())
 app.use(mw.handleBouncerValidationError()) // Must come after bouncer.middleware()
 app.use(
-    pugRender(require('path').join(__dirname, '../views'), {
+    mw.pugRender(require('path').join(__dirname, '../views'), {
         locals: {
             config,
             cancan,
