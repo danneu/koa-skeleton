@@ -39,10 +39,10 @@
         "koa-compress": "^2.0.0",
         "koa-helmet": "^3.1.0",
         "koa-logger": "^3.1.0",
-        "pug-render": "0.0.1",
         "koa-router": "^7.1.1",
         "pg": "^7.3.0",
         "pg-extra": "^0.1.0",
+        "pug-render": "^1.0.0",
         "recaptcha-validator": "^2.0.0",
         "uuid": "^3.0.1"
     },
