@@ -11,7 +11,7 @@ const debug = require('debug')('app:index')
 const Koa = require('koa')
 const helmet = require('koa-helmet')
 const compress = require('koa-compress')
-const static = require('koa-better-static2')
+const serveStatic = require('koa-better-static2')
 const logger = require('koa-logger')
 const bodyParser = require('koa-bodyparser')
 const bouncer = require('koa-bouncer')
@@ -34,13 +34,7 @@ app.proxy = config.TRUST_PROXY
 app.use(mw.ensureReferer())
 app.use(helmet())
 app.use(compress())
-app.use(
-    static('public', {
-        // cache static assets for 365 days in production
-        maxage:
-            config.NODE_ENV === 'production' ? 1000 * 60 * 60 * 24 * 365 : 0,
-    })
-)
+app.use(serveStatic('public', { maxage: 0 }))
 app.use(logger())
 app.use(bodyParser())
 app.use(mw.methodOverride()) // Must come after body parser
