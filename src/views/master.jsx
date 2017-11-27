@@ -63,11 +63,6 @@ const Master = ({ children, title, ctx }) => (
                 </div>
             </div>
 
-            {/* Vendored javascript is any javascript supplied by 3rd parties */}
-            <script src="/vendor/jquery-1.11.3.min.js" />
-            <script src="/vendor/bootstrap-3.3.7/js/bootstrap.min.js" />
-            <script src="/vendor/jquery.timeago.js" />
-
             {/* Custom javascript defined for our app */}
             <script src="/js/app.js" />
         </body>
