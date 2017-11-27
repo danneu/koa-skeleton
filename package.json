@@ -26,7 +26,7 @@
         "tabWidth": 4
     },
     "engines": {
-        "node": ">=7.x"
+        "node": ">=9.x"
     },
     "dependencies": {
         "autolinker": "^1.6.0",
