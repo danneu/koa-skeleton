@@ -2,7 +2,6 @@ const React = require('react')
 const config = require('../config')
 const PropTypes = require('prop-types')
 const MessagePanel = require('./partials/message-panel')
-const InlineScript = require('./partials/inline-script')
 
 const Homepage = ({ ctx, messages }) => [
     <Jumbotron />,
