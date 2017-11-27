@@ -34,6 +34,8 @@ app.proxy = config.TRUST_PROXY
 app.use(mw.ensureReferer())
 app.use(helmet())
 app.use(compress())
+// TODO: You would set a high maxage on static assets if they had their hash in their filename.
+// This project currently has no static asset build system setup.
 app.use(serveStatic('public', { maxage: 0 }))
 app.use(logger())
 app.use(bodyParser())
