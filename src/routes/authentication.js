@@ -18,17 +18,14 @@ const router = new Router()
 
 // Show login form
 router.get('/login', async ctx => {
-    await ctx.render('login.pug', {
-        ctx,
+    await ctx.render('login', {
         title: 'Login',
-        recaptchaSitekey: config.RECAPTCHA_SITEKEY,
     })
 })
 
 // //////////////////////////////////////////////////////////
 
 // Create login session
-// router.post('/login', mw.ensureRecaptcha, function*() {
 router.post('/login', mw.ensureRecaptcha(), async ctx => {
     // Validate
 
@@ -73,10 +70,8 @@ router.post('/login', mw.ensureRecaptcha(), async ctx => {
 
 // Show register form
 router.get('/register', async ctx => {
-    await ctx.render('register.pug', {
-        ctx,
+    await ctx.render('register', {
         title: 'Register',
-        recaptchaSitekey: config.RECAPTCHA_SITEKEY,
     })
 })
 

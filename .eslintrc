@@ -1,11 +1,12 @@
 {
-    "extends": ["eslint:recommended"],
+    "extends": ["eslint:recommended", "react-app"],
     "parserOptions": {
         "ecmaVersion": 8,
         "ecmaFeatures": {
             "experimentalObjectRestSpread": true
         }
     },
+    "plugins": ["react"],
     "env": {
         "es6": true,
         "node": true

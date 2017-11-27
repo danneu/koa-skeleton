@@ -17,12 +17,12 @@ that it's better left as a demonstration of how one can structure a Koa + Postgr
 
 ## The Stack
 
-Depends on Node v7.x:
+Depends on Node v8.x+:
 
 - **Micro-framework**: [Koa 2.x](http://koajs.com/). It's very similar to [Express](http://expressjs.com/) except it supports async/await.
 - **Database**: [Postgres](http://www.postgresql.org/).
 - **User-input validation**: [koa-bouncer](https://github.com/danneu/koa-bouncer).
-- **View-layer templating**: [Pug](https://pugjs.org/api/getting-started.html). I chose it over Nunjucks because it has better editor support.
+- **HTML templating**: [React/JSX](https://github.com/danneu/react-template-render). HTML is rendered on the server via React JSX templates.
 - **Deployment**: [Heroku](https://heroku.com/). Keeps things easy while you focus on coding your webapp. Forces you to write your webapp statelessly and horizontally-scalably.
 
 ## Setup
@@ -131,6 +131,8 @@ Instead, require the `src/config.js` and access them there.
 
 The following version numbers are meaningless.
 
+- `4.0.0` 26 Nov 2017
+  - Replace Pug with React/JSX for HTML templating.
 - `3.1.0` 14 Nov 2017
   - Replace Nunjucks with Pug for HTML templating.
 - `3.0.0` 25 Apr 2017

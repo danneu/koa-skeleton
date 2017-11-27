@@ -19,8 +19,7 @@ router.use(async (ctx, next) => {
 // Show admin panel homepage
 router.get('/admin', async ctx => {
     const stats = await db.admin.getStats()
-    await ctx.render('admin/index.pug', {
-        ctx,
+    await ctx.render('admin/index', {
         stats,
         title: 'Admin Panel',
     })

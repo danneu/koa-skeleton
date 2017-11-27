@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt')
 const assert = require('better-assert')
 const debug = require('debug')('app:belt')
 const Autolinker = require('autolinker')
+const timeago = require('timeago.js')
 
 // A dumping ground of common functions used around the app.
 // As it gets full, consider extracting similar functions into
@@ -132,3 +133,8 @@ exports.markupToHtml = (() => {
 exports.capitalize = s => {
     return s[0] + s.slice(1).toLowerCase()
 }
+
+exports.timeago = (() => {
+    const instance = timeago()
+    return date => instance.format(date)
+})()

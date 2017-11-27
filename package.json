@@ -8,11 +8,15 @@
     },
     "scripts": {
         "start": "node app.js",
-        "start-dev": "nodemon --ext js,html app.js",
+        "start-dev": "nodemon --ext js,jsx,html app.js",
         "reset-db": "node ./sql/reset_db",
         "deploy": "git push heroku master",
         "pretty-fix": "prettier --write \"{src,sql,test}/**/*.js\"",
-        "lint": "eslint src"
+        "lint": "eslint src",
+        "patch": "npm version patch && npm publish",
+        "minor": "npm version minor && npm publish",
+        "major": "npm version major && npm publish",
+        "postpublish": "git push origin master --follow-tags"
     },
     "prettier": {
         "semi": false,
@@ -25,6 +29,8 @@
     },
     "dependencies": {
         "autolinker": "^1.4.3",
+        "babel-preset-react": "^6.24.1",
+        "babel-register": "^6.26.0",
         "bcrypt": "^1.0.3",
         "better-assert": "1.0.2",
         "debug": "^3.1.0",
@@ -41,13 +47,16 @@
         "koa-logger": "^3.1.0",
         "koa-router": "^7.1.1",
         "pg": "^7.3.0",
-        "pg-extra": "^0.1.0",
-        "pug-render": "^1.0.0",
+        "pg-extra": "^0.2.0",
+        "prop-types": "^15.6.0",
+        "react": "^16.1.1",
+        "react-template-render": "^1.0.0",
         "recaptcha-validator": "^2.0.0",
+        "timeago.js": "^3.0.2",
         "uuid": "^3.0.1"
     },
-    "license": "MIT",
     "devDependencies": {
         "prettier": "^1.7.4"
-    }
+    },
+    "license": "MIT"
 }

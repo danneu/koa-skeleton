@@ -1,5 +1,11 @@
 // Load env vars from .env, always run this early
 require('dotenv').config()
+
+require('babel-register')({
+    presets: ['react'],
+    extensions: ['.jsx'],
+})
+
 // 3rd party
 const debug = require('debug')('app:index')
 const Koa = require('koa')
@@ -43,15 +49,8 @@ app.use(mw.wrapCurrUser())
 app.use(mw.wrapFlash())
 app.use(bouncer.middleware())
 app.use(mw.handleBouncerValidationError()) // Must come after bouncer.middleware()
-app.use(
-    mw.pugRender(require('path').join(__dirname, '../views'), {
-        locals: {
-            config,
-            cancan,
-            belt,
-        },
-    })
-)
+const viewsRoot = require('path').join(__dirname, 'views')
+app.use(mw.reactRender(viewsRoot, { parent: 'master' }))
 
 // Provide a convience function for protecting our routes behind
 // our authorization rules. If authorization check fails, 404 response.
