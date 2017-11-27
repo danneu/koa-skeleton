@@ -1,5 +1,6 @@
 {
     "name": "koa-skeleton",
+    "private": true,
     "description": "a simple, full-featured koa application",
     "version": "4.0.0",
     "repository": {
@@ -13,9 +14,9 @@
         "deploy": "git push heroku master",
         "pretty-fix": "prettier --write \"{src,sql,test}/**/*.js\"",
         "lint": "eslint src",
-        "patch": "npm version patch && npm publish",
-        "minor": "npm version minor && npm publish",
-        "major": "npm version major && npm publish",
+        "patch": "npm version patch",
+        "minor": "npm version minor",
+        "major": "npm version major",
         "postpublish": "git push origin master --follow-tags"
     },
     "prettier": {
