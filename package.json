@@ -29,7 +29,7 @@
         "node": ">=7.x"
     },
     "dependencies": {
-        "autolinker": "^1.4.3",
+        "autolinker": "^1.6.0",
         "babel-preset-react": "^6.24.1",
         "babel-register": "^6.26.0",
         "bcrypt": "^1.0.3",
@@ -38,17 +38,17 @@
         "dotenv": "^4.0.0",
         "escape-html": "^1.0.3",
         "interval-cache": "^1.0.0",
-        "knex": "^0.14.0",
-        "koa": "^2.2.0",
+        "knex": "^0.14.2",
+        "koa": "^2.4.1",
         "koa-better-static2": "^1.0.2",
         "koa-bodyparser": "^4.2.0",
-        "koa-bouncer": "^6.0.0",
+        "koa-bouncer": "^6.0.4",
         "koa-compress": "^2.0.0",
-        "koa-helmet": "^3.1.0",
+        "koa-helmet": "^3.3.0",
         "koa-logger": "^3.1.0",
-        "koa-router": "^7.1.1",
-        "pg": "^7.3.0",
-        "pg-extra": "^0.2.0",
+        "koa-router": "^7.3.0",
+        "pg": "^7.4.0",
+        "pg-extra": "^0.2.1",
         "prop-types": "^15.6.0",
         "react": "^16.1.1",
         "react-template-render": "^1.0.0",
@@ -57,7 +57,7 @@
         "uuid": "^3.0.1"
     },
     "devDependencies": {
-        "prettier": "^1.7.4"
+        "prettier": "^1.8.2"
     },
     "license": "MIT"
 }

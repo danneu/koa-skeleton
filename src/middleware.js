@@ -4,7 +4,6 @@ const nodeUrl = require('url')
 const debug = require('debug')('app:middleware')
 const bouncer = require('koa-bouncer')
 const recaptcha = require('recaptcha-validator')
-const pugRender = require('pug-render')
 const makeRender = require('react-template-render')
 // 1st
 const db = require('./db')
