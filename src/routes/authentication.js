@@ -17,7 +17,7 @@ const router = new Router()
 // //////////////////////////////////////////////////////////
 
 // Show login form
-router.get('/login', async ctx => {
+router.get('/login', async (ctx) => {
     await ctx.render('login', {
         title: 'Login',
     })
@@ -26,7 +26,7 @@ router.get('/login', async ctx => {
 // //////////////////////////////////////////////////////////
 
 // Create login session
-router.post('/login', mw.ensureRecaptcha(), async ctx => {
+router.post('/login', mw.ensureRecaptcha(), async (ctx) => {
     // Validate
 
     ctx
@@ -69,7 +69,7 @@ router.post('/login', mw.ensureRecaptcha(), async ctx => {
 // //////////////////////////////////////////////////////////
 
 // Show register form
-router.get('/register', async ctx => {
+router.get('/register', async (ctx) => {
     await ctx.render('register', {
         title: 'Register',
     })
@@ -78,7 +78,7 @@ router.get('/register', async ctx => {
 // //////////////////////////////////////////////////////////
 
 // Create user
-router.post('/users', mw.ensureRecaptcha(), async ctx => {
+router.post('/users', mw.ensureRecaptcha(), async (ctx) => {
     // Validation
 
     ctx
@@ -96,12 +96,12 @@ router.post('/users', mw.ensureRecaptcha(), async ctx => {
     ctx
         .validateBody('password2')
         .isString('Password confirmation is required')
-        .checkPred(s => s.length > 0, 'Password confirmation is required')
+        .checkPred((s) => s.length > 0, 'Password confirmation is required')
 
     ctx
         .validateBody('password1')
         .isString('Password is required')
-        .checkPred(s => s.length > 0, 'Password is required')
+        .checkPred((s) => s.length > 0, 'Password is required')
         .isLength(6, 100, 'Password must be 6-100 chars')
         .eq(ctx.vals.password2, 'Password must match confirmation')
 
@@ -144,7 +144,7 @@ router.post('/users', mw.ensureRecaptcha(), async ctx => {
 // //////////////////////////////////////////////////////////
 
 // Logout
-router.del('/sessions/:id', async ctx => {
+router.del('/sessions/:id', async (ctx) => {
     // If user isn't logged in, give them the success case anyways
     if (!ctx.currUser) {
         ctx.flash = { message: ['success', 'You successfully logged out'] }

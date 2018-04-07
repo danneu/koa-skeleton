@@ -151,13 +151,13 @@ exports.ensureRecaptcha = function() {
             .validateBody('g-recaptcha-response')
             .required('You must attempt the human test')
             .isString()
-            .checkPred(s => s.length > 0, 'You must attempt the human test')
+            .checkPred((s) => s.length > 0, 'You must attempt the human test')
 
         await recaptcha(
             config.RECAPTCHA_SITESECRET,
             ctx.vals['g-recaptcha-response'],
             ctx.request.ip
-        ).catch(err => {
+        ).catch((err) => {
             if (typeof err === 'string') {
                 console.warn(`Got invalid captcha: ${err}`)
                 ctx

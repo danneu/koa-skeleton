@@ -12,18 +12,13 @@
         "start-dev": "nodemon --ext js,jsx,html app.js",
         "reset-db": "node ./sql/reset_db",
         "deploy": "git push heroku master",
-        "pretty-fix": "prettier --write \"{src,sql,test}/**/*.js\"",
+        "prettier":
+            "prettier --write --no-semi --single-quote --arrow-parens always --tab-width 4 --trailing-comma es5  \"{src,sql,test}/**/*.js\"",
         "lint": "eslint src",
         "patch": "npm version patch",
         "minor": "npm version minor",
         "major": "npm version major",
         "postpublish": "git push origin master --follow-tags"
-    },
-    "prettier": {
-        "semi": false,
-        "singleQuote": true,
-        "trailingComma": "es5",
-        "tabWidth": 4
     },
     "engines": {
         "node": ">=9.x"

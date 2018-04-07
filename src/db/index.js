@@ -170,7 +170,7 @@ exports.getMessageById = async function(messageId) {
 exports.updateUser = async function(userId, fields) {
     assert(Number.isInteger(userId))
     const WHITELIST = ['email', 'role']
-    assert(Object.keys(fields).every(key => WHITELIST.indexOf(key) > -1))
+    assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1))
     const string = knex('users')
         .where({ id: userId })
         .update(fields)
@@ -184,7 +184,7 @@ exports.updateUser = async function(userId, fields) {
 exports.updateMessage = async function(messageId, fields) {
     assert(Number.isInteger(messageId))
     const WHITELIST = ['is_hidden', 'markup']
-    assert(Object.keys(fields).every(key => WHITELIST.indexOf(key) > -1))
+    assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1))
     const string = knex('messages')
         .where({ id: messageId })
         .update(fields)

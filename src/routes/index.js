@@ -49,7 +49,7 @@ function loadMessage() {
 
 // Useful route for quickly testing something in development
 // 404s in production
-router.get('/test', async ctx => {
+router.get('/test', async (ctx) => {
     ctx.assert(config.NODE_ENV === 'development', 404)
     // ...
 })
@@ -57,7 +57,7 @@ router.get('/test', async ctx => {
 // //////////////////////////////////////////////////////////
 
 // Show homepage
-router.get('/', async ctx => {
+router.get('/', async (ctx) => {
     const messages = await db.getRecentMessages()
     messages.forEach(pre.presentMessage)
     await ctx.render('homepage', {
@@ -72,7 +72,7 @@ router.get('/', async ctx => {
 // Body:
 // - email: Optional String
 // - role: Optional String
-router.put('/users/:uname', loadUser(), async ctx => {
+router.put('/users/:uname', loadUser(), async (ctx) => {
     const { user } = ctx.state
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_*', user)
     // VALIDATION
@@ -106,7 +106,7 @@ router.put('/users/:uname', loadUser(), async ctx => {
 // //////////////////////////////////////////////////////////
 
 // Edit user page
-router.get('/users/:uname/edit', loadUser(), async ctx => {
+router.get('/users/:uname/edit', loadUser(), async (ctx) => {
     const { user } = ctx.state
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_*', user)
     await ctx.render('users-edit', {
@@ -118,7 +118,7 @@ router.get('/users/:uname/edit', loadUser(), async ctx => {
 // //////////////////////////////////////////////////////////
 
 // Show user profile
-router.get('/users/:uname', loadUser(), async ctx => {
+router.get('/users/:uname', loadUser(), async (ctx) => {
     const { user } = ctx.state
     const messages = await db.getRecentMessagesForUserId(user.id)
     messages.forEach(pre.presentMessage)
@@ -132,7 +132,7 @@ router.get('/users/:uname', loadUser(), async ctx => {
 // //////////////////////////////////////////////////////////
 
 // Create message
-router.post('/messages', mw.ratelimit(), mw.ensureRecaptcha(), async ctx => {
+router.post('/messages', mw.ratelimit(), mw.ensureRecaptcha(), async (ctx) => {
     // AUTHZ
     ctx.assertAuthorized(ctx.currUser, 'CREATE_MESSAGE')
     // VALIDATE
@@ -158,7 +158,7 @@ router.post('/messages', mw.ratelimit(), mw.ensureRecaptcha(), async ctx => {
 // //////////////////////////////////////////////////////////
 
 // List all messages
-router.get('/messages', async ctx => {
+router.get('/messages', async (ctx) => {
     ctx
         .validateQuery('page')
         .defaultTo(1)
@@ -180,7 +180,7 @@ router.get('/messages', async ctx => {
 // //////////////////////////////////////////////////////////
 
 // List all users
-router.get('/users', async ctx => {
+router.get('/users', async (ctx) => {
     ctx
         .validateQuery('page')
         .defaultTo(1)
@@ -207,7 +207,7 @@ router.get('/users', async ctx => {
 // - is_hidden: Optional String of 'true' | 'false'
 // - markup: Optional String
 // - redirectTo: Optional String
-router.put('/messages/:message_id', loadMessage(), async ctx => {
+router.put('/messages/:message_id', loadMessage(), async (ctx) => {
     const { message } = ctx.state
     // AUTHZ: Ensure user is authorized to make *any* update to message
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_MESSAGE', message)
@@ -216,7 +216,7 @@ router.put('/messages/:message_id', loadMessage(), async ctx => {
         ctx
             .validateBody('is_hidden')
             .isString()
-            .tap(x => x === 'true')
+            .tap((x) => x === 'true')
     }
     if (ctx.request.body.markup) {
         ctx.assertAuthorized(ctx.currUser, 'UPDATE_MESSAGE_MARKUP', message)
@@ -233,7 +233,7 @@ router.put('/messages/:message_id', loadMessage(), async ctx => {
         .validateBody('redirectTo')
         .defaultTo('/')
         .isString()
-        .checkPred(s => s.startsWith('/'))
+        .checkPred((s) => s.startsWith('/'))
     // UPDATE
     await db.updateMessage(message.id, {
         is_hidden: ctx.vals.is_hidden,
@@ -250,7 +250,7 @@ router.put('/messages/:message_id', loadMessage(), async ctx => {
 //
 // Body:
 // - role: String
-router.put('/users/:uname/role', loadUser(), async ctx => {
+router.put('/users/:uname/role', loadUser(), async (ctx) => {
     const { user } = ctx.state
     // AUTHZ
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_ROLE', user)
@@ -260,13 +260,13 @@ router.put('/users/:uname/role', loadUser(), async ctx => {
         .required('Must provide a role')
         .isString()
         .trim()
-        .checkPred(s => s.length > 0, 'Must provide a role')
+        .checkPred((s) => s.length > 0, 'Must provide a role')
         .isIn(['ADMIN', 'MOD', 'MEMBER', 'BANNED'], 'Invalid role')
     ctx
         .validateBody('redirectTo')
         .defaultTo('/')
         .isString()
-        .checkPred(s => s.startsWith('/'))
+        .checkPred((s) => s.startsWith('/'))
     // UPDATE
     await db.updateUser(user.id, { role: ctx.vals.role })
     // RESPOND

@@ -43,13 +43,13 @@ exports.formatDate = function(d) {
 // String -> Bool
 exports.isValidUuid = (() => {
     const re = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
-    return uuid => re.test(uuid)
+    return (uuid) => re.test(uuid)
 })()
 
 exports.slugify = (() => {
     const MAX_SLUG_LENGTH = 80
 
-    const slugifyString = x =>
+    const slugifyString = (x) =>
         String(x)
             .trim()
             // Remove apostrophes
@@ -121,20 +121,20 @@ exports.autolink = function(s) {
 
 exports.markupToHtml = (() => {
     // Turns all \n into <br>
-    const nl2br = s => {
+    const nl2br = (s) => {
         assert(typeof s === 'string')
         return s.replace(/\n/g, '<br>')
     }
-    return markup => {
+    return (markup) => {
         return exports.autolink(nl2br(escapeHtml(markup)))
     }
 })()
 
-exports.capitalize = s => {
+exports.capitalize = (s) => {
     return s[0] + s.slice(1).toLowerCase()
 }
 
 exports.timeago = (() => {
     const instance = timeago()
-    return date => instance.format(date)
+    return (date) => instance.format(date)
 })()

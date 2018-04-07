@@ -44,7 +44,7 @@ seed().then(
         console.log('Finished resetting db')
         process.exit(0)
     },
-    err => {
+    (err) => {
         console.error('Error:', err, err.stack)
         process.exit(1)
     }

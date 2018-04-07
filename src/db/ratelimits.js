@@ -14,7 +14,7 @@ const { pool } = require('./util')
 exports.bump = async function(ipAddress, maxDate) {
     assert(typeof ipAddress === 'string')
     assert(maxDate instanceof Date)
-    return pool.withTransaction(async client => {
+    return pool.withTransaction(async (client) => {
         await client.query(sql`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE`)
 
         // Get latest ratelimit for this user
