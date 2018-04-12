@@ -10,7 +10,7 @@ const Paginate = ({ paginator }) =>
                         return (
                             <li className={pg.isActive ? 'active' : ''}>
                                 <a href={pg.href}>
-                                    <span ariaHidden={true}>{pg.text}</span>
+                                    <span aria-hidden={true}>{pg.text}</span>
                                 </a>
                             </li>
                         )
