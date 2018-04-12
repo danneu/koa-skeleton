@@ -12,8 +12,7 @@
         "start-dev": "nodemon --ext js,jsx,html app.js",
         "reset-db": "node ./sql/reset_db",
         "deploy": "git push heroku master",
-        "prettier":
-            "prettier --write --no-semi --single-quote --arrow-parens always --tab-width 4 --trailing-comma es5  \"{src,sql,test}/**/*.js\"",
+        "prettier": "prettier --write --no-semi --single-quote --arrow-parens always --tab-width 4 --trailing-comma es5  \"{src,sql,test}/**/*.js\"",
         "lint": "eslint src",
         "patch": "npm version patch",
         "minor": "npm version minor",
@@ -33,7 +32,7 @@
         "dotenv": "^4.0.0",
         "escape-html": "^1.0.3",
         "interval-cache": "^1.0.0",
-        "knex": "^0.14.4",
+        "knex": "^0.14.6",
         "koa": "^2.5.0",
         "koa-better-static2": "^1.0.2",
         "koa-bodyparser": "^4.2.0",
@@ -46,13 +45,13 @@
         "pg-extra": "^0.2.1",
         "prop-types": "^15.6.1",
         "react": "^16.3.1",
-        "react-template-render": "^1.0.0",
+        "react-template-render": "^1.1.0",
         "recaptcha-validator": "^2.0.0",
         "timeago.js": "^3.0.2",
         "uuid": "^3.2.1"
     },
     "devDependencies": {
-        "prettier": "^1.11.1"
+        "prettier": "^1.12.0"
     },
     "license": "MIT"
 }
