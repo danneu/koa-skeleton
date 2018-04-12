@@ -2,14 +2,14 @@ const React = require('react')
 const PropTypes = require('prop-types')
 
 const AdminIndex = ({ ctx, stats }) => [
-    <ol class="breadcrumb">
+    <ol className="breadcrumb">
         <li>
             <a href="/">Home</a>
         </li>
-        <li class="active">Admin</li>
+        <li className="active">Admin</li>
     </ol>,
 
-    <div class="page-header">
+    <div className="page-header">
         <h1>Admin Panel</h1>
     </div>,
 

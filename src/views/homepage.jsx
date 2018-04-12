@@ -107,7 +107,7 @@ const NewMessagePanel = ({ ctx }) => (
             <div className="panel-footer text-right">
                 <button
                     type="submit"
-                    class="g-recaptcha btn btn-default"
+                    className="g-recaptcha btn btn-default"
                     data-badge="inline"
                     data-sitekey={config.RECAPTCHA_SITEKEY}
                     data-callback="onRecaptchaSuccess"
