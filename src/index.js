@@ -46,10 +46,12 @@ app.use(mw.wrapFlash())
 app.use(bouncer.middleware())
 app.use(mw.handleBouncerValidationError()) // Must come after bouncer.middleware()
 const viewsRoot = require('path').join(__dirname, 'views')
-app.use(mw.reactRender(viewsRoot, { 
-  parent: 'master',
-  keyPropWarnings: false,
-}))
+app.use(
+    mw.reactRender(viewsRoot, {
+        parent: 'master',
+        keyPropWarnings: false,
+    })
+)
 
 // Provide a convience function for protecting our routes behind
 // our authorization rules. If authorization check fails, 404 response.
