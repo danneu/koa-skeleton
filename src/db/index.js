@@ -106,7 +106,7 @@ exports.insertMessage = async function(data) {
 exports.insertUser = async function(uname, password, email) {
     assert(typeof uname === 'string')
     assert(typeof password === 'string')
-    const digest = await belt.hashPassword(password)
+    const digest = await belt.scrypt.hash(password)
     return pool.one(sql`
     INSERT INTO users (uname, email, digest)
     VALUES (${uname}, ${email}, ${digest})

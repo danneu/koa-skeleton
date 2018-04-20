@@ -1,8 +1,9 @@
 // Node
 const crypto = require('crypto')
 // 3rd
+const Promise = require('bluebird')
+const scrypt = require('scrypt-for-humans')
 const escapeHtml = require('escape-html')
-const bcrypt = require('bcrypt')
 const assert = require('better-assert')
 const debug = require('debug')('app:belt')
 const Autolinker = require('autolinker')
@@ -75,16 +76,26 @@ exports.slugify = (() => {
 
 // //////////////////////////////////////////////////////////
 
-// Returns hashed password value to be used in `users.digest` column
-// String -> String
-exports.hashPassword = function(password) {
-    return bcrypt.hash(password, 10)
-}
+// scrypt-for-humans takes and returns base64 strings.
+// Instead, our wrapper just keeps it in byte array (Buffer) form
+// since that's how it enters/exits the database.
+exports.scrypt = {
+    // Returns Promise<bool>
+    async verifyHash(password, hash) {
+        assert(typeof password === 'string')
+        assert(Buffer.isBuffer(hash))
+        return scrypt.verifyHash(password, hash.toString('base64'))
+            .then(() => true)
+            .catch(scrypt.PasswordError, () => false)
+    },
 
-// Compares password plaintext against bcrypted digest
-// String, String -> Bool
-exports.checkPassword = function(password, digest) {
-    return bcrypt.compare(password, digest)
+    // Returns Promise<Buffer>
+    async hash(password) {
+        assert(typeof password === 'string')
+        return scrypt
+            .hash(password)
+            .then((base64) => Buffer.from(base64, 'base64'))
+    },
 }
 
 // Used to lightly process user-submitted message markup before

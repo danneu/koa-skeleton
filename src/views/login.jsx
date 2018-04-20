@@ -36,7 +36,7 @@ const Login = ({ ctx }) => [
                                 className="form-control"
                                 required
                                 autoFocus
-                                value={
+                                defaultValue={
                                     (ctx.flash.params &&
                                         ctx.flash.params.uname) ||
                                     ''

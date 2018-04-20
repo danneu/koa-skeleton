@@ -6,13 +6,17 @@ create or replace function rand_int(lo int, hi int) returns int as 'select (floo
 create or replace function rand_inet() returns inet as $$select (rand_int(256) || '.' || rand_int(256) || '.' || rand_int(256) || '.' || rand_int(256)) :: inet$$ language sql;
 create or replace function rand_user_id() returns uuid as 'select id from users where random() < 0.01 limit 1' language sql;
 
+-- Matches the password "secret"
+create or replace function seeded_digest() returns bytea as $$select decode('c2NyeXB0AA4AAAAIAAAAAUS3XIJO3T/LokiFm6Lu9trKG4jws01rHAbNT+6PucM8j6gC/uXFzJy0cJpQRFO+PSm0H6eVEa/gxbyZDwLSMEA2OSu/RibO4w9WEjSR2xJk', 'base64')$$ language sql;
+
 ------------------------------------------------------------
 -- Creates admins, password is 'secret'
 ------------------------------------------------------------
 
 INSERT INTO users (uname, role, digest) VALUES
-  ('foo', 'ADMIN', '$2a$12$3InPKSvlWwgLHYVxvJpaMeXDZF/.hhoiYMv72xydoqm3Pg58Emrwm')
-  , ('test', 'ADMIN', '$2a$12$3InPKSvlWwgLHYVxvJpaMeXDZF/.hhoiYMv72xydoqm3Pg58Emrwm');
+  ('foo', 'ADMIN', seeded_digest()),
+  ('test', 'ADMIN', seeded_digest())
+;
 
 ------------------------------------------------------------
 -- Bulk seed users, password is always 'secret'
@@ -21,7 +25,7 @@ INSERT INTO users (uname, role, digest) VALUES
 INSERT INTO users (uname, digest)
   SELECT
     'user-' || x.id,
-    '$2a$12$3InPKSvlWwgLHYVxvJpaMeXDZF/.hhoiYMv72xydoqm3Pg58Emrwm'
+    seeded_digest()
   FROM generate_series(1, 10000) AS x(id);
 
 ------------------------------------------------------------

@@ -34,6 +34,7 @@ router.post('/login', ensureRecaptcha(), async (ctx) => {
         .required('Invalid creds')
         .isString()
         .trim()
+        .check(await db.getUserByUname(ctx.vals.uname), 'Username does not exist')
     ctx
         .validateBody('password')
         .required('Invalid creds')
@@ -42,10 +43,8 @@ router.post('/login', ensureRecaptcha(), async (ctx) => {
 
     const user = await db.getUserByUname(ctx.vals.uname)
     ctx.check(user, 'Invalid creds')
-    ctx.check(
-        await belt.checkPassword(ctx.vals.password, user.digest),
-        'Invalid creds'
-    )
+
+    ctx.check(await belt.scrypt.verifyHash(ctx.vals.password, user.digest), 'Invalid creds')
 
     // User authenticated
 

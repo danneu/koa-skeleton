@@ -13,7 +13,7 @@ CREATE TABLE users (
   id             uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   uname          citext      NOT NULL,
   role           user_role   NOT NULL DEFAULT 'MEMBER',
-  digest         text        NOT NULL,
+  digest         bytea       NOT NULL,
   email          citext      NULL,
   last_online_at timestamptz NOT NULL DEFAULT NOW(),
   created_at     timestamptz NOT NULL DEFAULT NOW(),

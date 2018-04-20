@@ -138,6 +138,9 @@ Instead, require the `src/config.js` and access them there.
 
 The following version numbers are meaningless.
 
+*   20 Apr 2018
+    * Replaced bcrypt with scrypt.
+    * Made various small schema changes.
 *   `4.0.0` 26 Nov 2017
     *   Replace Pug with React/JSX for HTML templating.
 *   `3.1.0` 14 Nov 2017
