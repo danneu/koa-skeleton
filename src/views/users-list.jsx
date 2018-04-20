@@ -29,7 +29,7 @@ const UsersList = ({ ctx, users, usersCount, paginator }) => [
                 <th>Role</th>
             </tr>
         </thead>
-        <tbody>{users.map(user => <UserRow ctx={ctx} user={user} />)}</tbody>
+        <tbody>{users.map((user) => <UserRow ctx={ctx} user={user} />)}</tbody>
     </table>,
     <Paginate paginator={paginator} />,
 ]
@@ -76,7 +76,7 @@ const UserRow = ({ ctx, user }) => (
                     <input type="hidden" name="_method" value="PUT" />
                     <input type="hidden" name="redirectTo" value="/users" />
                     <select name="role">
-                        {['ADMIN', 'MOD', 'MEMBER', 'BANNED'].map(role => (
+                        {['ADMIN', 'MOD', 'MEMBER', 'BANNED'].map((role) => (
                             <option value={role} selected={user.role === role}>
                                 {belt.capitalize(role)}
                                 {user.role === role && '←'}
