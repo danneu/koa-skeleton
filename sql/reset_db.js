@@ -4,14 +4,14 @@ const path = require('path')
 const { promisify } = require('util')
 const readFile = promisify(require('fs').readFile)
 // 1st
-const config = require('../src/config')
+const { NODE_ENV } = require('../src/config')
 const { pool } = require('../src/db/util')
 
 // //////////////////////////////////////////////////////////
 
 // Sanity check: Ensure this isn't being run in production
 
-if (config.NODE_ENV !== 'development') {
+if (NODE_ENV !== 'development') {
     throw new Error('[reset_db] May only reset database in development mode')
 }
 

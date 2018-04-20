@@ -41,9 +41,9 @@ exports.formatDate = function(d) {
 }
 
 // String -> Bool
-exports.isValidUuid = (() => {
-    const re = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
-    return (uuid) => re.test(uuid)
+exports.isUuid = (() => {
+    const UUID_REGEX = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
+    return (uuid) => UUID_REGEX.test(uuid)
 })()
 
 exports.slugify = (() => {
@@ -126,11 +126,13 @@ exports.markupToHtml = (() => {
         return s.replace(/\n/g, '<br>')
     }
     return (markup) => {
+        assert(typeof markup === 'string')
         return exports.autolink(nl2br(escapeHtml(markup)))
     }
 })()
 
 exports.capitalize = (s) => {
+    assert(typeof s === 'string')
     return s[0] + s.slice(1).toLowerCase()
 }
 

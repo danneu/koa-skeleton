@@ -4,7 +4,7 @@ const Router = require('koa-router')
 const debug = require('debug')('app:routes:index')
 // 1st party
 const db = require('../db')
-const mw = require('../middleware')
+const ensureRecaptcha = require('../middleware/ensure-recaptcha')
 const config = require('../config')
 const belt = require('../belt')
 
@@ -26,7 +26,7 @@ router.get('/login', async (ctx) => {
 // //////////////////////////////////////////////////////////
 
 // Create login session
-router.post('/login', mw.ensureRecaptcha(), async (ctx) => {
+router.post('/login', ensureRecaptcha(), async (ctx) => {
     // Validate
 
     ctx
@@ -78,7 +78,7 @@ router.get('/register', async (ctx) => {
 // //////////////////////////////////////////////////////////
 
 // Create user
-router.post('/users', mw.ensureRecaptcha(), async (ctx) => {
+router.post('/users', ensureRecaptcha(), async (ctx) => {
     // Validation
 
     ctx

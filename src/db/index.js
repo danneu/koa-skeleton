@@ -6,7 +6,7 @@ const { sql, _raw } = require('pg-extra')
 const debug = require('debug')('app:db:index')
 // 1st
 const belt = require('../belt')
-const config = require('../config')
+const { MESSAGES_PER_PAGE, USERS_PER_PAGE } = require('../config')
 const { pool } = require('./util')
 
 // This module is for general database queries that haven't
@@ -23,7 +23,7 @@ exports.ratelimits = require('./ratelimits')
 //
 // Also bumps user's last_online_at column to NOW().
 exports.getUserBySessionId = async function(sessionId) {
-    assert(belt.isValidUuid(sessionId))
+    assert(belt.isUuid(sessionId))
     return pool.one(sql`
     UPDATE users
     SET last_online_at = NOW()
@@ -138,7 +138,7 @@ exports.insertSession = async function(userId, ipAddress, userAgent, interval) {
 
 exports.logoutSession = async function(userId, sessionId) {
     assert(Number.isInteger(userId))
-    assert(typeof sessionId === 'string')
+    assert(belt.isUuid(sessionId))
     return pool.query(sql`
     UPDATE sessions
     SET logged_out_at = NOW()
@@ -198,7 +198,7 @@ exports.updateMessage = async function(messageId, fields) {
 exports.getMessages = async function(page) {
     page = page || 1
     assert(Number.isInteger(page))
-    const perPage = config.MESSAGES_PER_PAGE
+    const perPage = MESSAGES_PER_PAGE
     const offset = (page - 1) * perPage
     const limit = perPage
     return pool.many(sql`
@@ -243,7 +243,7 @@ exports.getUsersCount = async function() {
 exports.getUsers = async function(page) {
     page = page || 1
     assert(Number.isInteger(page))
-    const perPage = config.USERS_PER_PAGE
+    const perPage = USERS_PER_PAGE
     const offset = (page - 1) * perPage
     const limit = perPage
     return pool.many(sql`

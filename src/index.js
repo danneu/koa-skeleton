@@ -16,8 +16,7 @@ const logger = require('koa-logger')
 const bodyParser = require('koa-bodyparser')
 const bouncer = require('koa-bouncer')
 // 1st party
-const config = require('./config')
-const mw = require('./middleware')
+const { PORT, TRUST_PROXY } = require('./config')
 const belt = require('./belt')
 const cancan = require('./cancan')
 
@@ -25,13 +24,13 @@ const cancan = require('./cancan')
 
 const app = new Koa()
 app.poweredBy = false
-app.proxy = config.TRUST_PROXY
+app.proxy = TRUST_PROXY
 
 // //////////////////////////////////////////////////////////
 // Middleware
 // //////////////////////////////////////////////////////////
 
-app.use(mw.ensureReferer())
+app.use(require('./middleware/ensure-referer')())
 app.use(helmet())
 app.use(compress())
 // TODO: You would set a high maxage on static assets if they had their hash in their filename.
@@ -39,15 +38,15 @@ app.use(compress())
 app.use(serveStatic('public', { maxage: 0 }))
 app.use(logger())
 app.use(bodyParser())
-app.use(mw.methodOverride()) // Must come after body parser
-app.use(mw.removeTrailingSlash())
-app.use(mw.wrapCurrUser())
-app.use(mw.wrapFlash())
+app.use(require('./middleware/method-override')()) // Must come after body parser
+app.use(require('./middleware/remove-trailing-slash')())
+app.use(require('./middleware/curr-user')())
+app.use(require('./middleware/flash')())
 app.use(bouncer.middleware())
-app.use(mw.handleBouncerValidationError()) // Must come after bouncer.middleware()
+app.use(require('./middleware/handle-bouncer-validation-error')()) // Must come after bouncer.middleware()
 const viewsRoot = require('path').join(__dirname, 'views')
 app.use(
-    mw.reactRender(viewsRoot, {
+    require('./middleware/react-render')(viewsRoot, {
         parent: 'master',
         keyPropWarnings: false,
     })
@@ -83,7 +82,7 @@ app.use(require('./routes/admin').routes())
 
 // //////////////////////////////////////////////////////////
 
-app.start = function(port = config.PORT) {
+app.start = function(port = PORT) {
     app.listen(port, () => {
         console.log(`Listening on http://localhost:${port}`)
     })

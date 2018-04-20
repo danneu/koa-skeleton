@@ -5,8 +5,9 @@ const debug = require('debug')('app:routes:index')
 // 1st party
 const db = require('../db')
 const pre = require('../presenters')
-const mw = require('../middleware')
-const config = require('../config')
+const ratelimit = require('../middleware/ratelimit')
+const ensureRecaptcha = require('../middleware/ensure-recaptcha')
+const { NODE_ENV } = require('../config')
 const belt = require('../belt')
 const paginate = require('../paginate')
 const cache = require('../cache')
@@ -50,7 +51,7 @@ function loadMessage() {
 // Useful route for quickly testing something in development
 // 404s in production
 router.get('/test', async (ctx) => {
-    ctx.assert(config.NODE_ENV === 'development', 404)
+    ctx.assert(NODE_ENV === 'development', 404)
     // ...
 })
 
@@ -132,7 +133,7 @@ router.get('/users/:uname', loadUser(), async (ctx) => {
 // //////////////////////////////////////////////////////////
 
 // Create message
-router.post('/messages', mw.ratelimit(), mw.ensureRecaptcha(), async (ctx) => {
+router.post('/messages', ratelimit(), ensureRecaptcha(), async (ctx) => {
     // AUTHZ
     ctx.assertAuthorized(ctx.currUser, 'CREATE_MESSAGE')
     // VALIDATE

@@ -2,7 +2,7 @@
 const debug = require('debug')('app:paginate')
 const assert = require('better-assert')
 // 1st
-const config = require('./config')
+const { MESSAGES_PER_PAGE } = require('./config')
 
 // TODO: Clean this mess up
 //
@@ -12,7 +12,7 @@ const config = require('./config')
 exports.makePaginator = function(currPage, totalItems) {
     assert(Number.isInteger(currPage))
     assert(Number.isInteger(totalItems))
-    const perPage = config.MESSAGES_PER_PAGE
+    const perPage = MESSAGES_PER_PAGE
     assert(Number.isInteger(perPage))
 
     const totalPages = Math.max(1, Math.ceil(totalItems / perPage))
