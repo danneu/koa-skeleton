@@ -14,7 +14,7 @@ const UsersList = ({ ctx, users, usersCount, paginator }) => [
     </ol>,
     <div className="page-header">
         <h1>
-            Users <small>{usersCount} total</small>
+            Users <small>{belt.commafy(usersCount)} total</small>
         </h1>
     </div>,
     <Paginate paginator={paginator} />,

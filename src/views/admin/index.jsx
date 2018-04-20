@@ -1,5 +1,6 @@
 const React = require('react')
 const PropTypes = require('prop-types')
+const belt = require('../../belt')
 
 const AdminIndex = ({ ctx, stats }) => [
     <ol className="breadcrumb">
@@ -21,7 +22,7 @@ const AdminIndex = ({ ctx, stats }) => [
                         <div className="panel-body text-center">
                             <p className="lead">Users</p>
                             <p className="lead" style={{ fontSize: '300%' }}>
-                                {stats.users_count}
+                                {belt.commafy(stats.users_count)}
                             </p>
                             <p>
                                 <a href="/users">View All</a>
@@ -34,7 +35,7 @@ const AdminIndex = ({ ctx, stats }) => [
                         <div className="panel-body text-center">
                             <p className="lead">Messages</p>
                             <p className="lead" style={{ fontSize: '300%' }}>
-                                {stats.messages_count}
+                                {belt.commafy(stats.messages_count)}
                             </p>
                             <p>
                                 <a href="/messages">View All</a>

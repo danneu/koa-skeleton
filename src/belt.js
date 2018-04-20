@@ -84,7 +84,8 @@ exports.scrypt = {
     async verifyHash(password, hash) {
         assert(typeof password === 'string')
         assert(Buffer.isBuffer(hash))
-        return scrypt.verifyHash(password, hash.toString('base64'))
+        return scrypt
+            .verifyHash(password, hash.toString('base64'))
             .then(() => true)
             .catch(scrypt.PasswordError, () => false)
     },
@@ -146,4 +147,17 @@ exports.capitalize = (s) => {
 exports.timeago = (() => {
     const instance = timeago()
     return (date) => instance.format(date)
+})()
+
+// Format integer with commas.
+//
+//     commafy(1000) === '1,000'
+//     commafy(1000000) === '1,000,000'
+exports.commafy = (() => {
+    const REGEX = /\B(?=(\d{3})+(?!\d))/g
+
+    return (num) => {
+        assert(Number.isInteger(num))
+        return String(num).replace(REGEX, ',')
+    }
 })()
