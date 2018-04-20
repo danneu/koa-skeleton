@@ -61,19 +61,34 @@ exports.getRecentMessages = async function() {
   `)
 }
 
-exports.getRecentMessagesForUserId = async function(userId) {
+// If hidden is true, then hidden messages are returned as well.
+exports.getRecentMessagesForUserId = async function(
+    userId,
+    { hidden = false } = {}
+) {
+    debug({ hidden })
+    assert(typeof hidden === 'boolean')
     assert(belt.isUuid(userId))
-    return pool.many(sql`
-    SELECT
-      m.*,
-      to_json(u.*) "user"
-    FROM messages m
-    LEFT JOIN users u ON m.user_id = u.id
-    WHERE m.is_hidden = false
-      AND u.id = ${userId}
-    ORDER BY m.id DESC
-    LIMIT 25
-  `)
+
+    const query = sql`
+      SELECT
+        m.*,
+        to_json(u.*) "user"
+      FROM messages m
+      LEFT JOIN users u ON m.user_id = u.id
+      WHERE u.id = ${userId}
+    `
+
+    if (!hidden) {
+        query.append(sql`AND m.is_hidden = false`)
+    }
+
+    query.append(sql`
+      ORDER BY m.id DESC
+      LIMIT 25
+    `)
+
+    return pool.many(query)
 }
 
 // //////////////////////////////////////////////////////////

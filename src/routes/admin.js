@@ -3,6 +3,7 @@ const Router = require('koa-router')
 const debug = require('debug')('app:routes:admin')
 // 1st
 const db = require('../db')
+const loadUser = require('../middleware/load-user-from-param')
 
 // Every route in this router is only accessible to admins
 
@@ -27,13 +28,28 @@ router.get('/admin', async (ctx) => {
 
 // //////////////////////////////////////////////////////////
 
-// Delete hidden messages
+// Delete all hidden messages
 router.del('/admin/messages/hidden', async (ctx) => {
-    await db.admin.deleteHiddenMessages()
+    await db.admin.deleteAllHiddenMessages()
 
     ctx.flash = { message: ['success', 'Deleted hidden messages'] }
     ctx.redirect('back')
 })
+
+// //////////////////////////////////////////////////////////
+
+// Delete user's hidden messages
+router.del(
+    '/admin/users/:uname/messages/hidden',
+    loadUser('uname'),
+    async (ctx) => {
+        const { user } = ctx.state
+        await db.admin.deleteHiddenMessagesByUserId(user.id)
+
+        ctx.flash = { message: ['success', 'Deleted hidden messages'] }
+        ctx.redirect('back')
+    }
+)
 
 // //////////////////////////////////////////////////////////
 

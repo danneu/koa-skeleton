@@ -15,6 +15,7 @@ CREATE TABLE users (
   role           user_role   NOT NULL DEFAULT 'MEMBER',
   digest         bytea       NOT NULL,
   email          citext      NULL,
+  message_count  int         NOT NULL DEFAULT 0,
   last_online_at timestamptz NOT NULL DEFAULT NOW(),
   created_at     timestamptz NOT NULL DEFAULT NOW(),
 
@@ -60,6 +61,24 @@ CREATE TABLE messages (
 
 -- Speed up user_id FK joins
 CREATE INDEX ON messages (user_id);
+
+
+-- On message insert/delete, update user.message_count.
+CREATE OR REPLACE FUNCTION update_user_message_count() RETURNS trigger AS $$
+    BEGIN
+        IF (TG_OP = 'DELETE') THEN
+            UPDATE users SET message_count = message_count - 1 WHERE id = OLD.user_id;
+        ELSIF (TG_OP = 'INSERT') THEN
+            UPDATE users SET message_count = message_count + 1 WHERE id = NEW.user_id;
+        END IF;
+        RETURN NULL; -- result is ignored since this is an AFTER trigger
+    END;
+$$ LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS message_inserted_or_deleted ON messages;
+CREATE TRIGGER message_inserted_or_deleted
+    AFTER INSERT OR DELETE ON messages
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_user_message_count();
 
 ------------------------------------------------------------
 ------------------------------------------------------------

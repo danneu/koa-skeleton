@@ -57,19 +57,35 @@ const UsersShow = ({ ctx, user, messages }) => [
                     <li>
                         Last online <Timeago date={user.last_online_at} />
                     </li>
+                    <li>{belt.commafy(user.message_count)} messages</li>
                 </ul>
             </div>
         </div>
     </div>,
 
     <h2>
+        {cancan.isStaff(ctx.currUser) && (
+            <form
+                className="pull-right"
+                method="POST"
+                action={`/admin/users/${user.uname}/messages/hidden`}
+            >
+                <input type="hidden" name="_method" value="DELETE" />
+                <button type="submit" className="btn btn-default">
+                    <span className="glyphicon glyphicon-trash" /> Clear hidden
+                    messages
+                </button>
+            </form>
+        )}{' '}
         {ctx.currUser && ctx.currUser.id === user.id ? 'Your' : 'Their'} Recent
         Messages
     </h2>,
 
     messages.length === 0
         ? 'No messages'
-        : messages.map(message => <MessagePanel ctx={ctx} message={message} />),
+        : messages.map((message) => (
+              <MessagePanel ctx={ctx} message={message} />
+          )),
 ]
 
 UsersShow.propTypes = {

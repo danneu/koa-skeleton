@@ -6,11 +6,13 @@ const debug = require('debug')('app:routes:index')
 const db = require('../db')
 const pre = require('../presenters')
 const ratelimit = require('../middleware/ratelimit')
+const loadUser = require('../middleware/load-user-from-param')
 const ensureRecaptcha = require('../middleware/ensure-recaptcha')
 const { NODE_ENV } = require('../config')
 const belt = require('../belt')
 const paginate = require('../paginate')
 const cache = require('../cache')
+const cancan = require('../cancan')
 
 //
 // The index.js routes file is mostly a junk drawer for miscellaneous
@@ -19,19 +21,6 @@ const cache = require('../cache')
 //
 
 // MIDDLEWARE
-
-// expects /:uname param in url
-// sets ctx.state.user
-function loadUser() {
-    return async (ctx, next) => {
-        ctx.validateParam('uname')
-        const user = await db.getUserByUname(ctx.vals.uname)
-        ctx.assert(user, 404)
-        pre.presentUser(user)
-        ctx.state.user = user
-        await next()
-    }
-}
 
 // expects /:message_id param in url
 // sets ctx.state.message
@@ -73,7 +62,7 @@ router.get('/', async (ctx) => {
 // Body:
 // - email: Optional String
 // - role: Optional String
-router.put('/users/:uname', loadUser(), async (ctx) => {
+router.put('/users/:uname', loadUser('uname'), async (ctx) => {
     const { user } = ctx.state
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_*', user)
     // VALIDATION
@@ -107,7 +96,7 @@ router.put('/users/:uname', loadUser(), async (ctx) => {
 // //////////////////////////////////////////////////////////
 
 // Edit user page
-router.get('/users/:uname/edit', loadUser(), async (ctx) => {
+router.get('/users/:uname/edit', loadUser('uname'), async (ctx) => {
     const { user } = ctx.state
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_*', user)
     await ctx.render('users-edit', {
@@ -119,9 +108,11 @@ router.get('/users/:uname/edit', loadUser(), async (ctx) => {
 // //////////////////////////////////////////////////////////
 
 // Show user profile
-router.get('/users/:uname', loadUser(), async (ctx) => {
+router.get('/users/:uname', loadUser('uname'), async (ctx) => {
     const { user } = ctx.state
-    const messages = await db.getRecentMessagesForUserId(user.id)
+    const messages = await db.getRecentMessagesForUserId(user.id, {
+        hidden: cancan.isStaff(ctx.currUser),
+    })
     messages.forEach(pre.presentMessage)
     await ctx.render('users-show', {
         user,
@@ -251,7 +242,7 @@ router.put('/messages/:message_id', loadMessage(), async (ctx) => {
 //
 // Body:
 // - role: String
-router.put('/users/:uname/role', loadUser(), async (ctx) => {
+router.put('/users/:uname/role', loadUser('uname'), async (ctx) => {
     const { user } = ctx.state
     // AUTHZ
     ctx.assertAuthorized(ctx.currUser, 'UPDATE_USER_ROLE', user)

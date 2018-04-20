@@ -5,15 +5,17 @@ const assert = require('better-assert')
 module.exports = {
     can,
     isAdmin,
+    isStaff,
 }
 
-// Is `user` an admin?
-//
-// This convenience function exists so that we don't have to first check
-// if `user` is defined before passing it in.
-function isAdmin(user) {
-    if (!user) return false
+// Is user ADMIN.
+function isAdmin(user = {}) {
     return user.role === 'ADMIN'
+}
+
+// Is user ADMIN or MOD
+function isStaff(user = {}) {
+    return ['ADMIN', 'MOD'].includes(user.role)
 }
 
 // Retuns boolean

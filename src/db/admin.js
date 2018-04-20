@@ -1,6 +1,9 @@
+// 3rd
+const assert = require('better-assert')
 // 1st
 const { pool } = require('./util')
 const { sql } = require('pg-extra')
+const belt = require('../belt')
 
 // //////////////////////////////////////////////////////////
 
@@ -16,9 +19,18 @@ exports.getStats = async function() {
 
 // //////////////////////////////////////////////////////////
 
-exports.deleteHiddenMessages = function() {
+exports.deleteAllHiddenMessages = function() {
     return pool.query(sql`
-    DELETE FROM messages
-    WHERE is_hidden = true
-  `)
+      DELETE FROM messages
+      WHERE is_hidden = true
+    `)
+}
+
+exports.deleteHiddenMessagesByUserId = function(userId) {
+    assert(belt.isUuid(userId))
+    return pool.query(sql`
+      DELETE FROM messages
+      WHERE is_hidden = true
+        AND user_id = ${userId}
+    `)
 }
