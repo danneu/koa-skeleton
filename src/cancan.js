@@ -2,11 +2,16 @@
 const debug = require('debug')('app:cancan')
 const assert = require('better-assert')
 
+module.exports = {
+    can,
+    isAdmin,
+}
+
 // Is `user` an admin?
 //
 // This convenience function exists so that we don't have to first check
 // if `user` is defined before passing it in.
-exports.isAdmin = function(user) {
+function isAdmin(user) {
     if (!user) return false
     return user.role === 'ADMIN'
 }
@@ -21,7 +26,7 @@ exports.isAdmin = function(user) {
 //
 //    can(this.currUser, 'READ_TOPIC', topic)
 //    can(this.currUser, 'CREATE_TOPIC')
-exports.can = function(user, action, target) {
+function can(user, action, target) {
     assert(typeof action === 'string')
 
     switch (action) {
@@ -35,8 +40,8 @@ exports.can = function(user, action, target) {
             return false
         case 'UPDATE_USER_*': // target is other user
             return (
-                exports.can(user, 'UPDATE_USER_SETTINGS', target) ||
-                exports.can(user, 'UPDATE_USER_ROLE', target)
+                can(user, 'UPDATE_USER_SETTINGS', target) ||
+                can(user, 'UPDATE_USER_ROLE', target)
             )
         case 'UPDATE_USER_SETTINGS': // target is other user
             assert(target)
@@ -80,8 +85,8 @@ exports.can = function(user, action, target) {
         case 'UPDATE_MESSAGE': // target is message
             assert(target)
             return (
-                exports.can(user, 'UPDATE_MESSAGE_STATE', target) ||
-                exports.can(user, 'UPDATE_MESSAGE_MARKUP', target)
+                can(user, 'UPDATE_MESSAGE_STATE', target) ||
+                can(user, 'UPDATE_MESSAGE_MARKUP', target)
             )
         // Can user change message.is_hidden?
         case 'UPDATE_MESSAGE_STATE': // target is message

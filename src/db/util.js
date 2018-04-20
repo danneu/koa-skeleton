@@ -4,7 +4,7 @@ const pg = extend(require('pg'))
 // 1st
 const { DATABASE_URL } = require('../config')
 
-// This is the connection pool the rest of our db namespace
+// This is the connection pool singleton the rest of our db namespace
 // should import and use
 const pool = new pg.Pool({ connectionString: DATABASE_URL })
 

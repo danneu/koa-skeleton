@@ -1,3 +1,6 @@
+// If request path ends in '/', redirect to path without slash.
+//
+// Avoids dupe-content URLs.
 module.exports = function removeTrailingSlash() {
     return async (ctx, next) => {
         if (ctx.path.length > 1 && ctx.path.endsWith('/')) {

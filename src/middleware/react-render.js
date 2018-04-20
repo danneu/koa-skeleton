@@ -1,6 +1,6 @@
 const makeRender = require('react-template-render')
 
-// Adds ctx.render() method to koa context for rendering our pug templates
+// Adds ctx.render() method to koa context for rendering our .jsx templates
 module.exports = function reactRender(root, opts) {
     return async (ctx, next) => {
         ctx.renderer = makeRender(root, opts)
