@@ -63,20 +63,25 @@ CREATE TABLE messages (
 CREATE INDEX ON messages (user_id);
 
 
--- On message insert/delete, update user.message_count.
+-- Update user.message_count on message insert/delete or when message is toggled
+-- between hidden/unhidden.
 CREATE OR REPLACE FUNCTION update_user_message_count() RETURNS trigger AS $$
     BEGIN
         IF (TG_OP = 'DELETE') THEN
             UPDATE users SET message_count = message_count - 1 WHERE id = OLD.user_id;
         ELSIF (TG_OP = 'INSERT') THEN
             UPDATE users SET message_count = message_count + 1 WHERE id = NEW.user_id;
+        ELSIF (TG_OP = 'UPDATE' AND OLD.is_hidden AND NOT NEW.is_hidden) THEN
+            UPDATE users SET message_count = message_count + 1 WHERE id = NEW.user_id;
+        ELSIF (TG_OP = 'UPDATE' AND NOT OLD.is_hidden AND NEW.is_hidden) THEN
+            UPDATE users SET message_count = message_count - 1 WHERE id = NEW.user_id;
         END IF;
         RETURN NULL; -- result is ignored since this is an AFTER trigger
     END;
 $$ LANGUAGE plpgsql;
-DROP TRIGGER IF EXISTS message_inserted_or_deleted ON messages;
-CREATE TRIGGER message_inserted_or_deleted
-    AFTER INSERT OR DELETE ON messages
+DROP TRIGGER IF EXISTS any_message_action ON messages;
+CREATE TRIGGER any_message_action
+    AFTER INSERT OR DELETE OR UPDATE ON messages
     FOR EACH ROW
     EXECUTE PROCEDURE update_user_message_count();
 

@@ -30,7 +30,7 @@ router.get('/admin', async (ctx) => {
 
 // Delete all hidden messages
 router.del('/admin/messages/hidden', async (ctx) => {
-    await db.admin.deleteAllHiddenMessages()
+    await db.admin.deleteHiddenMessages({ all: true })
 
     ctx.flash = { message: ['success', 'Deleted hidden messages'] }
     ctx.redirect('back')
@@ -44,7 +44,7 @@ router.del(
     loadUser('uname'),
     async (ctx) => {
         const { user } = ctx.state
-        await db.admin.deleteHiddenMessagesByUserId(user.id)
+        await db.admin.deleteHiddenMessages({ userId: user.id })
 
         ctx.flash = { message: ['success', 'Deleted hidden messages'] }
         ctx.redirect('back')

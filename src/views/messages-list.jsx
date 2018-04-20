@@ -3,6 +3,7 @@ const PropTypes = require('prop-types')
 const cancan = require('../cancan')
 const MessagePanel = require('./partials/message-panel')
 const Paginate = require('./partials/paginate')
+const belt = require('../belt')
 
 const MessagesList = ({ ctx, messages, messagesCount, paginator }) => [
     <ol className="breadcrumb">
@@ -26,10 +27,12 @@ const MessagesList = ({ ctx, messages, messagesCount, paginator }) => [
                     </button>
                 </form>
             )}{' '}
-            Messages <small>{messagesCount} total</small>
+            Messages <small>{belt.commafy(messagesCount)} total</small>
         </h1>
         <Paginate paginator={paginator} />
-        {messages.map(message => <MessagePanel ctx={ctx} message={message} />)}
+        {messages.map((message) => (
+            <MessagePanel ctx={ctx} message={message} />
+        ))}
         <Paginate paginator={paginator} />
     </div>,
 ]

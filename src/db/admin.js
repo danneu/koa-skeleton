@@ -19,18 +19,20 @@ exports.getStats = async function() {
 
 // //////////////////////////////////////////////////////////
 
-exports.deleteAllHiddenMessages = function() {
-    return pool.query(sql`
-      DELETE FROM messages
-      WHERE is_hidden = true
-    `)
-}
+// filter must be one of:
+//    - { all: true } -- Delete all hidden messages
+//    - { userId: 'xxx' } -- Only delete user's hidden messages
+exports.deleteHiddenMessages = function(filter) {
+    assert(typeof filter === 'object')
+    assert(filter.all === true || belt.isUuid(filter.userId))
 
-exports.deleteHiddenMessagesByUserId = function(userId) {
-    assert(belt.isUuid(userId))
-    return pool.query(sql`
-      DELETE FROM messages
-      WHERE is_hidden = true
-        AND user_id = ${userId}
-    `)
+    const query = sql`
+    DELETE FROM messages
+    WHERE is_hidden = true
+  `
+    if (filter.userId) {
+        query.append(sql`AND user_id = ${filter.userId}`)
+    }
+
+    return pool.query(query)
 }

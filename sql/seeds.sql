@@ -41,7 +41,7 @@ insert into messages (user_id, markup, ip_address)
       'Message ' || num || ' from ' || (select u.uname from users u where u.id = user_id) end markup,
     rand_inet() ip_address
   from (
-         select generate_series(1, 100000) num,
+         select generate_series(1, 10000) num,
          case when rand_bool() then null
          else rand_user_id() end user_id
   ) tmp
@@ -56,4 +56,4 @@ insert into sessions (user_id, ip_address, expired_at)
     rand_user_id() user_id,
     rand_inet() ip_address,
     now() + '1 year'::interval expired_at
-  from generate_series(1, 100000);
+  from generate_series(1, 10000);
