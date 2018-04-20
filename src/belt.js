@@ -100,14 +100,10 @@ exports.transformMarkup = function(s) {
     )
 }
 
-// String -> String
-exports.toAvatarUrl = function(str) {
-    assert(typeof str === 'string')
-    const md5 = crypto
-        .createHash('md5')
-        .update(str)
-        .digest('hex')
-    return `https://www.gravatar.com/avatar/${md5}?d=monsterid`
+exports.toAvatarUrl = function(uuid) {
+    assert(exports.isUuid(uuid))
+    const hash = uuid.replace(/-/g, '')
+    return `https://www.gravatar.com/avatar/${hash}?d=monsterid`
 }
 
 exports.autolink = function(s) {

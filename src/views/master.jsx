@@ -2,7 +2,7 @@ const React = require('react')
 const PropTypes = require('prop-types')
 
 const Master = ({ children, title, ctx }) => (
-    <html>
+    <html lang="en">
         <head>
             <link
                 href="/vendor/bootstrap-3.3.7/css/bootstrap.min.css"

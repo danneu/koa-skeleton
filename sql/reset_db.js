@@ -35,6 +35,7 @@ async function seed() {
     await (async () => {
         const sql = await slurpSql('seeds.sql')
         console.log('-- Executing seeds.sql...')
+        console.log('   (May take a while. Generating a lot of test data)')
         await pool._query(sql)
     })()
 }

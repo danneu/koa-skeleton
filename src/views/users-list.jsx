@@ -47,7 +47,7 @@ const UserRow = ({ ctx, user }) => (
         <td>
             <a href={user.url}>
                 <img
-                    src={belt.toAvatarUrl(user.uname)}
+                    src={belt.toAvatarUrl(user.id)}
                     alt={`${user.uname} avatar`}
                     height={32}
                     width={32}

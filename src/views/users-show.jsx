@@ -27,7 +27,7 @@ const UsersShow = ({ ctx, user, messages }) => [
                 <a href={user.url}>
                     <img
                         className="media-object thumbnail"
-                        src={belt.toAvatarUrl(user.uname)}
+                        src={belt.toAvatarUrl(user.id)}
                         alt={`${user.uname} avatar`}
                         height={128}
                         width={128}

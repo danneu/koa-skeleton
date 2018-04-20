@@ -21,7 +21,7 @@ const MessagePanel = ({ ctx, message }) => {
                         [
                             <a href={message.user.url}>
                                 <img
-                                    src={belt.toAvatarUrl(message.user.uname)}
+                                    src={belt.toAvatarUrl(message.user.id)}
                                     alt={`${message.user.uname} avatar`}
                                     height={24}
                                     width={24}

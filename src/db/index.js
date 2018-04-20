@@ -28,15 +28,11 @@ exports.getUserBySessionId = async function(sessionId) {
     UPDATE users
     SET last_online_at = NOW()
     WHERE id = (
-      SELECT u.id
-      FROM users u
-      WHERE u.id = (
-        SELECT s.user_id
-        FROM active_sessions s
-        WHERE s.id = ${sessionId}
-      )
+      SELECT s.user_id
+      FROM active_sessions s
+      WHERE s.id = ${sessionId}
     )
-    RETURNING *
+    RETURNING *;
   `)
 }
 
@@ -46,7 +42,7 @@ exports.getUserByUname = async function(uname) {
     return pool.one(sql`
     SELECT *
     FROM users
-    WHERE lower(uname) = lower(${uname})
+    WHERE uname = ${uname}
   `)
 }
 
@@ -66,7 +62,7 @@ exports.getRecentMessages = async function() {
 }
 
 exports.getRecentMessagesForUserId = async function(userId) {
-    assert(Number.isInteger(userId))
+    assert(belt.isUuid(userId))
     return pool.many(sql`
     SELECT
       m.*,
@@ -120,9 +116,10 @@ exports.insertUser = async function(uname, password, email) {
 
 // userAgent is optional string
 exports.insertSession = async function(userId, ipAddress, userAgent, interval) {
-    assert(Number.isInteger(userId))
+    assert(belt.isUuid(userId))
     assert(typeof ipAddress === 'string')
     assert(typeof interval === 'string')
+    assert(typeof userAgent === 'string' || !userAgent)
     return pool.one(sql`
     INSERT INTO sessions (id, user_id, ip_address, user_agent, expired_at)
     VALUES (
@@ -137,18 +134,18 @@ exports.insertSession = async function(userId, ipAddress, userAgent, interval) {
 }
 
 exports.logoutSession = async function(userId, sessionId) {
-    assert(Number.isInteger(userId))
+    assert(belt.isUuid(userId))
     assert(belt.isUuid(sessionId))
     return pool.query(sql`
     UPDATE sessions
-    SET logged_out_at = NOW()
+    SET revoked_at = NOW()
     WHERE user_id = ${userId}
       AND id = ${sessionId}
   `)
 }
 
 exports.hideMessage = async function(messageId) {
-    assert(messageId)
+    assert(belt.isUuid(messageId))
     return pool.query(sql`
     UPDATE messages
     SET is_hidden = true
@@ -157,7 +154,7 @@ exports.hideMessage = async function(messageId) {
 }
 
 exports.getMessageById = async function(messageId) {
-    assert(messageId)
+    assert(belt.isUuid(messageId))
     return pool.one(sql`
     SELECT *
     FROM messages
@@ -168,7 +165,7 @@ exports.getMessageById = async function(messageId) {
 // //////////////////////////////////////////////////////////
 
 exports.updateUser = async function(userId, fields) {
-    assert(Number.isInteger(userId))
+    assert(belt.isUuid(userId))
     const WHITELIST = ['email', 'role']
     assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1))
     const string = knex('users')
@@ -182,7 +179,7 @@ exports.updateUser = async function(userId, fields) {
 // //////////////////////////////////////////////////////////
 
 exports.updateMessage = async function(messageId, fields) {
-    assert(Number.isInteger(messageId))
+    assert(belt.isUuid(messageId))
     const WHITELIST = ['is_hidden', 'markup']
     assert(Object.keys(fields).every((key) => WHITELIST.indexOf(key) > -1))
     const string = knex('messages')
