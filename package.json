@@ -2,7 +2,7 @@
     "name": "koa-skeleton",
     "private": true,
     "description": "a simple, full-featured koa application",
-    "version": "4.0.0",
+    "version": "4.1.0",
     "repository": {
         "type": "git",
         "url": "https://github.com/danneu/koa-skeleton"
