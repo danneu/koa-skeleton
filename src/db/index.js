@@ -250,7 +250,6 @@ exports.getUsersCount = async function() {
 
 // //////////////////////////////////////////////////////////
 
-// TODO: user.messages_count counter cache
 // TODO: idx for is_hidden
 exports.getUsers = async function(page) {
     page = page || 1
@@ -259,15 +258,9 @@ exports.getUsers = async function(page) {
     const offset = (page - 1) * perPage
     const limit = perPage
     return pool.many(sql`
-    SELECT
-      u.*,
-      (
-        SELECT COUNT(*)
-        FROM messages
-        WHERE user_id = u.id AND is_hidden = false
-      ) AS messages_count
-    FROM users u
-    ORDER BY u.id DESC
+    SELECT *
+    FROM users
+    ORDER BY id DESC
     OFFSET ${offset}
     LIMIT ${limit}
   `)

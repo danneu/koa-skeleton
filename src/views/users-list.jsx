@@ -60,7 +60,7 @@ const UserRow = ({ ctx, user }) => (
             <td>{user.email ? <code>{user.email}</code> : '--'}</td>
         )}
         {/* Messages */}
-        <td>{user.messages_count}</td>
+        <td>{user.message_count}</td>
         {/* Joined */}
         <td>
             <Timeago date={user.created_at} />
