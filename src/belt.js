@@ -1,8 +1,7 @@
 // Node
 const crypto = require('crypto')
 // 3rd
-const Promise = require('bluebird')
-const scrypt = require('scrypt-for-humans')
+const scrypt = require('scrypt')
 const escapeHtml = require('escape-html')
 const assert = require('better-assert')
 const debug = require('debug')('app:belt')
@@ -76,26 +75,19 @@ exports.slugify = (() => {
 
 // //////////////////////////////////////////////////////////
 
-// scrypt-for-humans takes and returns base64 strings.
-// Instead, our wrapper just keeps it in byte array (Buffer) form
-// since that's how it enters/exits the database.
 exports.scrypt = {
     // Returns Promise<bool>
     async verifyHash(password, hash) {
         assert(typeof password === 'string')
         assert(Buffer.isBuffer(hash))
-        return scrypt
-            .verifyHash(password, hash.toString('base64'))
-            .then(() => true)
-            .catch(scrypt.PasswordError, () => false)
+        return scrypt.verifyKdf(hash, password)
     },
 
     // Returns Promise<Buffer>
     async hash(password) {
         assert(typeof password === 'string')
-        return scrypt
-            .hash(password)
-            .then((base64) => Buffer.from(base64, 'base64'))
+        // Hashing should take 0.1 seconds
+        return scrypt.params(0.1).then((params) => scrypt.kdf(password, params))
     },
 }
 
