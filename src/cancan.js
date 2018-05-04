@@ -8,13 +8,12 @@ module.exports = {
     isStaff,
 }
 
-// Is user ADMIN.
-function isAdmin(user = {}) {
-    return user.role === 'ADMIN'
+function isAdmin(user) {
+    return user && user.role === 'ADMIN'
 }
 
-// Is user ADMIN or MOD
-function isStaff(user = {}) {
+function isStaff(user) {
+    if (!user) return false
     return ['ADMIN', 'MOD'].includes(user.role)
 }
 
