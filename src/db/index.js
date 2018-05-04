@@ -56,7 +56,7 @@ exports.getRecentMessages = async function() {
     FROM messages m
     LEFT JOIN users u ON m.user_id = u.id
     WHERE m.is_hidden = false
-    ORDER BY m.id DESC
+    ORDER BY m.created_at DESC
     LIMIT 25
   `)
 }
@@ -84,7 +84,7 @@ exports.getRecentMessagesForUserId = async function(
     }
 
     query.append(sql`
-      ORDER BY m.id DESC
+      ORDER BY m.created_at DESC
       LIMIT 25
     `)
 
@@ -219,7 +219,7 @@ exports.getMessages = async function(page) {
       to_json(u.*) AS "user"
     FROM messages m
     LEFT OUTER JOIN users u ON m.user_id = u.id
-    ORDER BY m.id DESC
+    ORDER BY m.created_at DESC
     OFFSET ${offset}
     LIMIT ${limit}
   `)
@@ -260,7 +260,7 @@ exports.getUsers = async function(page) {
     return pool.many(sql`
     SELECT *
     FROM users
-    ORDER BY id DESC
+    ORDER BY created_at DESC
     OFFSET ${offset}
     LIMIT ${limit}
   `)
