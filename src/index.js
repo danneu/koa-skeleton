@@ -17,7 +17,6 @@ const bodyParser = require('koa-bodyparser')
 const bouncer = require('koa-bouncer')
 // 1st party
 const { PORT, TRUST_PROXY } = require('./config')
-const belt = require('./belt')
 const cancan = require('./cancan')
 
 // //////////////////////////////////////////////////////////
