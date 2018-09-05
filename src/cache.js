@@ -13,6 +13,7 @@ const db = require('./db')
 
 // //////////////////////////////////////////////////////////
 
-module.exports = new IntervalCache({ throwIfKeyNotFound: true })
-  .every('messages-count', { mins: 1 }, db.getMessagesCount, 0)
-  .every('users-count', { mins: 1 }, db.getUsersCount, 0)
+module.exports = new IntervalCache()
+    .every('messages-count', 1000 * 60, db.getMessagesCount, 0)
+    .every('users-count', 1000 * 60, db.getUsersCount, 0)
+    .start()

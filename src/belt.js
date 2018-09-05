@@ -1,152 +1,155 @@
 // Node
 const crypto = require('crypto')
 // 3rd
-const bcrypt = require('bcryptjs')
+const scrypt = require('scrypt')
+const escapeHtml = require('escape-html')
 const assert = require('better-assert')
 const debug = require('debug')('app:belt')
 const Autolinker = require('autolinker')
+const timeago = require('timeago.js')
 
 // A dumping ground of common functions used around the app.
 // As it gets full, consider extracting similar functions into
 // separate modules to stay organized.
 
 // Ex: formatDate(d) -> '8 Dec 2014 16:24'
-exports.formatDate = function (d) {
-  assert(d instanceof Date)
-  const months = ['Jan', 'Feb', 'Mar', 'Apr',
-    'May', 'Jun', 'Jul', 'Aug',
-    'Sep', 'Oct', 'Nov', 'Dec']
-  const mins = d.getMinutes()
-  // Pad mins to format "XX". e.g. 8 -> "08", 10 -> "10"
-  const paddedMins = mins < 10 ? '0' + mins : mins
-  return [
-    d.getDate(),
-    months[d.getMonth()],
-    d.getFullYear(),
-    d.getHours() + ':' + paddedMins
-  ].join(' ')
+exports.formatDate = function(d) {
+    assert(d instanceof Date)
+    const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+    ]
+    const mins = d.getMinutes()
+    // Pad mins to format "XX". e.g. 8 -> "08", 10 -> "10"
+    const paddedMins = mins < 10 ? '0' + mins : mins
+    return [
+        d.getDate(),
+        months[d.getMonth()],
+        d.getFullYear(),
+        d.getHours() + ':' + paddedMins,
+    ].join(' ')
 }
 
 // String -> Bool
-exports.isValidUuid = (function () {
-  const re = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
-  return function (uuid) {
-    return re.test(uuid)
-  }
+exports.isUuid = (() => {
+    const UUID_REGEX = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
+    return (uuid) => UUID_REGEX.test(uuid)
 })()
 
-exports.slugify = function (...xs) {
-  const MAX_SLUG_LENGTH = 80
-  // Slugifies one string
-  function slugifyString (x) {
-    return x.toString()
-      .trim()
-      // Remove apostrophes
-      .replace(/'/g, '')
-      // Hyphenize anything that's not alphanumeric, hyphens, or spaces
-      .replace(/[^a-z0-9- ]/ig, '-')
-      // Replace spaces with hyphens
-      .replace(/ /g, '-')
-      // Consolidate consecutive hyphens
-      .replace(/-{2,}/g, '-')
-      // Remove prefix and suffix hyphens
-      .replace(/^[-]+|[-]+$/, '')
-      .toLowerCase()
-  }
-  return slugifyString(
-    xs.map(x => x.toString())
-      .join('-')
-      .slice(0, MAX_SLUG_LENGTH)
-  )
-}
+exports.slugify = (() => {
+    const MAX_SLUG_LENGTH = 80
+
+    const slugifyString = (x) =>
+        String(x)
+            .trim()
+            // Remove apostrophes
+            .replace(/'/g, '')
+            // Hyphenize anything that's not alphanumeric, hyphens, or spaces
+            .replace(/[^a-z0-9- ]/gi, '-')
+            // Replace spaces with hyphens
+            .replace(/ /g, '-')
+            // Consolidate consecutive hyphens
+            .replace(/-{2,}/g, '-')
+            // Remove prefix and suffix hyphens
+            .replace(/^[-]+|[-]+$/, '')
+            .toLowerCase()
+
+    return (...xs) =>
+        slugifyString(
+            xs
+                .map(String)
+                .join('-')
+                .slice(0, MAX_SLUG_LENGTH)
+        )
+})()
 
 // //////////////////////////////////////////////////////////
 
-// Returns hashed password value to be used in `users.digest` column
-// String -> String
-exports.hashPassword = function (password) {
-  return new Promise(function (resolve, reject) {
-    bcrypt.hash(password, 4, function (err, hash) {
-      if (err) return reject(err)
-      resolve(hash)
-    })
-  })
-}
+exports.scrypt = {
+    // Returns Promise<bool>
+    async verifyHash(password, hash) {
+        assert(typeof password === 'string')
+        assert(Buffer.isBuffer(hash))
+        return scrypt.verifyKdf(hash, password)
+    },
 
-// Compares password plaintext against bcrypted digest
-// String, String -> Bool
-exports.checkPassword = function (password, digest) {
-  return new Promise(function (resolve, reject) {
-    bcrypt.compare(password, digest, function (err, result) {
-      if (err) return reject(err)
-      resolve(result)
-    })
-  })
-}
-
-// //////////////////////////////////////////////////////////
-
-// Quickly generate Date objects in the future.
-//
-//    futureDate({ days: 4 })            -> Date
-//    futureDate(someDate, { years: 2 }) -> Date
-exports.futureDate = function (nowDate, opts) {
-  if (!opts) {
-    opts = nowDate
-    nowDate = new Date()
-  }
-  return new Date(nowDate.getTime() +
-    (opts.years || 0) * 1000 * 60 * 60 * 24 * 365 +
-    (opts.days || 0) * 1000 * 60 * 60 * 24 +
-    (opts.hours || 0) * 1000 * 60 * 60 +
-    (opts.minutes || 0) * 1000 * 60 +
-    (opts.seconds || 0) * 1000 +
-    (opts.milliseconds || 0))
-}
-
-exports.nl2br = function (s) {
-  // FIXME: nunjucks escape filter returns { val: String, length: Int }
-  // object. Must've changed recently?
-  if (s.val) s = s.val
-  assert(typeof s === 'string')
-  return s.replace(/\n/g, '<br>')
-}
-
-// Used for parsing form params so that a "true" string is parsed to `true`
-// and everything is parsed to `false`.
-exports.parseBoolean = function (s) {
-  return s === 'true'
+    // Returns Promise<Buffer>
+    async hash(password) {
+        assert(typeof password === 'string')
+        // Hashing should take 0.1 seconds
+        return scrypt.params(0.1).then((params) => scrypt.kdf(password, params))
+    },
 }
 
 // Used to lightly process user-submitted message markup before
 // saving to database.
-exports.transformMarkup = function (s) {
-  assert(typeof s === 'string')
-  return s
-    // Normalize \r\n into \n
-    .replace(/\r\n/g, '\n')
-    // FIXME: Unrobust way to collapse consecutive newlines
-    .replace(/\n{3,}/g, '\n\n')
+exports.transformMarkup = function(s) {
+    assert(typeof s === 'string')
+    return (
+        s
+            // Normalize \r\n into \n
+            .replace(/\r\n/g, '\n')
+            // FIXME: Unrobust way to collapse consecutive newlines
+            .replace(/\n{3,}/g, '\n\n')
+    )
 }
 
-// String -> String (MD5 hex)
-exports.md5 = function (str) {
-  assert(typeof str === 'string')
-  return crypto.createHash('md5').update(str).digest('hex')
+exports.toAvatarUrl = function(uuid) {
+    assert(exports.isUuid(uuid))
+    const hash = uuid.replace(/-/g, '')
+    return `https://www.gravatar.com/avatar/${hash}?d=monsterid`
 }
 
-// String -> String
-exports.toAvatarUrl = function (str) {
-  assert(typeof str === 'string')
-  const hash = exports.md5(str)
-  return `https://www.gravatar.com/avatar/${hash}?d=monsterid`
+exports.autolink = function(s) {
+    assert(typeof s === 'string')
+    return Autolinker.link(s, {
+        email: false,
+        phone: false,
+        twitter: false,
+    })
 }
 
-exports.autolink = function (s) {
-  assert(typeof s === 'string')
-  return Autolinker.link(s, {
-    email: false,
-    phone: false,
-    twitter: false
-  })
+exports.markupToHtml = (() => {
+    // Turns all \n into <br>
+    const nl2br = (s) => {
+        assert(typeof s === 'string')
+        return s.replace(/\n/g, '<br>')
+    }
+    return (markup) => {
+        assert(typeof markup === 'string')
+        return exports.autolink(nl2br(escapeHtml(markup)))
+    }
+})()
+
+exports.capitalize = (s) => {
+    assert(typeof s === 'string')
+    return s[0] + s.slice(1).toLowerCase()
 }
+
+exports.timeago = (() => {
+    const instance = timeago()
+    return (date) => instance.format(date)
+})()
+
+// Format integer with commas.
+//
+//     commafy(1000) === '1,000'
+//     commafy(1000000) === '1,000,000'
+exports.commafy = (() => {
+    const REGEX = /\B(?=(\d{3})+(?!\d))/g
+
+    return (num) => {
+        assert(Number.isInteger(num))
+        return String(num).replace(REGEX, ',')
+    }
+})()

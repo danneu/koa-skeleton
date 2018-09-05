@@ -1,10 +1,17 @@
 {
-  "extends": "standard",
-  "rules": {
-    "no-unused-vars": [2, {
-      "varsIgnorePattern": "^debug$|^assert$|^_$",
-      "argsIgnorePattern": "^_$"
-    }],
-    "no-multiple-empty-lines": [2, { "max": 2 }]
-  }
+    "extends": ["eslint:recommended", "react-app"],
+    "parserOptions": {
+        "ecmaVersion": 8,
+        "ecmaFeatures": {
+            "experimentalObjectRestSpread": true
+        }
+    },
+    "plugins": ["react"],
+    "env": {
+        "es6": true,
+        "node": true
+    },
+    "rules": {
+        "no-console": ["error", { "allow": ["log", "warn", "error"] }]
+    }
 }

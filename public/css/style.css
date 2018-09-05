@@ -1,4 +1,3 @@
-
 /*
 
     Put general styles and Bootstrap overrides here
@@ -6,8 +5,8 @@
 */
 
 body {
-  font-size: 16px; /* Bootstrap default is 14px, too small */
-  padding-bottom: 10px;
+    font-size: 16px; /* Bootstrap default is 14px, too small */
+    padding-bottom: 10px;
 }
 
 /* Centers the generated Recaptcha iframe within its container */
@@ -17,6 +16,30 @@ body {
 }
 
 .footer {
-  font-size: 75%;
-  margin-top: 200px; /* Provide a scroll gutter between content */
+    font-size: 75%;
+    margin-top: 200px; /* Provide a scroll gutter between content */
+}
+
+/* Pagination */
+
+.paginator {
+    text-align: center;
+}
+
+.pagination > li > span {
+    color: #777;
+    border-top: 0;
+    border-bottom: 0;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+.pagination > li > span:hover {
+    color: #777;
+    background-color: transparent;
+}
+
+abbr[data-original-title],
+abbr[title] {
+    /* Bootstrap gives abbr's an extraneous underline */
+    border: 0;
 }

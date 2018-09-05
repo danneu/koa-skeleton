@@ -1,46 +1,64 @@
 {
-  "name": "koa-skeleton",
-  "description": "a simple, full-featured koa application made to be forked and modified",
-  "version": "3.0.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/danneu/koa-skeleton"
-  },
-  "scripts": {
-    "start": "node app.js",
-    "start-dev": "nodemon --ext js,html app.js",
-    "reset-db": "node ./sql/reset_db",
-    "lint": "./node_modules/.bin/standard 'src/**.js' 'sql/**.js' 'test/**.js'",
-    "deploy": "git push heroku master"
-  },
-  "engines": {
-    "node": "7.x"
-  },
-  "dependencies": {
-    "autolinker": "^1.4.3",
-    "bcryptjs": "2.4.3",
-    "better-assert": "1.0.2",
-    "debug": "^2.6.4",
-    "dotenv": "^4.0.0",
-    "interval-cache": "0.0.1",
-    "knex": "^0.12.9",
-    "koa": "^2.2.0",
-    "koa-better-static": "^1.0.5",
-    "koa-body": "^1.6.0",
-    "koa-bouncer": "^6.0.0",
-    "koa-compress": "^2.0.0",
-    "koa-convert": "^1.2.0",
-    "koa-helmet": "^3.1.0",
-    "koa-logger": "^2.0.1",
-    "koa-nunjucks-render": "^1.2.0",
-    "koa-router": "^7.1.1",
-    "pg": "^6.1.5",
-    "pg-extra": "0.0.13",
-    "recaptcha-validator": "^1.0.11",
-    "uuid": "^3.0.1"
-  },
-  "devDependencies": {
-    "standard": "^10.0.2"
-  },
-  "license": "MIT"
+    "name": "koa-skeleton",
+    "private": true,
+    "description": "a simple, full-featured koa application",
+    "version": "4.1.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/danneu/koa-skeleton"
+    },
+    "scripts": {
+        "start": "node app.js",
+        "start-dev": "nodemon --ext js,jsx,html app.js",
+        "reset-db": "node ./sql/reset_db",
+        "deploy": "git push heroku master",
+        "prettier": "prettier --write \"{src,sql,test}/**/*.js\"",
+        "lint": "eslint src",
+        "patch": "npm version patch",
+        "minor": "npm version minor",
+        "major": "npm version major",
+        "postpublish": "git push origin master --follow-tags"
+    },
+    "prettier": {
+        "semi": false,
+        "singleQuote": true,
+        "trailingComma": "es5",
+        "tabWidth": 4,
+        "arrowParens": "always"
+    },
+    "engines": {
+        "node": ">=9.x"
+    },
+    "dependencies": {
+        "autolinker": "^1.6.2",
+        "babel-preset-react": "^6.24.1",
+        "babel-register": "^6.26.0",
+        "better-assert": "1.0.2",
+        "debug": "^3.1.0",
+        "dotenv": "^6.0.0",
+        "escape-html": "^1.0.3",
+        "interval-cache": "^1.0.0",
+        "knex": "^0.15.0",
+        "koa": "^2.5.0",
+        "koa-better-static2": "^1.0.2",
+        "koa-bodyparser": "^4.2.0",
+        "koa-bouncer": "^6.0.4",
+        "koa-compress": "^3.0.0",
+        "koa-helmet": "^4.0.0",
+        "koa-logger": "^3.2.0",
+        "koa-router": "^7.4.0",
+        "pg": "^7.4.1",
+        "pg-extra": "^2.0.0",
+        "prop-types": "^15.6.1",
+        "react": "^16.3.1",
+        "react-template-render": "^1.1.0",
+        "recaptcha-validator": "^2.0.0",
+        "scrypt": "^6.0.3",
+        "timeago.js": "^3.0.2",
+        "uuid": "^3.2.1"
+    },
+    "devDependencies": {
+        "prettier": "^1.12.0"
+    },
+    "license": "MIT"
 }

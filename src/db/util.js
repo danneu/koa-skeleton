@@ -1,13 +1,13 @@
 // 3rd
-const {extend, parseUrl} = require('pg-extra')
+const { extend } = require('pg-extra')
 const pg = extend(require('pg'))
 // 1st
-const config = require('../config')
+const { DATABASE_URL } = require('../config')
 
-// =========================================================
-
-// This is the connection pool the rest of our db namespace
+// This is the connection pool singleton the rest of our db namespace
 // should import and use
-const pool = new pg.Pool(parseUrl(config.DATABASE_URL))
+const pool = new pg.extra.Pool({ connectionString: DATABASE_URL })
 
-module.exports = {pool}
+const getClient = () => new pg.extra.Client({ connectionString: DATABASE_URL })
+
+module.exports = { pool, getClient }
